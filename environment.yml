@@ -1,0 +1,7 @@
+name: offline-map
+dependencies:
+  - python=3
+  - pip
+  - pip:
+    - fastapi
+    - uvicorn
