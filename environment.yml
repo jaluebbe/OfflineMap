@@ -1,6 +1,6 @@
 name: offline-map
 dependencies:
-  - python=3
+  - python>=3.7
   - pip
   - pip:
     - fastapi
