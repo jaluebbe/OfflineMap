@@ -24,11 +24,11 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "https://api.maptiler.com/tiles/v3/tiles.json?key={key}"
+      "url": "../api/vector/metadata/osm_offline.json"
     }
   },
-  "sprite": "https://openmaptiles.github.io/osm-bright-gl-style/sprite",
-  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key={key}",
+  "sprite": "http://localhost/static/sprites/osm_bright",
+  "glyphs": "../fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
@@ -356,7 +356,7 @@
       "metadata": {"mapbox:group": "1444849382550.77"},
       "source": "openmaptiles",
       "source-layer": "landcover",
-      "filter": ["all", ["==", "class", "sand"]],
+      "filter": ["==", "class", "sand"],
       "layout": {"visibility": "visible"},
       "paint": {"fill-color": "rgba(245, 238, 188, 1)", "fill-opacity": 1}
     },
@@ -397,7 +397,7 @@
         "text-font": ["KlokanTech Noto Sans Regular"],
         "text-size": 10
       },
-      "paint": {"text-color": "rgba(212, 177, 146, 1)"}
+      "paint": {"text-color": "#666"}
     },
     {
       "id": "tunnel-service-track-casing",
@@ -544,6 +544,52 @@
       }
     },
     {
+      "id": "tunnel-path-steps-casing",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["==", "brunnel", "tunnel"],
+        ["==", "class", "path"],
+        ["==", "subclass", "steps"]
+      ],
+      "layout": {"line-cap": "butt", "line-join": "round"},
+      "paint": {
+        "line-color": "#cfcdca",
+        "line-opacity": {"stops": [[12, 0], [12.5, 1]]},
+        "line-width": {
+          "base": 1.2,
+          "stops": [[12, 0.5], [13, 1], [14, 2], [20, 9.25]]
+        },
+        "line-dasharray": [0.5, 0.25]
+      }
+    },
+    {
+      "id": "tunnel-path-steps",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["==", "brunnel", "tunnel"],
+        ["==", "class", "path"],
+        ["==", "subclass", "steps"]
+      ],
+      "layout": {"line-join": "bevel", "line-cap": "butt"},
+      "paint": {
+        "line-color": "#fff",
+        "line-opacity": 1,
+        "line-width": {
+          "base": 1.2,
+          "stops": [[13.5, 0], [14, 1.25], [20, 5.75]]
+        },
+        "line-dasharray": [0.5, 0.25]
+      }
+    },
+    {
       "id": "tunnel-path",
       "type": "line",
       "metadata": {"mapbox:group": "1444849354174.1904"},
@@ -553,7 +599,8 @@
         "all",
         ["==", "$type", "LineString"],
         ["==", "brunnel", "tunnel"],
-        ["==", "class", "path"]
+        ["==", "class", "path"],
+        ["!=", "subclass", "steps"]
       ],
       "paint": {
         "line-color": "#cba",
@@ -855,6 +902,28 @@
       }
     },
     {
+      "id": "highway-path-steps-casing",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["!in", "brunnel", "bridge", "tunnel"],
+        ["==", "class", "path"],
+        ["in", "subclass", "steps"]
+      ],
+      "layout": {"line-cap": "butt", "line-join": "round"},
+      "paint": {
+        "line-color": "#cfcdca",
+        "line-opacity": {"stops": [[12, 0], [12.5, 1]]},
+        "line-width": {
+          "base": 1.2,
+          "stops": [[12, 0.5], [13, 1], [14, 2], [20, 9.25]]
+        }
+      }
+    },
+    {
       "id": "highway-motorway-link-casing",
       "type": "line",
       "metadata": {"mapbox:group": "1444849345966.4436"},
@@ -1040,12 +1109,36 @@
         "all",
         ["==", "$type", "LineString"],
         ["!in", "brunnel", "bridge", "tunnel"],
-        ["==", "class", "path"]
+        ["==", "class", "path"],
+        ["!=", "subclass", "steps"]
       ],
       "paint": {
         "line-color": "#cba",
         "line-dasharray": [1.5, 0.75],
         "line-width": {"base": 1.2, "stops": [[15, 1.2], [20, 4]]}
+      }
+    },
+    {
+      "id": "highway-path-steps",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["!in", "brunnel", "bridge", "tunnel"],
+        ["==", "class", "path"],
+        ["==", "subclass", "steps"]
+      ],
+      "layout": {"line-join": "bevel", "line-cap": "butt"},
+      "paint": {
+        "line-color": "#fff",
+        "line-opacity": 1,
+        "line-width": {
+          "base": 1.2,
+          "stops": [[13.5, 0], [14, 1.25], [20, 5.75]]
+        },
+        "line-dasharray": [0.5, 0.25]
       }
     },
     {
@@ -1460,8 +1553,31 @@
         ["==", "class", "path"]
       ],
       "paint": {
-        "line-color": "#f8f4f0",
+        "line-color": "#cfcdca",
         "line-width": {"base": 1.2, "stops": [[15, 1.2], [20, 18]]}
+      }
+    },
+    {
+      "id": "bridge-path-steps",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["==", "brunnel", "bridge"],
+        ["==", "class", "path"],
+        ["==", "subclass", "steps"]
+      ],
+      "layout": {"line-join": "round", "line-cap": "butt"},
+      "paint": {
+        "line-color": "#fff",
+        "line-opacity": 1,
+        "line-width": {
+          "base": 1.2,
+          "stops": [[13.5, 0], [14, 1.25], [20, 5.75]]
+        },
+        "line-dasharray": [0.5, 0.25]
       }
     },
     {
@@ -1474,7 +1590,8 @@
         "all",
         ["==", "$type", "LineString"],
         ["==", "brunnel", "bridge"],
-        ["==", "class", "path"]
+        ["==", "class", "path"],
+        ["!=", "subclass", "steps"]
       ],
       "paint": {
         "line-color": "#cba",
