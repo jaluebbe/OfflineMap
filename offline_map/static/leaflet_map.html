@@ -34,7 +34,7 @@
 </body>
 <script>
     var map = L.map('map', {
-        minZoom: 6,
+        minZoom: 0,
         maxZoom: 20
     });
     map.attributionControl.addAttribution('<a href="https://github.com/jaluebbe/OfflineMap">Source on GitHub</a>');
@@ -66,8 +66,7 @@
     addOSMVectorLayer("osm_positron", "germany", "OSM Positron");
     map.setView([49.87, 8.65], 14);
     L.marker([49.8743, 8.6575]).addTo(map)
-        .bindPopup('<b><a href="https://2025.pycon.de/" target="_blank">PyCon DE & PyData 2025</a></b><br>Darmstadtium<br>23. April - 25. April 2025')
-        .openPopup();
+        .bindPopup('<b><a href="https://2025.pycon.de/" target="_blank">PyCon DE & PyData 2025</a></b><br>Darmstadtium<br>23. April - 25. April 2025');
 </script>
 
 </html>

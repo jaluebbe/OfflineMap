@@ -6,18 +6,30 @@ from pathlib import Path
 router = APIRouter()
 
 osm_path = Path("..")
+natural_earth_vector_path = Path("natural_earth_vector.mbtiles")
+natural_earth_shaded_relief_path = Path("natural_earth_2_shaded_relief.mbtiles")
+
+
+def get_db_connection(db_file_name: Path):
+    if not db_file_name.is_file():
+        raise HTTPException(
+            status_code=404, detail=f"File '{db_file_name}' not found."
+        )
+    return sqlite3.connect(f"file:{db_file_name}?mode=ro", uri=True)
+
+
+def fetch_tile_data(db_connection, zoom_level, tile_column, tile_row):
+    cursor = db_connection.execute(
+        "SELECT tile_data FROM tiles WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
+        (zoom_level, tile_column, tile_row),
+    )
+    return cursor.fetchone()
 
 
 @router.get("/api/vector/metadata/{region}.json")
 def get_vector_metadata(region: str, request: Request):
     db_file_name = osm_path / f"{region}.mbtiles"
-    if not db_file_name.is_file():
-        raise HTTPException(
-            status_code=404, detail=f"Region '{region}' not found."
-        )
-    with sqlite3.connect(
-        f"file:{db_file_name}?mode=ro", uri=True
-    ) as db_connection:
+    with get_db_connection(db_file_name) as db_connection:
         cursor = db_connection.execute("SELECT * FROM metadata")
         result = cursor.fetchall()
     if result is None:
@@ -40,7 +52,8 @@ def get_vector_metadata(region: str, request: Request):
         elif key == "center":
             continue
         elif key == "bounds":
-            metadata[key] = [float(_value) for _value in value.split(",")]
+            continue
+            # metadata[key] = [float(_value) for _value in value.split(",")]
         else:
             metadata[key] = value
     return metadata
@@ -51,19 +64,15 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
     db_file_name = osm_path / f"{region}.mbtiles"
-    if not db_file_name.is_file():
-        raise HTTPException(
-            status_code=404, detail=f"Region '{region}' not found."
+    with get_db_connection(db_file_name) as db_connection:
+        result = fetch_tile_data(
+            db_connection, zoom_level, tile_column, tile_row
         )
-    with sqlite3.connect(
-        f"file:{db_file_name}?mode=ro", uri=True
-    ) as db_connection:
-        cursor = db_connection.execute(
-            "SELECT tile_data FROM tiles "
-            "WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
-            (zoom_level, tile_column, tile_row),
-        )
-        result = cursor.fetchone()
+    if result is None and zoom_level <= 7:
+        with get_db_connection(natural_earth_vector_path) as db_connection:
+            result = fetch_tile_data(
+                db_connection, zoom_level, tile_column, tile_row
+            )
     if result is None:
         raise HTTPException(status_code=404, detail="Tile not found.")
     return Response(
@@ -106,16 +115,10 @@ def get_vector_style(region: str, style_name: str, request: Request):
 def get_raster_natural_earth_2_shaded_relief(zoom_level: int, x: int, y: int):
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
-    db_file_name = f"natural_earth_2_shaded_relief.mbtiles"
-    with sqlite3.connect(
-        f"file:{db_file_name}?mode=ro", uri=True
-    ) as db_connection:
-        cursor = db_connection.execute(
-            "SELECT tile_data FROM tiles "
-            "WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
-            (zoom_level, tile_column, tile_row),
+    with get_db_connection(natural_earth_shaded_relief_path) as db_connection:
+        result = fetch_tile_data(
+            db_connection, zoom_level, tile_column, tile_row
         )
-        result = cursor.fetchone()
     if result is None:
         raise HTTPException(status_code=404, detail="Tile not found.")
     return Response(content=result[0], media_type="image/webp")
