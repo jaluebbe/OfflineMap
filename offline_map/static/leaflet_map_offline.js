@@ -1,0 +1,48 @@
+var map = L.map('map', {
+    minZoom: 0,
+    maxZoom: 20
+});
+map.attributionControl.addAttribution('<a href="https://github.com/jaluebbe/OfflineMap">Source on GitHub</a>');
+// add link to an imprint and a privacy statement if the file is available.
+function addPrivacyStatement() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('HEAD', "/static/datenschutz.html");
+    xhr.onload = function() {
+        if (xhr.status === 200)
+            map.attributionControl.addAttribution(
+                '<a href="/static/datenschutz.html" target="_blank">Impressum & Datenschutzerkl&auml;rung</a>'
+            );
+    }
+    xhr.send();
+}
+addPrivacyStatement();
+
+function addOSMVectorLayer(styleName, region, layerLabel) {
+    let myLayer = L.maplibreGL({
+        style: '../api/vector/style/' + region + '/' + styleName + '.json',
+        attribution: '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    });
+    layerControl.addBaseLayer(myLayer, layerLabel);
+    // make sure to reprint the vector map after being selected.
+    map.on('baselayerchange', function(eo) {
+        if (eo.name === layerLabel) {
+            myLayer._update();
+        }
+    });
+    return myLayer;
+};
+
+L.control.scale({
+    'imperial': false
+}).addTo(map);
+var baseLayers = {};
+var other_layers = {};
+var layerControl = L.control.layers(baseLayers, other_layers, {
+    collapsed: L.Browser.mobile, // hide on mobile devices
+    position: 'topright'
+}).addTo(map);
+addOSMVectorLayer("osm_basic", "germany", "OSM Basic").addTo(map);
+addOSMVectorLayer("osm_bright", "germany", "OSM Bright");
+addOSMVectorLayer("osm_liberty", "germany", "OSM Liberty");
+addOSMVectorLayer("osm_positron", "germany", "OSM Positron");
+map.setView([49.87, 8.65], 14);
