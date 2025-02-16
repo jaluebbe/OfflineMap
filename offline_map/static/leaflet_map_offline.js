@@ -41,8 +41,9 @@ var layerControl = L.control.layers(baseLayers, other_layers, {
     collapsed: L.Browser.mobile, // hide on mobile devices
     position: 'topright'
 }).addTo(map);
-addOSMVectorLayer("osm_basic", "germany", "OSM Basic").addTo(map);
-addOSMVectorLayer("osm_bright", "germany", "OSM Bright");
-addOSMVectorLayer("osm_liberty", "germany", "OSM Liberty");
-addOSMVectorLayer("osm_positron", "germany", "OSM Positron");
+const mapRegion = "germany";
+addOSMVectorLayer("osm_basic", mapRegion, "OSM Basic").addTo(map);
+addOSMVectorLayer("osm_bright", mapRegion, "OSM Bright");
+addOSMVectorLayer("osm_liberty", mapRegion, "OSM Liberty");
+addOSMVectorLayer("osm_positron", mapRegion, "OSM Positron");
 map.setView([49.87, 8.65], 14);
