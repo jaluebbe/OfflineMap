@@ -25,7 +25,7 @@ latlong_regex = re.compile(
 
 def _format_mgrs_easting_northing(
     easting: int | float | str, northing: int | float | str
-) -> tuple[int, int]:
+) -> tuple[str, str]:
     easting_int = int(easting)
     northing_int = int(northing)
     max_length = len(str(max(easting_int, northing_int)))
@@ -94,6 +94,7 @@ def convert_latlong(latitude: float | str, longitude: float | str) -> dict:
 
 
 def parse_coordinate(coordinate: str) -> dict | None:
+    coordinate = coordinate.upper()
     mgrs_match = mgrs_regex.match(coordinate)
     if mgrs_match:
         return convert_mgrs(
@@ -125,7 +126,9 @@ if __name__ == "__main__":
         "32U LB 230 052",
         "32U LB 2301 0526",
         "32U LB 23015 05269",
+        "32U lb 23015 05269",
         "32ULB2301505269",
+        "32uLB2301505269",
         "32U LB 2301 0526",
         "32U LB2301505269",
         "32 N 323015 5605270",
