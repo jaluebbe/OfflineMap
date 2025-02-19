@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from coordinate_parser import (
     convert_latlong,
     convert_utm,
@@ -39,4 +39,7 @@ async def convert_mgrs_endpoint(
 
 @router.get("/api/parse_coordinate")
 async def parse_coordinate_endpoint(coordinate: str = Query(...)):
-    return parse_coordinate(coordinate)
+    result = parse_coordinate(coordinate)
+    if result is None:
+        raise HTTPException(status_code=400, detail="Cannot parse coordinate.")
+    return result
