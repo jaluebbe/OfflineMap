@@ -29,7 +29,7 @@ async def convert_utm_endpoint(
 
 @router.get("/api/convert_mgrs")
 async def convert_mgrs_endpoint(
-    grid_zone_designator: str = Query(..., regex="^\d{1,2}[C-HJ-NP-X]$"),
+    grid_zone_designator: str = Query(..., regex=r"^\d{1,2}[C-HJ-NP-X]$"),
     grid_square_id: str = Query(..., regex="^[A-HJ-NP-Z]{2}$"),
     easting: float | None = Query(None),
     northing: float | None = Query(None),
