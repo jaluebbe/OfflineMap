@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg58"
+   style="clip-rule:evenodd;fill-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"
+   xml:space="preserve"
+   version="1.1"
+   viewBox="0 0 10.00026 120.99999"
+   height="120.99999"
+   width="10.00026"><metadata
+   id="metadata64"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs62" />
+    <g
+   id="g56"
+   transform="matrix(0.11351935,0,0,0.1132614,-0.64884803,-8.9255604)">
+        <g
+   id="g54"
+   transform="translate(-1.44824,-15.206)">
+            <g
+   id="g40"
+   transform="matrix(1,0,0,0.982695,-856.259,-271.698)">
+                <rect
+   id="rect38"
+   style="fill:#ffffff;stroke:#000000;stroke-width:1.01px"
+   height="950.336"
+   width="85.063004"
+   y="373.664"
+   x="864.93799" />
+            </g>
+            <g
+   id="g44"
+   transform="translate(-1230.54,-75.789)">
+                <path
+   id="path42"
+   style="fill:#ff0000"
+   d="m 1324.28,1001.41 v 103.77 h -42.53 v -103.77 z m -85.06,-103.762 h 42.53 v 103.762 h -42.53 z m 85.06,-103.765 v 103.765 h -42.53 V 793.883 Z m -85.06,-103.766 h 42.53 v 103.766 h -42.53 z m 85.06,-103.765 v 103.765 h -42.53 V 586.352 Z m -85.06,-103.766 h 42.53 v 103.766 h -42.53 z m 85.06,-103.766 v 103.766 h -42.53 V 378.82 Z m -85.06,-103.765 h 42.53 V 378.82 h -42.53 z m 42.53,-103.766 h 42.53 v 103.766 h -42.53 z" />
+            </g>
+            <g
+   id="g48"
+   transform="matrix(0.925221,0,0,-1.76096,-1092.39,3168.95)">
+                <path
+   id="path46"
+   style="stroke:#000000;stroke-width:1.04px"
+   d="M 1236.03,1140.02 1282,1215 h -91.94 z" />
+            </g>
+            <g
+   id="g52"
+   transform="matrix(1,0,0,0.982695,-856.259,-271.698)">
+                <rect
+   id="rect50"
+   style="fill:none;stroke:#000000;stroke-width:3.03px"
+   height="950.336"
+   width="85.063004"
+   y="373.664"
+   x="864.93799" />
+            </g>
+        </g>
+    </g>
+</svg>
