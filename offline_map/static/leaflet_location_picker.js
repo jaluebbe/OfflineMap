@@ -26,36 +26,81 @@ const myMarker = L.marker([50, 8.6], {
     })
 });
 
-myMarker.bindTooltip("", {
-    direction: 'top'
-});
+function updateControl(position) {
+    const resultDiv = document.getElementById('coordinate-result');
+    resultDiv.innerHTML = `
+        <div><b>Lat., Lon.</b></div>${position.latitude}, ${position.longitude}</div>
+        <div><b>UTM</b></div><div>${position.utm}</div>
+        <div><b>MGRS</b></div><div>${position.mgrs}</div>
+    `;
+    resultDiv.style.color = "black";
+    document.getElementById('coordinate-input').value = '';
+}
+
+function updateMarker(position) {
+    myMarker.setLatLng([position.latitude, position.longitude]);
+    if (!map.hasLayer(myMarker)) {
+        myMarker.addTo(map);
+    }
+    if (!map.getBounds().contains(myMarker.getLatLng())) {
+        map.panInside(myMarker.getLatLng());
+    }
+}
+
+function handleApiResponse(response) {
+    if (response.status === 200) {
+        return response.json();
+    } else if (response.status === 400) {
+        throw new Error("Invalid coordinate");
+    } else {
+        throw new Error("Unexpected error");
+    }
+}
 
 function convertPosition(e) {
-    const xhr = new XMLHttpRequest();
     const latlng = e.latlng.wrap();
-    xhr.open('GET', `/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const position = JSON.parse(xhr.responseText);
+    fetch(`/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+        .then(handleApiResponse)
+        .then(position => {
             if (e.type === 'click' || e.type === 'locationfound') {
-                myMarker.setLatLng(latlng);
-                if (!map.hasLayer(myMarker)) {
-                    myMarker.addTo(map);
-                }
-                if (!map.getBounds().contains(myMarker.getLatLng())) {
-                    map.panInside(myMarker.getLatLng());
-                }
+                updateMarker(position);
             }
-            myMarker._tooltip.setContent(
-                `<b>${position.latitude}, ${position.longitude}</b><br>${position.utm}<br>${position.mgrs}`
-            );
-        }
-    };
-    xhr.send();
+            updateControl(position);
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
 myMarker.on('move', throttle(convertPosition, 100));
 map.on('click', convertPosition);
 map.on('locationfound', convertPosition);
-map.locate();
+
+document.getElementById('coordinate-go-button').addEventListener('click', function() {
+    handleCoordinateInput();
+});
+
+document.getElementById('coordinate-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        handleCoordinateInput();
+    }
+});
+
+function handleCoordinateInput() {
+    const coordinateInput = document.getElementById('coordinate-input').value;
+    const resultDiv = document.getElementById('coordinate-result');
+    if (coordinateInput.trim() === "") {
+        map.locate();
+        return;
+    }
+    fetch(`/api/parse_coordinate?coordinate=${encodeURIComponent(coordinateInput)}`)
+        .then(handleApiResponse)
+        .then(data => {
+            updateControl(data);
+            updateMarker(data);
+        })
+        .catch(error => {
+            resultDiv.textContent = error.message;
+            resultDiv.style.color = "red";
+        });
+}
