@@ -41,9 +41,21 @@ var layerControl = L.control.layers(baseLayers, other_layers, {
     collapsed: L.Browser.mobile, // hide on mobile devices
     position: 'topright'
 }).addTo(map);
-const mapRegion = "germany";
-addOSMVectorLayer("osm_basic", mapRegion, "OSM Basic").addTo(map);
-addOSMVectorLayer("osm_bright", mapRegion, "OSM Bright");
-addOSMVectorLayer("osm_liberty", mapRegion, "OSM Liberty");
-addOSMVectorLayer("osm_positron", mapRegion, "OSM Positron");
-map.setView([49.87, 8.65], 14);
+
+fetch('/api/vector/regions')
+    .then(response => response.json())
+    .then(data => {
+        if (data.length > 0) {
+            const mapRegion = data[0];
+            addOSMVectorLayer("osm_basic", mapRegion, "OSM Basic").addTo(map);
+            addOSMVectorLayer("osm_bright", mapRegion, "OSM Bright");
+            addOSMVectorLayer("osm_liberty", mapRegion, "OSM Liberty");
+            addOSMVectorLayer("osm_positron", mapRegion, "OSM Positron");
+            map.setView([49.87, 8.65], 14);
+        } else {
+            console.warn('No regions available.');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching regions:', error);
+    });

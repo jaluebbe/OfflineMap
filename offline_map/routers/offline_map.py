@@ -26,6 +26,14 @@ def fetch_tile_data(db_connection, zoom_level, tile_column, tile_row):
     return cursor.fetchone()
 
 
+@router.get("/api/vector/regions")
+def list_vector_regions():
+    mbtiles_files = sorted(
+        osm_path.glob("*.mbtiles"), key=lambda f: f.stat().st_size, reverse=True
+    )
+    return [file.stem for file in mbtiles_files]
+
+
 @router.get("/api/vector/metadata/{region}.json")
 def get_vector_metadata(region: str, request: Request):
     db_file_name = osm_path / f"{region}.mbtiles"
