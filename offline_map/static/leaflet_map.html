@@ -23,6 +23,29 @@
             width: 100%;
             min-height: 285px;
         }
+
+        #coordinate-control {
+            padding: 5px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        #coordinate-input {
+            width: 135px;
+        }
+
+        #coordinate-result {
+            padding: 5px;
+            font-size: 12px;
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-gap: 5px;
+        }
     </style>
 </head>
 
@@ -31,6 +54,13 @@
     <script src="leaflet/leaflet.js"></script>
     <script src="maplibre-gl/maplibre-gl.js"></script>
     <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
+    <div id="coordinate-control" class="leaflet-control leaflet-bar">
+        <div>
+            <input type="text" id="coordinate-input" placeholder="Enter coordinate">
+            <button id="coordinate-go-button">Go</button>
+        </div>
+        <div id="coordinate-result"></div>
+    </div>
 </body>
 <script src="/static/leaflet_map_offline.js"></script>
 <script src="/static/leaflet_location_picker.js"></script>
