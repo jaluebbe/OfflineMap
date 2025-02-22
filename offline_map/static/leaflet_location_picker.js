@@ -43,7 +43,7 @@ function updateMarker(position) {
         myMarker.addTo(map);
     }
     if (!map.getBounds().contains(myMarker.getLatLng())) {
-        map.panInside(myMarker.getLatLng());
+        map.setView(myMarker.getLatLng());
     }
 }
 
