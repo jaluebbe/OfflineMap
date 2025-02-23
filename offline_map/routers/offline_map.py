@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, HTTPException, Request, Response
 from pathlib import Path
 
-router = APIRouter()
+router = APIRouter(tags=["offline_map"])
 
 osm_path = Path("..")
 natural_earth_vector_path = Path("natural_earth_vector.mbtiles")

@@ -6,7 +6,7 @@ from coordinate_parser import (
     parse_coordinate,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["coordinates"])
 
 
 @router.get("/api/convert_lat_lon")
