@@ -17,9 +17,9 @@ utm_regex = re.compile(
 )
 
 latlong_regex = re.compile(
-    r"^(?P<latitude>[+-]?\d{1,2}(?:\.\d+)?)\s*"
-    r"[,\s]?\s*"
-    r"(?P<longitude>[+-]?\d{1,3}(?:\.\d+)?)$"
+    r"^(?P<latitude>[+-]?\d{1,2}(?:[\.,]\d+)?)\s*"
+    r"[,;\s]?\s*"
+    r"(?P<longitude>[+-]?\d{1,3}(?:[\.,]\d+)?)$"
 )
 
 
@@ -114,7 +114,8 @@ def parse_coordinate(coordinate: str) -> dict | None:
     latlong_match = latlong_regex.match(coordinate)
     if latlong_match:
         return convert_latlong(
-            latlong_match.group("latitude"), latlong_match.group("longitude")
+            latlong_match.group("latitude").replace(",", "."),
+            latlong_match.group("longitude").replace(",", "."),
         )
 
 
