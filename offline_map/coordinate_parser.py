@@ -11,7 +11,7 @@ mgrs_regex = re.compile(
 
 utm_regex = re.compile(
     r"^(?P<zone>\d{1,2})\s*"
-    r"(?P<hemisphere>[NS])\s*"
+    r"(?P<hemisphere>[NS]?)\s*"
     r"(?P<easting>\d{1,6})\s*"
     r"(?P<northing>\d{1,7})$"
 )
@@ -64,7 +64,7 @@ def convert_utm(
     easting: int | float | str,
     northing: int | float | str,
 ) -> dict:
-    _utm = Utm(zone, hemisphere, easting, northing)
+    _utm = Utm(zone, hemisphere or "N", easting, northing)
     _latlon = _utm.toLatLon()
     _mgrs = _utm.toMgrs()
     _mgrs_easting, _mgrs_northing = _format_mgrs_easting_northing(
@@ -133,6 +133,8 @@ if __name__ == "__main__":
         "32U LB 2301 0526",
         "32U LB2301505269",
         "32 N 323015 5605270",
+        "32 323015 5605270",
+        "323230155605270",
         "32 N 300000 5600000",
         "32 N 323015 5600000",
         "32 N 300000 5605270",
