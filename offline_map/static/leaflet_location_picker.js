@@ -26,6 +26,8 @@ const myMarker = L.marker([50, 8.6], {
     })
 });
 
+const locationPickerLayer = L.layerGroup();
+
 function updateControl(position) {
     const resultDiv = document.getElementById('coordinate-result');
     resultDiv.innerHTML = `
@@ -40,7 +42,7 @@ function updateControl(position) {
 function updateMarker(position) {
     myMarker.setLatLng([position.latitude, position.longitude]);
     if (!map.hasLayer(myMarker)) {
-        myMarker.addTo(map);
+        myMarker.addTo(locationPickerLayer);
     }
     if (!map.getBounds().contains(myMarker.getLatLng())) {
         map.setView(myMarker.getLatLng());
@@ -58,6 +60,8 @@ function handleApiResponse(response) {
 }
 
 function convertPosition(e) {
+    if (!map.hasLayer(locationPickerLayer))
+        return;
     const latlng = e.latlng.wrap();
     fetch(`/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
         .then(handleApiResponse)
@@ -104,3 +108,6 @@ function handleCoordinateInput() {
             resultDiv.style.color = "red";
         });
 }
+
+layerControl.addOverlay(locationPickerLayer, "Location picker")
+locationPickerLayer.addTo(map);
