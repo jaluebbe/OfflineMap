@@ -1,6 +1,6 @@
 var map = L.map('map', {
     minZoom: 0,
-    maxZoom: 20
+    maxZoom: 22
 });
 map.attributionControl.addAttribution('<a href="https://github.com/jaluebbe/OfflineMap">Source on GitHub</a>');
 // add link to an imprint and a privacy statement if the file is available.
