@@ -59,12 +59,39 @@ var wmsHBDOP = L.tileLayer.wms('https://geodienste.bremen.de/wms_dop20_2023', {
         [53.61, 9]
     ]
 });
+var wmsHeDOP = L.tileLayer.wms('https://www.gds-srv.hessen.de/cgi-bin/lika-services/ogc-free-images.ows', {
+    layers: 'he_dop_rgb',
+    format: 'image/png',
+    transparent: true,
+    attribution: '&copy <a href="https://hvbg.hessen.de/">HVBG</a>',
+    minZoom: 12,
+    maxZoom: 22,
+    bounds: [
+        [49.25, 7.41867],
+        [51.7596, 10.5]
+    ]
+});
+var wmsSLDOP = L.tileLayer.wms('https://geoportal.saarland.de/freewms/dop2023', {
+    layers: 'sl_dop20_rgb',
+    format: 'image/png',
+    transparent: true,
+    attribution: '&copy GeoBasis DE/LVGL-SL (2025) <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    minZoom: 12,
+    maxZoom: 22,
+    bounds: [
+        [49.0829, 6.3406],
+        [49.6598, 7.43817]
+    ]
+});
 
 if (location.protocol === 'https:') {
-    var dopLayerGroup = L.layerGroup([wmsHamburgDOP, wmsNiDOP, wmsNWDOP, wmsSHDOP, wmsHBDOP], {
-        minZoom: 12,
-        maxZoom: 22
-    });
+    var dopLayerGroup = L.layerGroup(
+        [
+            wmsHamburgDOP, wmsNiDOP, wmsNWDOP, wmsSHDOP, wmsHBDOP, wmsHeDOP, wmsSLDOP
+        ], {
+            minZoom: 12,
+            maxZoom: 22
+        });
     layerControl.addBaseLayer(dopLayerGroup, "DOP");
 } else {
     console.warn('Running in offline mode. DOP imagery will not be available.');
