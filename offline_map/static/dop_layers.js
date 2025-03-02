@@ -83,11 +83,23 @@ var wmsSLDOP = L.tileLayer.wms('https://geoportal.saarland.de/freewms/dop2023', 
         [49.6598, 7.43817]
     ]
 });
+var wmsRPDOP = L.tileLayer.wms('https://geo4.service24.rlp.de/wms/rp_dop20.fcgi', {
+    layers: 'rp_dop20',
+    format: 'image/png',
+    transparent: true,
+    attribution: '&copy GeoBasis-DE / <a href="http://www.lvermgeo.rlp.de">LVermGeoRP</a> (2025) <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a> [Daten bearbeitet]',
+    minZoom: 12,
+    maxZoom: 22,
+    bounds: [
+        [48.897996, 6.037773],
+        [51.000893, 8.617703]
+    ]
+}).addTo(map)
 
 if (location.protocol === 'https:') {
     var dopLayerGroup = L.layerGroup(
         [
-            wmsHamburgDOP, wmsNiDOP, wmsNWDOP, wmsSHDOP, wmsHBDOP, wmsHeDOP, wmsSLDOP
+            wmsHamburgDOP, wmsNiDOP, wmsNWDOP, wmsSHDOP, wmsHBDOP, wmsHeDOP, wmsSLDOP, wmsRPDOP
         ], {
             minZoom: 12,
             maxZoom: 22
