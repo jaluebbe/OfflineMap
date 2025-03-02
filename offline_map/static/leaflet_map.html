@@ -80,7 +80,7 @@
             map.on('click', convertPosition);
         }
     }
-
+    
     map.on('pm:globaleditmodetoggled', disableMapClick);
     map.on('pm:globaldrawmodetoggled', disableMapClick);
     map.on('pm:globalrotatemodetoggled', disableMapClick);
@@ -90,18 +90,25 @@
     map.pm.addControls();
 
     L.Polygon.prototype.options.measurementOptions = {
-        ha: true
+        ha: true,
+        showOnHover: true
     };
+    L.Polyline.prototype.options.measurementOptions = {
+        showOnHover: true
+    };
+    L.Polyline.prototype.options.showMeasurements = true;
     const showMeasurements = L.layerGroup();
     layerControl.addOverlay(showMeasurements, "Show measurements");
     map.on('overlayadd', function(eventLayer) {
         if (eventLayer.name === 'Show measurements') {
-            L.Polyline.prototype.options.showMeasurements = true;
+            L.Polygon.prototype.options.measurementOptions.showOnHover = false;
+            L.Polyline.prototype.options.measurementOptions.showOnHover = false;
         }
     });
     map.on('overlayremove', function(eventLayer) {
         if (eventLayer.name === 'Show measurements') {
-            L.Polyline.prototype.options.showMeasurements = false;
+            L.Polygon.prototype.options.measurementOptions.showOnHover = true;
+            L.Polyline.prototype.options.measurementOptions.showOnHover = true;
         }
     });
 </script>
