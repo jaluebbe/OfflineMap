@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="leaflet/leaflet.css">
     <link rel="stylesheet" href="maplibre-gl/maplibre-gl.css">
     <link rel="stylesheet" href="leaflet/leaflet-geoman.css">
+    <link rel="stylesheet" href="leaflet/leaflet-measure-path.css">
     <style>
         body {
             margin: 0;
@@ -54,6 +55,7 @@
     <div id="map"></div>
     <script src="leaflet/leaflet.js"></script>
     <script src="leaflet/leaflet-geoman.min.js"></script>
+    <script src="leaflet/leaflet-measure-path.js"></script>
     <script src="maplibre-gl/maplibre-gl.js"></script>
     <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
     <div id="coordinate-control" class="leaflet-control leaflet-bar">
@@ -85,6 +87,22 @@
     map.on('pm:globaldragmodetoggled', disableMapClick);
     map.on('pm:globalremovalmodetoggled', disableMapClick);
     map.pm.addControls();
+
+    L.Polygon.prototype.options.measurementOptions = {
+        ha: true
+    };
+    const showMeasurements = L.layerGroup();
+    layerControl.addOverlay(showMeasurements, "Show measurements");
+    map.on('overlayadd', function(eventLayer) {
+        if (eventLayer.name === 'Show measurements') {
+            L.Polyline.prototype.options.showMeasurements = true;
+        }
+    });
+    map.on('overlayremove', function(eventLayer) {
+        if (eventLayer.name === 'Show measurements') {
+            L.Polyline.prototype.options.showMeasurements = false;
+        }
+    });
 </script>
 
 </html>
