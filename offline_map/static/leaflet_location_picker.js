@@ -1,5 +1,5 @@
 // Throttle function to limit the rate at which a function can fire
-var throttle = function throttle(func, limit) {
+const throttle = (func, limit) => {
     let inThrottle;
     return function() {
         const args = arguments;
@@ -60,8 +60,7 @@ function handleApiResponse(response) {
 }
 
 function convertPosition(e) {
-    if (!map.hasLayer(locationPickerLayer))
-        return;
+    if (!map.hasLayer(locationPickerLayer)) return;
     const latlng = e.latlng.wrap();
     fetch(`/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
         .then(handleApiResponse)
@@ -76,9 +75,56 @@ function convertPosition(e) {
         });
 }
 
+myMarker.bindTooltip("", {
+    direction: 'top'
+})
+
+function updateTooltip(plz, metadata) {
+    const tooltipContent = `
+        <div><b>PLZ</b>: ${plz || ''}</div>
+        <div>${metadata.community_prefix || ''} ${metadata.community || ''}</div>
+        <div>${metadata.district_prefix || ''} ${metadata.district || ''}</div>
+        <div>${metadata.state_prefix || ''} ${metadata.state || ''}</div>
+    `;
+    myMarker._tooltip.setContent(tooltipContent);
+}
+
+function fetchPlzAndAgs(latlng) {
+    const plzPromise = fetch(`/api/get_plz_from_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+        .then(handleApiResponse)
+        .catch(() => (''));
+    const agsPromise = fetch(`/api/get_ags_from_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+        .then(handleApiResponse)
+        .catch(() => (''));
+    Promise.all([plzPromise, agsPromise])
+        .then(([plz, ags]) => {
+            if (ags) {
+                fetch(`/api/get_ags_metadata?ags=${ags}`)
+                    .then(handleApiResponse)
+                    .then(metadata => {
+                        updateTooltip(plz, metadata);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        updateTooltip(plz, "");
+                    });
+            } else {
+                updateTooltip(plz, "");
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            updateTooltip('', {});
+        });
+}
+
 myMarker.on('move', throttle(convertPosition, 100));
 map.on('click', convertPosition);
 map.on('locationfound', convertPosition);
+
+myMarker.on('move', throttle((e) => fetchPlzAndAgs(e.latlng.wrap()), 100));
+map.on('click', (e) => fetchPlzAndAgs(e.latlng.wrap()));
+map.on('locationfound', (e) => fetchPlzAndAgs(e.latlng.wrap()));
 
 document.getElementById('coordinate-go-button').addEventListener('click', function() {
     handleCoordinateInput();
