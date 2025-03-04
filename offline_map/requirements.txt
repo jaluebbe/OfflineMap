@@ -3,3 +3,4 @@ uvicorn
 pygeodesy
 osmium
 point-in-geojson
+geopandas
