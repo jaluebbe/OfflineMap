@@ -94,7 +94,7 @@ var wmsRPDOP = L.tileLayer.wms('https://geo4.service24.rlp.de/wms/rp_dop20.fcgi'
         [48.897996, 6.037773],
         [51.000893, 8.617703]
     ]
-}).addTo(map)
+});
 
 if (location.protocol === 'https:') {
     var dopLayerGroup = L.layerGroup(
