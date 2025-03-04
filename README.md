@@ -53,3 +53,40 @@ docker run -e JAVA_TOOL_OPTIONS="-Xmx2g -XX:UseSVE=0" -v "$(pwd)/data":/data ghc
 It took 0:43:08 and resulted in a file size of 3.8 GB.
 
 For larger OSM regions like Europe, the internal SSD (245.11 GB) is to small to handle amount of data.
+
+### Prepare shapefiles and databases
+OpenStreetMap provides a lot of great information.
+However, there is no guarantee that all levels of administrative boundaries of the country are available.
+I am using two different approaches to divide the map.
+#### Administrative boundaries
+The [BKG](https://www.bkg.bund.de) provides the dataset [VG5000](https://gdz.bkg.bund.de/index.php/default/open-data/verwaltungsgebiete-1-5-000-000-stand-01-01-vg5000-01-01.html) containing the administrative boundaries from country level over state and district down to community level.
+The content of these shapefiles is integrated into communities_germany.json and germany.db .
+If you would like to recreate these files, copy the VG5000 shapefiles of type LAN, KRS and GEM to a VG5000 folder in the main folder of this repository.
+#### Postal code areas
+Another well known method for country segmentation of are postal codes, called Postleitzahl (PLZ) in Germany.
+The shapes of the postal codes are found in post_codes_germany.json .
+To obtain the data for recreating the file you need to go to https://www.suche-postleitzahl.org/downloads and create a map "Karte erstellen".
+Select "5-stellig", "GeoJSON", "mittel", "EPSG:4326 - wgs84" and download "plz-5stellig.geojson".
+Additionally, download "zuordnung_plz_ort.csv" if you would like to update the database table "location_ags_plz".
+Put these files into the main folder of this repository.
+#### Data processing
+Now call
+```
+prepare_shapefiles_and_database.py
+```
+to generate the GeoJSON shapes and database tables.
+When input files are missing, the respective step will be skipped.
+#### Database dump
+If you have the sqlite3 command line utitlity installed, you could create your initial database from a dump:
+```
+sqlite3 offline_map/germany.db < germany_dump.sql
+```
+If you would like to dump your own database, call:
+```
+sqlite3 offline_map/germany.db .dump > germany_dump.sql
+```
+The sqlite3 utility can be installed via
+```
+sudo apt install sqlite3
+```
+on Linux.
