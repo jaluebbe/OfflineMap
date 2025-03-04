@@ -108,3 +108,12 @@ if (location.protocol === 'https:') {
 } else {
     console.warn('Running in offline mode. DOP imagery will not be available.');
 }
+map.on('baselayerchange', function(eo) {
+    if (eo.name === "DOP") {
+        map.setMinZoom(12);
+        map.setMaxZoom(22);
+    } else {
+        map.setMinZoom(minZoom);
+        map.setMaxZoom(maxZoom);
+    }
+});
