@@ -135,3 +135,5 @@ dmypy.json
 /offline_map/germany.db
 plz-5stellig.geojson
 /VG5000/
+zuordnung_plz_ort.csv
+*.osm.pbf
