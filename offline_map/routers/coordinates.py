@@ -31,8 +31,8 @@ async def convert_utm_endpoint(
 async def convert_mgrs_endpoint(
     grid_zone_designator: str = Query(..., regex=r"^\d{1,2}[C-HJ-NP-X]$"),
     grid_square_id: str = Query(..., regex="^[A-HJ-NP-Z]{2}$"),
-    easting: float | None = Query(None),
-    northing: float | None = Query(None),
+    easting: str = Query("", regex="^\d*$"),
+    northing: str = Query("", regex="^\d*$"),
 ):
     return convert_mgrs(grid_zone_designator, grid_square_id, easting, northing)
 
