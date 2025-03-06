@@ -29,3 +29,7 @@ def get_ags_from_lat_lon(latitude, longitude):
     result = pig_communities.point_included_with_properties(longitude, latitude)
     if len(result) == 1:
         return result[0]["ags"]
+
+
+def get_features_for_ags(ags: str) -> list[dict]:
+    return pig_communities.features_with_property_str("ags", ags, "starts_with")
