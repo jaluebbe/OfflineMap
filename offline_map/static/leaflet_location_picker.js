@@ -27,6 +27,7 @@ const myMarker = L.marker([50, 8.6], {
 });
 
 const locationPickerLayer = L.layerGroup();
+let markerPositionedByInput = false;
 
 function updateControl(position) {
     const resultDiv = document.getElementById('coordinate-result');
@@ -60,6 +61,10 @@ function handleApiResponse(response) {
 }
 
 function convertPosition(e) {
+    if (markerPositionedByInput) {
+        markerPositionedByInput = false;
+        return;
+    }
     if (!map.hasLayer(locationPickerLayer)) return;
     const latlng = e.latlng.wrap();
     fetch(`/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
@@ -146,6 +151,7 @@ function handleCoordinateInput() {
     fetch(`/api/parse_coordinate?coordinate=${encodeURIComponent(coordinateInput)}`)
         .then(handleApiResponse)
         .then(data => {
+            markerPositionedByInput = true;
             updateControl(data);
             updateMarker(data);
         })
