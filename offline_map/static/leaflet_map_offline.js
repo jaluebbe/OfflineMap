@@ -53,7 +53,7 @@ fetch('/api/vector/regions')
             addOSMVectorLayer("osm_bright", mapRegion, "OSM Bright");
             addOSMVectorLayer("osm_liberty", mapRegion, "OSM Liberty");
             addOSMVectorLayer("osm_positron", mapRegion, "OSM Positron");
-            map.setView([49.87, 8.65], 14);
+            map.setView([52.2775, 8.0415], 12);
         } else {
             console.warn('No regions available.');
         }
