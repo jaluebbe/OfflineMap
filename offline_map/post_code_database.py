@@ -3,14 +3,14 @@ from pathlib import Path
 import point_in_geojson
 
 script_dir = Path(__file__).parent
+db_path = script_dir / "germany.db"
 with open(script_dir / "post_codes_germany.json") as f:
     pig_post_codes = point_in_geojson.PointInGeoJSON(f.read())
 
 
-def get_plz_from_lat_lon(latitude, longitude):
+def get_plz_from_lat_lon(latitude: float, longitude: float) -> str | None:
     result = pig_post_codes.point_included_with_properties(longitude, latitude)
-    if len(result) == 1:
-        return result[0]["plz"]
+    return result[0]["plz"] if len(result) == 1 else None
 
 
 def get_features_for_plz(plz: str) -> list[dict]:
@@ -18,7 +18,6 @@ def get_features_for_plz(plz: str) -> list[dict]:
 
 
 def get_metadata_for_plz(plz: str) -> dict:
-    db_path = script_dir / "germany.db"
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
@@ -35,7 +34,6 @@ def get_metadata_for_plz(plz: str) -> dict:
 
 
 def get_names_for_plz(plz: str) -> list[str]:
-    db_path = script_dir / "germany.db"
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
         cursor = conn.cursor()
         cursor.execute(
