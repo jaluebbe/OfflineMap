@@ -29,7 +29,7 @@ class PlaceHandler(osm.SimpleHandler):
                 return
             self.cursor.execute(
                 """
-                INSERT INTO places (
+                INSERT OR REPLACE INTO places (
                     node_id,
                     name,
                     place,
