@@ -6,7 +6,7 @@ from offline_map.post_code_database import get_plz_from_lat_lon
 
 class PlaceHandler(osm.SimpleHandler):
     def __init__(self, db_conn):
-        osm.SimpleHandler.__init__(self)
+        super().__init__()
         self.db_conn = db_conn
         self.cursor = db_conn.cursor()
 
