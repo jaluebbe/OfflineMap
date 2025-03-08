@@ -39,7 +39,7 @@ def simplify_locations(locations):
     return min(locations, key=lambda point: Point(point).distance(centroid))
 
 
-def should_include_way(tags, plz, ags):
+def should_include_way(tags):
     if not "name" in tags:
         return False
     if tags.get("indoor") and tags["indoor"] != "no":
@@ -47,8 +47,6 @@ def should_include_way(tags, plz, ags):
     if tags["name"].startswith(('"', "-", "(")):
         return False
     if ignore_street_regex.match(tags["name"]):
-        return False
-    if (tags["name"], plz, ags) in ignore_streets:
         return False
     if tags.get("access") in ["private", "forestry", "military"]:
         return False
@@ -79,6 +77,8 @@ class HighwayHandler(osm.SimpleHandler):
         self.cursor = db_conn.cursor()
 
     def way(self, w):
+        if not should_include_way(w.tags):
+            return
         locations = [
             (n.location.lat, n.location.lon)
             for n in w.nodes
@@ -91,7 +91,7 @@ class HighwayHandler(osm.SimpleHandler):
         plz = get_plz_from_lat_lon(*location)
         if None in (ags, plz):
             return
-        if not should_include_way(w.tags, plz, ags):
+        if (w.tags["name"], plz, ags) in ignore_streets:
             return
         self.cursor.execute(
             """
