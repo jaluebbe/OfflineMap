@@ -1,6 +1,16 @@
 # OfflineMap
 
-### Setup of Python environment
+## Setup
+This repository contains as pre-filled database file with streets and places in Germany extracted from OpenStreetMap (OSM).
+All the data is related to the German postal code (PLZ) regions as well as adminstrative boundaries (states, districts, communities).
+This repository contains all scripts to refresh this data if required.
+If this setup should be extended to another country, consider either to adapt the postal code and boundary system to your country or remove that dependency and rely completely on the data extracted from OSM. It may be also possible to extract the boundaries from OSM depending on how well they are maintained for your country.
+
+It is mandatory to download an OSM file to create the MBTiles file.
+You may start with a small region like Bremen to ensure everything is running.
+Depending on your hardware for file preparation your may create a file not just for Germany but also the DACH region or even the whole of Europe.
+
+### Setup of Python environment (mandatory)
 ```
 cd offline_map
 python -m venv venv
@@ -16,7 +26,7 @@ If your version is below 3.10 call:
 pip install eval_type_backport
 ```
 
-### Prepare OpenStreetMap offline data
+### Prepare OpenStreetMap offline data (MBTiles) (mandatory)
 ```
 docker run -e JAVA_TOOL_OPTIONS="-Xmx10g" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=europe
 ```
@@ -54,7 +64,7 @@ It took 0:43:08 and resulted in a file size of 3.8 GB.
 
 For larger OSM regions like Europe, the internal SSD (245.11 GB) is to small to handle amount of data.
 
-### Prepare shapefiles and databases
+### Prepare shapefiles and databases (optional)
 OpenStreetMap provides a lot of great information.
 However, there is no guarantee that all levels of administrative boundaries of the country are available.
 I am using two different approaches to divide the map.
