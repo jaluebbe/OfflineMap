@@ -76,17 +76,3 @@ prepare_shapefiles_and_database.py
 ```
 to generate the GeoJSON shapes and database tables.
 When input files are missing, the respective step will be skipped.
-#### Database dump
-If you have the sqlite3 command line utitlity installed, you could create your initial database from a dump:
-```
-sqlite3 offline_map/germany.db < germany_dump.sql
-```
-If you would like to dump your own database, call:
-```
-sqlite3 offline_map/germany.db .dump > germany_dump.sql
-```
-The sqlite3 utility can be installed via
-```
-sudo apt install sqlite3
-```
-on Linux.
