@@ -121,3 +121,63 @@ def query_places(search_term, case_insensitive=False, ags="", plz=""):
         columns = [column[0] for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]
         return results
+
+
+def get_state_ags() -> dict:
+    with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT
+                CASE
+                    WHEN nbd THEN bez || ' ' || gen
+                    ELSE gen
+                END AS concatenated,
+                ags
+            FROM states
+            """
+        )
+        rows = cursor.fetchall()
+        return dict(rows)
+
+
+def get_district_ags(ags: str = "") -> dict:
+    ags = ags[:2].ljust(5, "_")
+    with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT
+                CASE
+                    WHEN nbd THEN bez || ' ' || gen
+                    ELSE gen
+                END AS concatenated,
+                ags
+            FROM districts
+            WHERE ags LIKE ?
+            """,
+            (ags,),
+        )
+        rows = cursor.fetchall()
+        return dict(rows)
+
+
+def get_community_ags(ags: str = "") -> dict:
+    ags = ags[:5].ljust(8, "_")
+    with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT
+                CASE
+                    WHEN nbd THEN bez || ' ' || gen
+                    ELSE gen
+                END AS concatenated,
+                ags
+            FROM communities
+            WHERE ags LIKE ?
+            """,
+            (ags,),
+        )
+        rows = cursor.fetchall()
+        return dict(rows)
