@@ -135,6 +135,7 @@ def get_state_ags() -> dict:
                 END AS concatenated,
                 ags
             FROM states
+            ORDER BY gen ASC
             """
         )
         rows = cursor.fetchall()
@@ -155,6 +156,7 @@ def get_district_ags(ags: str = "") -> dict:
                 ags
             FROM districts
             WHERE ags LIKE ?
+            ORDER BY gen ASC
             """,
             (ags,),
         )
@@ -176,6 +178,7 @@ def get_community_ags(ags: str = "") -> dict:
                 ags
             FROM communities
             WHERE ags LIKE ?
+            ORDER BY gen ASC
             """,
             (ags,),
         )
