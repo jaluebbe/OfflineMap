@@ -36,7 +36,7 @@ async function fetchAndPopulateDropdown(baseUrl, ags, dropdown, defaultOptionTex
     dropdown.innerHTML = `<option value="">${defaultOptionText}</option>`;
     const url = new URL(baseUrl, window.location.origin);
     if (ags != null && ags.length == 0) {
-        dropdown.disabled = true;
+        dropdown.hidden = true;
         return;
     } else if (ags) {
         url.searchParams.append('ags', ags);
@@ -50,14 +50,14 @@ async function fetchAndPopulateDropdown(baseUrl, ags, dropdown, defaultOptionTex
             option.textContent = key;
             dropdown.appendChild(option);
         }
-        dropdown.disabled = false;
+        dropdown.hidden = false;
         if (dropdown.options.length === 2) {
             dropdown.selectedIndex = 1;
             onChangeCallback();
         }
     } catch (error) {
         console.error(`Error fetching data from ${baseUrl}:`, error);
-        dropdown.disabled = true;
+        dropdown.hidden = true;
     }
 }
 
@@ -108,7 +108,7 @@ async function stateSelectionChanged() {
     await handleSelectionChange('/api/get_features_for_ags', selectedValue, populateDistrictDropdown);
     const communitySelect = document.getElementById('community-select');
     communitySelect.innerHTML = '<option value="">Select a community</option>';
-    communitySelect.disabled = true;
+    communitySelect.hidden = true;
 }
 
 async function districtSelectionChanged() {
