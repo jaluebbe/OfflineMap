@@ -37,8 +37,20 @@
             z-index: 1000;
         }
 
+        #region-control {
+            display: grid;
+            grid-gap: 5px;
+        }
+
+        #search-control {
+            padding-top: 5px;
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-gap: 5px;
+        }
+
         #coordinate-input {
-            width: 135px;
+            min-width: 135px;
         }
 
         #coordinate-result {
@@ -59,7 +71,23 @@
     <script src="maplibre-gl/maplibre-gl.js"></script>
     <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
     <div id="coordinate-control" class="leaflet-control leaflet-bar">
-        <div>
+        <div id="region-control">
+            <select id="state-select" onchange="stateSelectionChanged()">
+                <option value="">State selection</option>
+            </select>
+            <select id="district-select" onchange="districtSelectionChanged()" disabled>
+                <option value="">District selection</option>
+            </select>
+            <select id="community-select" onchange="communitySelectionChanged()" disabled>
+                <option value="">Community selection</option>
+            </select>
+            <input type="text" id="plz-input" placeholder="Enter PLZ" oninput="plzChanged()">
+        </div>
+        <div id="search-control">
+            <input type="text" id="street-input" placeholder="Enter street name">
+            <button id="place-go-button">Go</button>
+            <input type="text" id="place-input" placeholder="Enter place name">
+            <button id="street-go-button">Go</button>
             <input type="text" id="coordinate-input" placeholder="Enter coordinate">
             <button id="coordinate-go-button">Go</button>
         </div>
@@ -69,6 +97,8 @@
 <script src="/static/leaflet_map_offline.js"></script>
 <script src="/static/leaflet_location_picker.js"></script>
 <script src="/static/dop_layers.js"></script>
+<script src="/static/leaflet_plz.js"></script>
+<script src="/static/leaflet_regions.js"></script>
 <script>
     L.marker([49.8743, 8.6575]).addTo(map)
         .bindPopup('<b><a href="https://2025.pycon.de/" target="_blank">PyCon DE & PyData 2025</a></b><br>Darmstadtium<br>23. April - 25. April 2025');
@@ -80,7 +110,6 @@
             map.on('click', convertPosition);
         }
     }
-    
     map.on('pm:globaleditmodetoggled', disableMapClick);
     map.on('pm:globaldrawmodetoggled', disableMapClick);
     map.on('pm:globalrotatemodetoggled', disableMapClick);

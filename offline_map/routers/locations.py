@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from post_code_database import get_plz_from_lat_lon
+from post_code_database import get_plz_from_lat_lon, get_features_for_plz
 from community_database import (
     get_ags_from_lat_lon,
     get_ags_metadata,
@@ -9,6 +9,7 @@ from community_database import (
     query_community,
     query_location,
     query_places,
+    get_features_for_ags,
 )
 from street_database import query_streets
 
@@ -35,6 +36,27 @@ async def get_ags_from_lat_lon_endpoint(
     if ags is None:
         raise HTTPException(status_code=404, detail="Community not found.")
     return ags
+
+
+@router.get("/api/get_features_for_ags")
+async def get_features_for_ags_endpoint(
+    ags: str = Query(..., min_length=2, max_length=8, regex="^\d{2,8}$"),
+    include_metadata: bool = True,
+):
+    features = get_features_for_ags(ags)
+    if include_metadata:
+        for result in features:
+            ags_metadata = get_ags_metadata(result["properties"].get("ags"))
+            if ags_metadata:
+                result["properties"].update(ags_metadata)
+    return features
+
+
+@router.get("/api/get_features_for_plz")
+async def get_features_for_plz_endpoint(
+    plz: str = Query(..., min_length=2, max_length=5, regex="^\d{2,5}$"),
+):
+    return get_features_for_plz(plz)
 
 
 @router.get("/api/get_ags_metadata")
