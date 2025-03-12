@@ -82,11 +82,10 @@ function fitBoundsToLayers() {
 
 async function handleStreetInput() {
     const streetInput = document.getElementById('street-input').value;
+    streetsLayer.clearLayers();
     if (!streetInput.trim()) {
-        console.log('Street input is empty. Aborting search.');
         return;
     }
-    streetsLayer.clearLayers();
     try {
         const streetUrl = new URL('/api/query_streets', window.location.origin);
         streetUrl.searchParams.append('search_term', streetInput);
@@ -117,11 +116,10 @@ async function handleStreetInput() {
 
 async function handlePlaceInput() {
     const placeInput = document.getElementById('place-input').value;
+    placesLayer.clearLayers();
     if (!placeInput.trim()) {
-        console.log('Place input is empty. Aborting search.');
         return;
     }
-    placesLayer.clearLayers();
     try {
         const locationUrl = new URL('/api/query_location', window.location.origin);
         locationUrl.searchParams.append('search_term', placeInput);
