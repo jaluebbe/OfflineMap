@@ -58,7 +58,7 @@ def get_features_for_ags(ags: str) -> list[dict]:
 
 def query_community(search_term, case_insensitive=False, ags=""):
     search_term = re.escape(search_term)
-    regex = f"^(?:|.*[ \\-]){search_term}(?:|[ \\-].*)$"
+    regex = f"^(?:|.*[ \\-]){search_term}.*$"
     if case_insensitive:
         regex = f"(?i){regex}"
     ags = ags.ljust(8, "_")
@@ -79,7 +79,7 @@ def query_community(search_term, case_insensitive=False, ags=""):
 
 def query_location(search_term, case_insensitive=False, ags="", plz=""):
     search_term = re.escape(search_term)
-    regex = f"^(?:|.*[ \\-]){search_term}(?:|[ \\-].*)$"
+    regex = f"^(?:|.*[ \\-]){search_term}.*$"
     if case_insensitive:
         regex = f"(?i){regex}"
     ags = ags.ljust(8, "_")
@@ -103,7 +103,7 @@ def query_location(search_term, case_insensitive=False, ags="", plz=""):
 
 def query_places(search_term, case_insensitive=False, ags="", plz=""):
     search_term = re.escape(search_term)
-    regex = f"^(?:|.*[ \\-]){search_term}(?:|[ \\-].*)$"
+    regex = f"^(?:|.*[ \\-]){search_term}.*$"
     if case_insensitive:
         regex = f"(?i){regex}"
     ags = ags.ljust(8, "_")
