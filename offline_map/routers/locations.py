@@ -106,16 +106,10 @@ async def query_location_endpoint(
     ags: str = Query("", max_length=8, regex="^\d*$"),
     plz: str = Query("", max_length=5, regex="^\d*$"),
     case_insensitive: bool = False,
-    include_metadata: bool = False,
 ):
     results = query_location(search_term, case_insensitive, ags, plz)
     if not results:
         raise HTTPException(status_code=404, detail="No results found.")
-    if include_metadata:
-        for result in results:
-            ags_metadata = get_ags_metadata(result.get("ags"))
-            if ags_metadata:
-                result.update(ags_metadata)
     return results
 
 
