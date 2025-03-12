@@ -18,7 +18,7 @@ function onEachRegionFeature(feature, layer) {
     });
 }
 
-let regionsLayer = L.geoJSON([], {
+const regionsLayer = L.geoJSON([], {
     onEachFeature: onEachRegionFeature,
     pane: 'regions',
     style: function(feature) {
