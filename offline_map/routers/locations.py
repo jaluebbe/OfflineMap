@@ -8,6 +8,7 @@ from community_database import (
     get_community_ags,
     query_community,
     query_location,
+    query_distinct_location,
     query_places,
     get_features_for_ags,
 )
@@ -90,40 +91,38 @@ async def get_community_ags_endpoint(
 
 @router.get("/api/query_community")
 async def query_community_endpoint(
-    search_term: str,
+    search_term: str = Query(..., min_length=1),
     case_insensitive: bool = False,
     ags: str = Query("", max_length=8, regex="^\d*$"),
 ):
-    results = query_community(search_term, case_insensitive, ags)
-    if not results:
-        raise HTTPException(status_code=404, detail="No results found.")
-    return results
+    return query_community(search_term, case_insensitive, ags)
 
 
 @router.get("/api/query_location")
 async def query_location_endpoint(
-    search_term: str,
+    search_term: str = Query(..., min_length=1),
     ags: str = Query("", max_length=8, regex="^\d*$"),
     plz: str = Query("", max_length=5, regex="^\d*$"),
     case_insensitive: bool = False,
+    distinct: bool = False,
 ):
-    results = query_location(search_term, case_insensitive, ags, plz)
-    if not results:
-        raise HTTPException(status_code=404, detail="No results found.")
-    return results
+    if distinct:
+        return query_distinct_location(
+            search_term, case_insensitive, ags, plz
+        )
+    else:
+        return query_location(search_term, case_insensitive, ags, plz)
 
 
 @router.get("/api/query_places")
 async def query_places_endpoint(
-    search_term: str,
+    search_term: str = Query(..., min_length=1),
     ags: str = Query("", max_length=8, regex="^\d*$"),
     plz: str = Query("", max_length=5, regex="^\d*$"),
     case_insensitive: bool = False,
     include_metadata: bool = False,
 ):
     results = query_places(search_term, case_insensitive, ags, plz)
-    if not results:
-        raise HTTPException(status_code=404, detail="No results found.")
     if include_metadata:
         for result in results:
             ags_metadata = get_ags_metadata(result.get("ags"))
@@ -134,15 +133,13 @@ async def query_places_endpoint(
 
 @router.get("/api/query_streets")
 async def query_streets_endpoint(
-    search_term: str,
+    search_term: str = Query(..., min_length=1),
     ags: str = Query("", max_length=8, regex="^\d*$"),
     plz: str = Query("", max_length=5, regex="^\d*$"),
     case_insensitive: bool = False,
     include_metadata: bool = False,
 ):
     results = query_streets(search_term, case_insensitive, ags, plz)
-    if not results:
-        raise HTTPException(status_code=404, detail="No results found.")
     if include_metadata:
         for result in results:
             ags_metadata = get_ags_metadata(result.get("ags"))
