@@ -1,6 +1,8 @@
 map.createPane('plz');
 map.getPane('plz').style.zIndex = 391;
 
+let selectedPlz = "";
+
 function onEachPlzFeature(feature, layer) {
     layer.bindTooltip(`<div><b>PLZ</b>: ${feature.properties.plz}</div>`, {
         sticky: true,
@@ -27,6 +29,7 @@ layerControl.addOverlay(plzLayer, "PLZ");
 async function plzChanged() {
     const plzInput = document.getElementById('plz-input').value.trim();
     plzLayer.clearLayers();
+    selectedPlz = plzInput;
     if (plzInput.length < 2) {
         return;
     }
