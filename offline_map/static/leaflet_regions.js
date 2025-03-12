@@ -1,6 +1,8 @@
 map.createPane('regions');
 map.getPane('regions').style.zIndex = 390;
 
+let selectedAgs = "";
+
 function formatRegionTooltip(metadata) {
     return `
         <div>${metadata.community_prefix || ''} ${metadata.community || ''}</div>
@@ -91,6 +93,7 @@ async function fetchAndAddGeoJSON(baseUrl, ags, layer) {
 }
 
 async function handleSelectionChange(baseUrl, selectedValue, nextDropdownFunction, fallbackFunction) {
+    selectedAgs = selectedValue;
     regionsLayer.clearLayers();
     if (selectedValue.length > 1) {
         await fetchAndAddGeoJSON(baseUrl, selectedValue, regionsLayer);
