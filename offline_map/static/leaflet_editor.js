@@ -1,7 +1,7 @@
 map.createPane('editor');
 map.getPane('editor').style.zIndex = 392;
 
-let editorLayer = L.geoJSON([], {
+const editorLayer = L.geoJSON([], {
     pane: 'editor',
 }).addTo(map);
 layerControl.addOverlay(editorLayer, "Editor");

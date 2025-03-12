@@ -10,7 +10,7 @@ function onEachPlzFeature(feature, layer) {
     });
 }
 
-let plzLayer = L.geoJSON([], {
+const plzLayer = L.geoJSON([], {
     onEachFeature: onEachPlzFeature,
     pane: 'plz',
     style: function(feature) {
