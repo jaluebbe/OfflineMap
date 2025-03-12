@@ -82,8 +82,11 @@ function fitBoundsToLayers() {
 
 async function handleStreetInput() {
     const streetInput = document.getElementById('street-input').value;
+    const goButton = document.getElementById('street-go-button');
+    goButton.disabled = true;
     streetsLayer.clearLayers();
     if (!streetInput.trim()) {
+        goButton.disabled = false;
         return;
     }
     try {
@@ -111,13 +114,18 @@ async function handleStreetInput() {
         fitBoundsToLayers();
     } catch (error) {
         console.error('Error fetching street data:', error);
+    } finally {
+        goButton.disabled = false;
     }
 }
 
 async function handlePlaceInput() {
     const placeInput = document.getElementById('place-input').value;
+    const goButton = document.getElementById('place-go-button');
+    goButton.disabled = true;
     placesLayer.clearLayers();
     if (!placeInput.trim()) {
+        goButton.disabled = false;
         return;
     }
     try {
@@ -159,6 +167,8 @@ async function handlePlaceInput() {
         fitBoundsToLayers();
     } catch (error) {
         console.error('Error fetching place data:', error);
+    } finally {
+        goButton.disabled = false;
     }
 }
 
