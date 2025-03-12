@@ -99,47 +99,10 @@
 <script src="/static/dop_layers.js"></script>
 <script src="/static/leaflet_plz.js"></script>
 <script src="/static/leaflet_regions.js"></script>
+<script src="/static/leaflet_editor.js"></script>
 <script>
     L.marker([49.8743, 8.6575]).addTo(map)
         .bindPopup('<b><a href="https://2025.pycon.de/" target="_blank">PyCon DE & PyData 2025</a></b><br>Darmstadtium<br>23. April - 25. April 2025');
-
-    function disableMapClick(e) {
-        if (e.enabled) {
-            map.off('click', convertPosition);
-        } else {
-            map.on('click', convertPosition);
-        }
-    }
-    map.on('pm:globaleditmodetoggled', disableMapClick);
-    map.on('pm:globaldrawmodetoggled', disableMapClick);
-    map.on('pm:globalrotatemodetoggled', disableMapClick);
-    map.on('pm:globalcutmodetoggled', disableMapClick);
-    map.on('pm:globaldragmodetoggled', disableMapClick);
-    map.on('pm:globalremovalmodetoggled', disableMapClick);
-    map.pm.addControls();
-
-    L.Polygon.prototype.options.measurementOptions = {
-        ha: true,
-        showOnHover: true
-    };
-    L.Polyline.prototype.options.measurementOptions = {
-        showOnHover: true
-    };
-    L.Polyline.prototype.options.showMeasurements = true;
-    const showMeasurements = L.layerGroup();
-    layerControl.addOverlay(showMeasurements, "Show measurements");
-    map.on('overlayadd', function(eventLayer) {
-        if (eventLayer.name === 'Show measurements') {
-            L.Polygon.prototype.options.measurementOptions.showOnHover = false;
-            L.Polyline.prototype.options.measurementOptions.showOnHover = false;
-        }
-    });
-    map.on('overlayremove', function(eventLayer) {
-        if (eventLayer.name === 'Show measurements') {
-            L.Polygon.prototype.options.measurementOptions.showOnHover = true;
-            L.Polyline.prototype.options.measurementOptions.showOnHover = true;
-        }
-    });
 </script>
 
 </html>
