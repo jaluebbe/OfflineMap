@@ -10,11 +10,7 @@ map.pm.setGlobalOptions({
 });
 
 function toggleMapClick(e) {
-    if (e.enabled) {
-        map.off('click', convertPosition);
-    } else {
-        map.on('click', convertPosition);
-    }
+    isEditing = e.enabled;
 }
 const pmEvents = [
     'pm:globaleditmodetoggled',

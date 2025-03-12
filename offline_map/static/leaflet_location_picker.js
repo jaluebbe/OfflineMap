@@ -28,6 +28,7 @@ const myMarker = L.marker([50, 8.6], {
 
 const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
+let isEditing = false;
 
 function updateControl(position) {
     const resultDiv = document.getElementById('coordinate-result');
@@ -61,10 +62,6 @@ function handleApiResponse(response) {
 }
 
 function convertPosition(e) {
-    if (markerPositionedByInput) {
-        markerPositionedByInput = false;
-        return;
-    }
     if (!map.hasLayer(locationPickerLayer)) return;
     const latlng = e.latlng.wrap();
     fetch(`/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
@@ -123,13 +120,21 @@ function fetchPlzAndAgs(latlng) {
         });
 }
 
-myMarker.on('move', throttle(convertPosition, 100));
-map.on('click', convertPosition);
-map.on('locationfound', convertPosition);
+function processMapEvent(e) {
+    const latlng = e.latlng.wrap();
+    if (markerPositionedByInput) {
+        markerPositionedByInput = false;
+        return;
+    }
+    if (!isEditing) {
+        convertPosition(e);
+        fetchPlzAndAgs(e.latlng.wrap());
+    }
+}
 
-myMarker.on('move', throttle((e) => fetchPlzAndAgs(e.latlng.wrap()), 100));
-map.on('click', (e) => fetchPlzAndAgs(e.latlng.wrap()));
-map.on('locationfound', (e) => fetchPlzAndAgs(e.latlng.wrap()));
+myMarker.on('move', throttle(processMapEvent, 100));
+map.on('click', processMapEvent);
+map.on('locationfound', processMapEvent);
 
 document.getElementById('coordinate-go-button').addEventListener('click', function() {
     handleCoordinateInput();
