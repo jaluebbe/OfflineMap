@@ -34,6 +34,18 @@ layerControl.addOverlay(editorLayer, "Editor");
 map.pm.setGlobalOptions({
     layerGroup: editorLayer,
 });
+editorLayer.on('add', function() {
+    editorLayer.eachLayer(function(layer) {
+        const properties = layer.feature?.properties || {};
+        if (typeof layer.showMeasurements === 'function') {
+            if (properties.showMeasurements) {
+                layer.showMeasurements();
+            } else {
+                layer.hideMeasurements();
+            }
+        }
+    });
+});
 
 function toggleMapClick(e) {
     isEditing = e.enabled;
