@@ -49,6 +49,27 @@
             grid-gap: 5px;
         }
 
+        .legend-control {
+            background: white;
+            line-height: 1.5;
+            color: #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .legend-header {
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
         #coordinate-input {
             min-width: 135px;
         }
@@ -64,6 +85,19 @@
 </head>
 
 <body>
+    <template id="featureControlTemplate">
+        <div class="legend-header">Feature</div>
+        <div class="legend-item">
+            <input type="color" id="colorInput" name="colorInput" value="#3388ff">
+            <input type="checkbox" id="measureCheckbox" name="measureCheckbox">
+            <label for="measureCheckbox">measure</label>
+            <input type="checkbox" id="fillCheckbox" name="fillCheckbox" checked>
+            <label for="fillCheckbox">fill</label>
+        </div>
+        <div class="legend-item">
+            <input type="text" id="textInput" name="textInput" placeholder="Enter text">
+        </div>
+    </template>
     <div id="map"></div>
     <script src="leaflet/leaflet.js"></script>
     <script src="leaflet/leaflet-geoman.min.js"></script>
