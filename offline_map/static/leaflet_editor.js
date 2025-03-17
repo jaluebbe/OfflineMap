@@ -21,7 +21,7 @@ const editorLayer = L.geoJSON([], {
         if (properties.color) {
             style.color = properties.color;
         }
-        if (properties.fill) {
+        if (typeof properties.fill !== 'undefined') {
             style.fill = properties.fill;
         }
         return style;
