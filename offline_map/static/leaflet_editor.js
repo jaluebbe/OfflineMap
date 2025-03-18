@@ -1,6 +1,17 @@
 map.createPane('editor');
 map.getPane('editor').style.zIndex = 392;
 
+function applyMeasurements(layer) {
+    const properties = layer.feature?.properties || {};
+    if (typeof layer.showMeasurements === 'function') {
+        if (properties.showMeasurements) {
+            layer.showMeasurements();
+        } else {
+            layer.hideMeasurements();
+        }
+    }
+}
+
 const editorLayer = L.geoJSON([], {
     pane: 'editor',
     onEachFeature: function(feature, layer) {
@@ -8,11 +19,7 @@ const editorLayer = L.geoJSON([], {
         layer.options.pmIgnore = !!properties.pmIgnore;
         if (typeof properties.showMeasurements !== 'undefined') {
             layer.options.showMeasurements = properties.showMeasurements;
-            if (typeof layer.showMeasurements === 'function' && layer.options.showMeasurements) {
-                layer.showMeasurements();
-            } else if (typeof layer.hideMeasurements === 'function') {
-                layer.hideMeasurements();
-            }
+            applyMeasurements(layer);
         }
         if (properties.text && properties.text.trim() !== '') {
             layer.bindTooltip(properties.text);
@@ -34,15 +41,14 @@ layerControl.addOverlay(editorLayer, "Editor");
 map.pm.setGlobalOptions({
     layerGroup: editorLayer,
 });
+
 editorLayer.on('add', function() {
     editorLayer.eachLayer(function(layer) {
-        const properties = layer.feature?.properties || {};
-        if (typeof layer.showMeasurements === 'function') {
-            if (properties.showMeasurements) {
-                layer.showMeasurements();
-            } else {
-                layer.hideMeasurements();
-            }
+        applyMeasurements(layer);
+        if (typeof layer.eachLayer === 'function') {
+            layer.eachLayer(function(subLayer) {
+                applyMeasurements(subLayer);
+            });
         }
     });
 });
@@ -67,13 +73,18 @@ map.on('pm:create', function(eo) {
     const layer = eo.layer;
     layer.feature = layer.feature || {
         type: 'Feature',
-        properties: {
-            color: colorInput.value,
-            fill: fillCheckbox.checked,
-            showMeasurements: measureCheckbox.checked,
-        }
+        properties: {}
     };
     const properties = layer.feature.properties;
+    if (eo.shape !== 'Marker' && eo.shape !== 'Text') {
+        properties.color = colorInput.value;
+    }
+    if (eo.shape !== 'Line' && eo.shape !== 'Text' && eo.shape !== 'Marker') {
+        properties.fill = fillCheckbox.checked;
+    }
+    if (eo.shape !== 'Marker' && eo.shape !== 'CircleMarker' && eo.shape !== 'Text') {
+        properties.showMeasurements = measureCheckbox.checked;
+    }
     const text = textInput.value;
     if (text) {
         properties.text = text;
@@ -89,46 +100,54 @@ map.on('pm:create', function(eo) {
         }
         layer.setStyle(style);
     }
-    if (typeof layer.showMeasurements === 'function') {
-        if (properties.showMeasurements) {
-            layer.showMeasurements();
-        } else {
-            layer.hideMeasurements();
-        }
-    }
+    applyMeasurements(layer);
 });
 
-map.on('pm:cut', function(eo) {
+function initializeFeature(newLayer, originalLayer) {
+    newLayer.feature = newLayer.feature || {
+        type: 'Feature',
+        properties: {}
+    };
+    newLayer.feature.properties = {
+        ...originalLayer.feature.properties
+    };
+}
+
+function copyTooltipAndPopup(originalLayer, newLayer) {
+    const tooltipContent = originalLayer.getTooltip()?.getContent();
+    const popupContent = originalLayer.getPopup()?.getContent();
+    if (tooltipContent) {
+        newLayer.bindTooltip(tooltipContent);
+    }
+    if (popupContent) {
+        newLayer.bindPopup(popupContent);
+    }
+}
+
+function flattenAndAddMultiPolygon(newLayer) {
+    const flattened = turf.flatten(newLayer.feature);
+    flattened.features.forEach((polygonFeature) => {
+        editorLayer.addData(polygonFeature);
+    });
+    editorLayer.removeLayer(newLayer);
+}
+
+map.on('pm:cut', function (eo) {
     const originalLayer = eo.originalLayer;
     const newLayer = eo.layer;
     if (originalLayer?.feature) {
-        newLayer.feature = newLayer.feature || {
-            type: 'Feature',
-            properties: {}
-        };
-        newLayer.feature.properties = {
-            ...originalLayer.feature.properties
-        };
-        const properties = newLayer.feature.properties;
-        if (properties.showMeasurements) {
-            newLayer.showMeasurements();
-        } else {
-            newLayer.hideMeasurements();
-        }
-        const tooltipContent = originalLayer.getTooltip()?.getContent();
-        const popupContent = originalLayer.getPopup()?.getContent();
-        if (tooltipContent) {
-            newLayer.bindTooltip(tooltipContent);
-        }
-        if (popupContent) {
-            newLayer.bindPopup(popupContent);
-        }
+        initializeFeature(newLayer, originalLayer);
+        applyMeasurements(newLayer);
+        copyTooltipAndPopup(originalLayer, newLayer);
         if (newLayer.feature.geometry?.type === 'MultiPolygon') {
-            const flattened = turf.flatten(newLayer.feature);
-            flattened.features.forEach((polygonFeature) => {
-                editorLayer.addData(polygonFeature)
+            flattenAndAddMultiPolygon(newLayer);
+        }
+        if (typeof newLayer.eachLayer === 'function') {
+            newLayer.eachLayer(function (layer) {
+                initializeFeature(layer, originalLayer);
+                applyMeasurements(layer);
+                copyTooltipAndPopup(originalLayer, layer);
             });
-            editorLayer.removeLayer(newLayer);
         }
     }
 });
