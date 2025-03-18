@@ -88,14 +88,14 @@
     <template id="featureControlTemplate">
         <div class="legend-header">Feature</div>
         <div class="legend-item">
-            <input type="color" id="colorInput" name="colorInput" value="#3388ff">
-            <input type="checkbox" id="measureCheckbox" name="measureCheckbox">
+            <input type="color" id="colorInput" name="colorInput" value="#3388ff" onchange="updateFeatureProperties()">
+            <input type="checkbox" id="measureCheckbox" name="measureCheckbox" onchange="updateFeatureProperties()">
             <label for="measureCheckbox">measure</label>
-            <input type="checkbox" id="fillCheckbox" name="fillCheckbox" checked>
+            <input type="checkbox" id="fillCheckbox" name="fillCheckbox" checked onchange="updateFeatureProperties()">
             <label for="fillCheckbox">fill</label>
         </div>
         <div class="legend-item">
-            <input type="text" id="textInput" name="textInput" placeholder="Enter text">
+            <input type="text" id="textInput" name="textInput" placeholder="Enter text" onchange="updateFeatureProperties()">
         </div>
     </template>
     <div id="map"></div>
