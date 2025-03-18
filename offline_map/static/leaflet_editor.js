@@ -1,6 +1,20 @@
 map.createPane('editor');
 map.getPane('editor').style.zIndex = 392;
 
+function dataChanged() {
+    const data = editorLayer.toGeoJSON();
+    localStorage.setItem('editorLayerData', JSON.stringify(data));
+}
+
+function loadEditorLayerFromLocalStorage() {
+    const storedData = localStorage.getItem('editorLayerData');
+    if (storedData) {
+        const geoJSONData = JSON.parse(storedData);
+        editorLayer.clearLayers();
+        editorLayer.addData(geoJSONData);
+    }
+}
+
 function applyMeasurements(layer) {
     const properties = layer.feature?.properties || {};
     if (typeof layer.showMeasurements === 'function') {
@@ -101,6 +115,7 @@ map.on('pm:create', function(eo) {
         layer.setStyle(style);
     }
     applyMeasurements(layer);
+    dataChanged();
 });
 
 function initializeFeature(newLayer, originalLayer) {
@@ -132,7 +147,7 @@ function flattenAndAddMultiPolygon(newLayer) {
     editorLayer.removeLayer(newLayer);
 }
 
-map.on('pm:cut', function (eo) {
+map.on('pm:cut', function(eo) {
     const originalLayer = eo.originalLayer;
     const newLayer = eo.layer;
     if (originalLayer?.feature) {
@@ -143,14 +158,19 @@ map.on('pm:cut', function (eo) {
             flattenAndAddMultiPolygon(newLayer);
         }
         if (typeof newLayer.eachLayer === 'function') {
-            newLayer.eachLayer(function (layer) {
+            newLayer.eachLayer(function(layer) {
                 initializeFeature(layer, originalLayer);
                 applyMeasurements(layer);
                 copyTooltipAndPopup(originalLayer, layer);
             });
         }
     }
+    dataChanged();
 });
+
+map.on('pm:remove', dataChanged);
+
+editorLayer.on('pm:update', dataChanged);
 
 L.Polygon.prototype.options.measurementOptions = {
     ha: true,
@@ -168,3 +188,5 @@ featureControl.onAdd = function(map) {
     return this._div;
 }
 featureControl.addTo(map);
+
+loadEditorLayerFromLocalStorage();
