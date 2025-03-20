@@ -106,7 +106,9 @@ function loadEditorLayerFromLocalStorage() {
         const geoJSONData = JSON.parse(storedData);
         editorLayer.clearLayers();
         editorLayer.addData(geoJSONData);
-        fitBoundsToLayers();
+        setTimeout(() => {
+            fitBoundsToLayers();
+        }, 100);
     }
 }
 
