@@ -3,6 +3,11 @@ map.getPane('editor').style.zIndex = 392;
 
 var selectedShape = undefined;
 
+function getDateString() {
+    let date = new Date();
+    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "_" + date.getHours() + "-" + date.getMinutes();
+}
+
 function updateEditorTooltip(layer, text) {
     if (text && text.trim() !== '') {
         layer.bindTooltip(text, {
@@ -161,6 +166,79 @@ editorLayer.on('add', function() {
         }
     });
 });
+
+function clearEditor() {
+    const confirmation = confirm("Do you really want to clear the editor layer?");
+    if (confirmation) {
+        editorLayer.clearLayers();
+        dataChanged();
+    }
+}
+
+function importEditor() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('You need to select a GeoJSON file.');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const jsonData = JSON.parse(event.target.result);
+            jsonData.features.forEach(feature => {
+                const geometryType = feature.geometry?.type;
+                feature.properties = feature.properties || {};
+                if (geometryType === 'Point') {
+                    if (!('text' in feature.properties)) {
+                        feature.properties.text = textInput.value;
+                    }
+                } else if (geometryType === 'LineString') {
+                    if (!('color' in feature.properties)) {
+                        feature.properties.color = colorInput.value;
+                    }
+                    if (!('showMeasurements' in feature.properties)) {
+                        feature.properties.showMeasurements = measureCheckbox.checked;
+                    }
+                } else if (geometryType === 'Polygon') {
+                    if (!('color' in feature.properties)) {
+                        feature.properties.color = colorInput.value;
+                    }
+                    if (!('fill' in feature.properties)) {
+                        feature.properties.fill = fillCheckbox.checked;
+                    }
+                    if (!('showMeasurements' in feature.properties)) {
+                        feature.properties.showMeasurements = measureCheckbox.checked;
+                    }
+                }
+            });
+            editorLayer.addData(jsonData);
+            dataChanged();
+        } catch (error) {
+            console.error('File cannot be imported:', error);
+            alert('Cannot import file. Please ensure it is valid GeoJSON.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function exportEditor() {
+    const exportName = 'editor';
+    let fileName = prompt('Choose file name', exportName + '_' + getDateString() + '.json');
+    if (fileName === null || fileName.length == 0) {
+        return;
+    }
+    var pom = document.createElement('a');
+    let exportData = JSON.stringify(editorLayer.toGeoJSON());
+    pom.setAttribute('href', 'data:application/geo+json;charset=utf-8,' + encodeURIComponent(exportData));
+    pom.setAttribute('download', fileName);
+    const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+    });
+    pom.dispatchEvent(clickEvent);
+}
 
 function toggleMapClick(e) {
     isEditing = e.enabled;
