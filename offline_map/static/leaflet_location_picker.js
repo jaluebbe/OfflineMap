@@ -26,6 +26,18 @@ const myMarker = L.marker([50, 8.6], {
     })
 });
 
+var coordinateControl = L.control({
+    position: 'bottomright'
+});
+coordinateControl.onAdd = function(map) {
+    this._div = L.DomUtil.create('div', 'coordinate-control');
+    let tempSource = document.getElementById('coordinateControlTemplate');
+    this._div.appendChild(tempSource.content.cloneNode(true));
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+}
+coordinateControl.addTo(map);
+
 const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
 let isEditing = false;

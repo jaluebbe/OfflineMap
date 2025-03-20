@@ -5,7 +5,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
-    <title>OfflineMap - Leaflet example</title>
+    <title>OfflineMap</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -24,17 +24,6 @@
             height: 100%;
             width: 100%;
             min-height: 285px;
-        }
-
-        #coordinate-control {
-            padding: 5px;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            position: absolute;
-            bottom: 20px;
-            right: 10px;
-            z-index: 1000;
         }
 
         #region-control {
@@ -58,6 +47,15 @@
             padding: 5px;
         }
 
+        .coordinate-control {
+            background: white;
+            line-height: 1.5;
+            color: #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 5px;
+        }
+
         .legend-header {
             font-size: 14px;
             text-align: center;
@@ -71,7 +69,7 @@
         }
 
         #coordinate-input {
-            min-width: 135px;
+            min-width: 120px;
         }
 
         #coordinate-result {
@@ -80,6 +78,10 @@
             display: grid;
             grid-template-columns: auto auto;
             grid-gap: 5px;
+        }
+
+        #textInput {
+            width: 120px;
         }
 
         #io-control {
@@ -118,11 +120,11 @@
     <script src="maplibre-gl/maplibre-gl.js"></script>
     <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
     <script src="turf.min.js" charset="utf-8"></script>
-    <div id="coordinate-control" class="leaflet-control leaflet-bar">
+    <template id="coordinateControlTemplate">
         <div id="io-control">
-            <input id="fileInput" name="fileInput" type="file" accept=".geojson,.json" onchange="importEditor()">
+            <input id="fileInput" name="fileInput" type="file" accept=".geojson,.json,application/geo+json,application/json" onchange="importEditor()" hidden>
             <div class="io-buttons">
-                <button id="importButton" onclick="importEditor()">Import</button>
+                <button id="openButton" onclick="fileInput.click()">Open</button>
                 <button id="exportButton" onclick="exportEditor()">Export</button>
                 <button id="clearButton" onclick="clearEditor()">Clear</button>
             </div>
@@ -148,7 +150,7 @@
             <button id="coordinate-go-button">Go</button>
         </div>
         <div id="coordinate-result"></div>
-    </div>
+    </template>
 </body>
 <script src="/static/leaflet_map_offline.js"></script>
 <script src="/static/leaflet_location_picker.js"></script>
