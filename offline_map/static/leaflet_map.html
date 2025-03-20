@@ -81,6 +81,18 @@
             grid-template-columns: auto auto;
             grid-gap: 5px;
         }
+
+        #io-control {
+            display: grid;
+            grid-gap: 5px;
+            padding: 5px;
+        }
+
+        .io-buttons {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            grid-gap: 5px;
+        }
     </style>
 </head>
 
@@ -107,6 +119,14 @@
     <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
     <script src="turf.min.js" charset="utf-8"></script>
     <div id="coordinate-control" class="leaflet-control leaflet-bar">
+        <div id="io-control">
+            <input id="fileInput" name="fileInput" type="file" accept=".geojson,.json" onchange="importEditor()">
+            <div class="io-buttons">
+                <button id="importButton" onclick="importEditor()">Import</button>
+                <button id="exportButton" onclick="exportEditor()">Export</button>
+                <button id="clearButton" onclick="clearEditor()">Clear</button>
+            </div>
+        </div>
         <div id="region-control">
             <select id="state-select" onchange="stateSelectionChanged()">
                 <option value="">State selection</option>
