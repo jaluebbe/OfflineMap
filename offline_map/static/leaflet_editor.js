@@ -106,6 +106,7 @@ function loadEditorLayerFromLocalStorage() {
         const geoJSONData = JSON.parse(storedData);
         editorLayer.clearLayers();
         editorLayer.addData(geoJSONData);
+        fitBoundsToLayers();
     }
 }
 
@@ -213,7 +214,9 @@ function importEditor() {
                 }
             });
             editorLayer.addData(jsonData);
+            fitBoundsToLayers();
             dataChanged();
+            fileInput.value = '';
         } catch (error) {
             console.error('File cannot be imported:', error);
             alert('Cannot import file. Please ensure it is valid GeoJSON.');

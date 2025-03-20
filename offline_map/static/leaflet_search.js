@@ -71,6 +71,9 @@ function fitBoundsToLayers() {
     if (placesLayer.getLayers().length > 0) {
         bounds.extend(placesLayer.getBounds());
     }
+    if (typeof editorLayer !== 'undefined' && editorLayer.getLayers().length > 0) {
+        bounds.extend(editorLayer.getBounds());
+    }
     if (bounds.isValid()) {
         if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
             map.setView(bounds.getCenter(), 16);
