@@ -22,6 +22,7 @@ const plzLayer = L.geoJSON([], {
             weight: 2,
         };
     },
+    pmIgnore: true,
     showMeasurements: false,
 }).addTo(map);
 layerControl.addOverlay(plzLayer, "PLZ");

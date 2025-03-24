@@ -84,9 +84,15 @@ function updateFeatureProperties() {
         return;
     }
     const properties = selectedShape.feature.properties || {};
-    properties.color = colorInput.value;
-    properties.fill = fillCheckbox.checked;
-    properties.showMeasurements = measureCheckbox.checked;
+    if (!colorInput.disabled) {
+        properties.color = colorInput.value;
+    }
+    if (!fillCheckbox.disabled) {
+        properties.fill = fillCheckbox.checked;
+    }
+    if (!measureCheckbox.disabled) {
+        properties.showMeasurements = measureCheckbox.checked;
+    }
     properties.text = textInput.value;
     if (typeof selectedShape.setStyle === 'function') {
         const style = {

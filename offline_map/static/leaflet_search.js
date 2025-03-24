@@ -31,6 +31,7 @@ const placesLayer = L.geoJSON([], {
     },
     pane: 'search',
     showMeasurements: false,
+    pmIgnore: true,
 });
 
 function formatStreetTooltip(metadata) {
