@@ -127,7 +127,9 @@ const editorLayer = L.geoJSON([], {
     pane: 'editor',
     pointToLayer: function(feature, latlng) {
         const properties = feature.properties || {};
-        if ('fill' in properties || 'color' in properties) {
+        if ('radius' in properties) {
+            return L.circle(latlng, properties);
+        } else if ('fill' in properties || 'color' in properties) {
             return L.circleMarker(latlng, properties);
         }
         return L.marker(latlng);
@@ -276,6 +278,9 @@ map.on('pm:create', function(eo) {
     }
     if (eo.shape !== 'Marker' && eo.shape !== 'CircleMarker' && eo.shape !== 'Text') {
         properties.showMeasurements = measureCheckbox.checked;
+    }
+    if (eo.shape == 'Circle') {
+        properties.radius = layer.getRadius();
     }
     const text = textInput.value;
     if (text) {
