@@ -21,7 +21,7 @@ addPrivacyStatement();
 
 function addOSMVectorLayer(styleName, region, layerLabel) {
     let myLayer = L.maplibreGL({
-        style: '../api/vector/style/' + region + '/' + styleName + '.json',
+        style: '/api/vector/style/' + region + '/' + styleName + '.json',
         attribution: '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     });
     layerControl.addBaseLayer(myLayer, layerLabel);
