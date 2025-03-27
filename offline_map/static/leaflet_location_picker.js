@@ -103,11 +103,11 @@ function updateTooltip(plz, metadata) {
     myMarker._tooltip.setContent(tooltipContent);
 }
 
-function fetchPlzAndAgs(latlng) {
-    const plzPromise = fetch(`/api/get_plz_from_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+function fetchPlzAndAgs(lat, lon) {
+    const plzPromise = fetch(`/api/get_plz_from_lat_lon?latitude=${lat}&longitude=${lon}`)
         .then(handleApiResponse)
         .catch(() => (''));
-    const agsPromise = fetch(`/api/get_ags_from_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+    const agsPromise = fetch(`/api/get_ags_from_lat_lon?latitude=${lat}&longitude=${lon}`)
         .then(handleApiResponse)
         .catch(() => (''));
     Promise.all([plzPromise, agsPromise])
@@ -140,7 +140,8 @@ function processMapEvent(e) {
     }
     if (!isEditing) {
         convertPosition(e);
-        fetchPlzAndAgs(e.latlng.wrap());
+        const position = e.latlng.wrap()
+        fetchPlzAndAgs(position.lat, position.lng);
     }
 }
 
@@ -171,6 +172,7 @@ function handleCoordinateInput() {
             markerPositionedByInput = true;
             updateControl(data);
             updateMarker(data);
+            fetchPlzAndAgs(data.latitude, data.longitude);
         })
         .catch(error => {
             resultDiv.textContent = error.message;
