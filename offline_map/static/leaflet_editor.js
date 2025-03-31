@@ -183,6 +183,13 @@ function clearEditor() {
     if (confirmation) {
         editorLayer.clearLayers();
         dataChanged();
+        document.getElementById('plz-input').value = '';
+        document.getElementById('place-input').value = '';
+        document.getElementById('street-input').value = '';
+        document.getElementById('coordinate-input').value = '';
+        document.getElementById('coordinate-result').innerHTML = '';
+        document.getElementById('state-select').selectedIndex = 0;
+        stateSelectionChanged();
     }
 }
 
