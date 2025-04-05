@@ -56,6 +56,19 @@ sudo cp /home/gpstracker/OfflineMap/etc/systemd/system/offline_map_api.service /
 sudo systemctl enable offline_map_api.service 
 sudo systemctl start offline_map_api.service 
 ```
+### Setup hotspot
+The hotspot setup for systems running bookwork mainly follows https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/203-automated-switching-accesspoint-wifi-network
+.
+Type the following commands and set name and password for your hotspot
+network.
+You may also add multiple known networks where the device should join as a
+client.
+```
+curl "https://www.raspberryconnect.com/images/scripts/AccessPopup.tar.gz" -o AccessPopup.tar.gz
+tar -xvf ./AccessPopup.tar.gz
+cd AccessPopup
+sudo ./installconfig.sh
+```
 ### Prepare OpenStreetMap offline data (MBTiles) (optional)
 ```
 docker run -e JAVA_TOOL_OPTIONS="-Xmx10g" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=europe
