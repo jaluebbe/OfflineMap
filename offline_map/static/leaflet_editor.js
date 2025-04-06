@@ -153,6 +153,9 @@ const editorLayer = L.geoJSON([], {
     style: function(feature) {
         const properties = feature.properties || {};
         const style = {};
+        if (L.Browser.mobile) {
+            stle.weight = 4;
+        }
         if (properties.color) {
             style.color = properties.color;
         }
