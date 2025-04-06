@@ -11,17 +11,24 @@ You may start with a small region like Bremen to ensure everything is running.
 Depending on your hardware for file preparation your may create a file not just for Germany but also the DACH region or even the whole of Europe.
 
 ### Setup of Python environment (mandatory)
+You may skip geopandas and pyosmium if you do not intend to reprocess any
+database or shapefile.
 #### On a 64 bit quad-core Raspi
+As user with sudo privileges:
+```
+sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-pyosmium
+```
+and as user gpstracker:
 ```
 cd offline_map
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install pygeodesy point-in-geojson geopandas gdown
 ```
 ##### On a 32 bit single-core Raspi
 As user with sudo privileges:
 ```
-sudo apt install python3-fastapi python3-uvicorn python3-geopandas python3-pyosmium
+sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-geopandas python3-pyosmium
 ```
 and as user gpstracker:
 ```
@@ -30,8 +37,6 @@ python -m venv --system-site-packages venv
 source venv/bin/activate
 pip install pygeodesy point-in-geojson gdown
 ```
-You may skip geopandas and pyosmium if you do not intend to reprocess any
-database or shapefile.
 #### Finally
 Check your Python version by calling:
 ```
