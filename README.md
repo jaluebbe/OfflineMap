@@ -11,12 +11,33 @@ You may start with a small region like Bremen to ensure everything is running.
 Depending on your hardware for file preparation your may create a file not just for Germany but also the DACH region or even the whole of Europe.
 
 ### Setup of Python environment (mandatory)
+You may skip geopandas and pyosmium if you do not intend to reprocess any
+database or shapefile.
+#### On a 64 bit quad-core Raspi
+As user with sudo privileges:
+```
+sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-pyosmium
+```
+and as user gpstracker:
 ```
 cd offline_map
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install pygeodesy point-in-geojson geopandas gdown
 ```
+##### On a 32 bit single-core Raspi
+As user with sudo privileges:
+```
+sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-geopandas python3-pyosmium
+```
+and as user gpstracker:
+```
+cd offline_map
+python -m venv --system-site-packages venv
+source venv/bin/activate
+pip install pygeodesy point-in-geojson gdown
+```
+#### Finally
 Check your Python version by calling:
 ```
 python --version
@@ -25,8 +46,35 @@ If your version is below 3.10 call:
 ```
 pip install eval_type_backport
 ```
-
-### Prepare OpenStreetMap offline data (MBTiles) (mandatory)
+Download a pre-built mbtiles for Germany:
+```
+gdown 'https://drive.google.com/uc?id=15LSW2EPb7X6Cd8dMHQCdyqUVVSWgMot3' -O ../germany.mbtiles
+```
+or start with a smaller one for Bremen:
+```
+gdown 'https://drive.google.com/uc?id=15LSW2EPb7X6Cd8dMHQCdyqUVVSWgMot3' -O ../bremen.mbtiles
+```
+### Install as a system service
+As sudo user call:
+```
+sudo cp /home/gpstracker/OfflineMap/etc/systemd/system/offline_map_api.service /etc/systemd/system/
+sudo systemctl enable offline_map_api.service 
+sudo systemctl start offline_map_api.service 
+```
+### Setup hotspot
+The hotspot setup for systems running bookwork mainly follows https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/203-automated-switching-accesspoint-wifi-network
+.
+Type the following commands and set name and password for your hotspot
+network.
+You may also add multiple known networks where the device should join as a
+client.
+```
+curl "https://www.raspberryconnect.com/images/scripts/AccessPopup.tar.gz" -o AccessPopup.tar.gz
+tar -xvf ./AccessPopup.tar.gz
+cd AccessPopup
+sudo ./installconfig.sh
+```
+### Prepare OpenStreetMap offline data (MBTiles) (optional)
 ```
 docker run -e JAVA_TOOL_OPTIONS="-Xmx10g" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=europe
 ```
