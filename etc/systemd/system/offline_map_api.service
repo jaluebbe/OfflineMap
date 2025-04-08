@@ -1,0 +1,13 @@
+[Unit]
+Description=Host an API to serve OpenStreetMap
+After=redis-server.service
+
+[Service]
+Type=simple
+User=gpstracker
+Restart=on-failure
+WorkingDirectory=/home/gpstracker/OfflineMap/offline_map
+ExecStart=/home/gpstracker/OfflineMap/offline_map/backend.py
+
+[Install]
+WantedBy=multi-user.target
