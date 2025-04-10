@@ -112,6 +112,11 @@ It took 0:43:08 and resulted in a file size of 3.8 GB.
 
 For larger OSM regions like Europe, the internal SSD (245.11 GB) is to small to handle amount of data.
 
+You might also try a version of planetiler that is configured for the
+OpenMapTiles styles:
+
+openmaptiles/planetiler-openmaptiles:latest
+
 ### Prepare shapefiles and databases (optional)
 OpenStreetMap provides a lot of great information.
 However, there is no guarantee that all levels of administrative boundaries of the country are available.
