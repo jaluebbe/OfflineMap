@@ -21,6 +21,13 @@ function updateEditorTooltip(layer, text) {
 }
 
 function dataChanged() {
+    editorLayer.eachLayer(layer => {
+        if (layer.feature && layer.feature.properties) {
+            if (layer.options && layer.options.text) {
+                layer.feature.properties.markerText = layer.options.text || '';
+            }
+        }
+    });
     const data = editorLayer.toGeoJSON();
     localStorage.setItem('editorLayerData', JSON.stringify(data));
 }
@@ -80,7 +87,6 @@ function updateInputsFromProperties(properties) {
 
 function updateFeatureProperties() {
     if (!selectedShape || !selectedShape.feature) {
-        console.warn('Kein Shape ausgewählt, um die Eigenschaften zu aktualisieren.');
         return;
     }
     const properties = selectedShape.feature.properties || {};
@@ -137,6 +143,11 @@ const editorLayer = L.geoJSON([], {
             return L.circle(latlng, properties);
         } else if ('fill' in properties || 'color' in properties) {
             return L.circleMarker(latlng, properties);
+        } else if ('markerText' in properties) {
+            return L.marker(latlng, {
+                textMarker: true,
+                text: properties.markerText,
+            });
         }
         return L.marker(latlng);
     },
@@ -186,13 +197,14 @@ function clearEditor() {
     if (confirmation) {
         editorLayer.clearLayers();
         dataChanged();
+        document.getElementById('state-select').selectedIndex = 0;
+        stateSelectionChanged();
         document.getElementById('plz-input').value = '';
+        plzChanged();
         document.getElementById('place-input').value = '';
         document.getElementById('street-input').value = '';
         document.getElementById('coordinate-input').value = '';
         document.getElementById('coordinate-result').innerHTML = '';
-        document.getElementById('state-select').selectedIndex = 0;
-        stateSelectionChanged();
     }
 }
 
@@ -286,6 +298,9 @@ map.on('pm:create', function(eo) {
         properties: {}
     };
     const properties = layer.feature.properties;
+    if (eo.shape === 'Text') {
+        properties.markerText = layer.options.text;
+    }
     if (eo.shape !== 'Marker' && eo.shape !== 'Text') {
         properties.color = colorInput.value;
     }
