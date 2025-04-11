@@ -30,6 +30,7 @@ const regionsLayer = L.geoJSON([], {
             weight: 2,
         };
     },
+    pmIgnore: true,
     showMeasurements: false,
 }).addTo(map);
 layerControl.addOverlay(regionsLayer, "Regions");
@@ -85,8 +86,10 @@ async function fetchAndAddGeoJSON(baseUrl, ags, layer) {
         const response = await fetch(url);
         const geojson = await response.json();
         layer.addData(geojson);
-        const bounds = layer.getBounds();
-        map.fitBounds(bounds);
+        if (map.hasLayer(layer)) {
+            const bounds = layer.getBounds();
+            map.fitBounds(bounds);
+        }
     } catch (error) {
         console.error(`Error fetching features from ${baseUrl}:`, error);
     }
