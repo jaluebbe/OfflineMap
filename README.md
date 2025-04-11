@@ -76,14 +76,16 @@ sudo ./installconfig.sh
 ```
 ### Prepare OpenStreetMap offline data (MBTiles) (optional)
 ```
-docker run -e JAVA_TOOL_OPTIONS="-Xmx10g" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=europe
+docker run -e JAVA_TOOL_OPTIONS="-Xmx10g" -v "$(pwd)/data":/data openmaptiles/planetiler-openmaptiles:latest --download --force --area=europe
+mv data/output.mbtiles data/europe.mbtiles
 ```
-You need Docker. Do not try this on a Raspberry Pi. It may take more than a day to create
-the output.mbtiles even on a powerful machine. You may choose another or a
+You need Docker. Do not try this on a Raspberry Pi. It may take more than a day to create the europe.mbtiles even on a powerful machine. You may choose another or a
 smaller region (e.g. "germany" or "dach" to include Austria, Germany and Switzerland).
 For more information see the
-[planetiler documentation](https://github.com/onthegomap/planetiler).
-Finally, copy the output.mbtiles to the following location on your Raspberry Pi:
+[Planetiler documentation](https://github.com/onthegomap/planetiler)
+and the documentation of the [Planetiler OpenMapTiles
+Profile](https://github.com/openmaptiles/planetiler-openmaptiles).
+Finally, copy the renamed output.mbtiles to the following location on your Raspberry Pi:
 ```
 /home/gpstracker/OfflineMap/
 ```
@@ -94,21 +96,24 @@ A [workaround](https://github.com/corretto/corretto-21/issues/85) with the addit
 These are some calls that were running successful on a Mac Mini M4 with 16GB of RAM.
 For the first test I started with the state of Lower Saxony:
 ```
-docker run -e JAVA_TOOL_OPTIONS="-Xmx1g -XX:UseSVE=0" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=niedersachsen
+docker run -e JAVA_TOOL_OPTIONS="-Xmx1g -XX:UseSVE=0" -v "$(pwd)/data":/data openmaptiles/planetiler-openmaptiles:latest --download --force --area=niedersachsen
+mv data/output.mbtiles data/niedersachsen.mbtiles
 ```
-It took 0:02:38 and resulted in a file size of 368 MB. 
+It took 0:02:49 and resulted in a file size of 368 MB. 
 
 Next I processed the data for Germany:
 ```
-docker run -e JAVA_TOOL_OPTIONS="-Xmx2g -XX:UseSVE=0" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=germany
+docker run -e JAVA_TOOL_OPTIONS="-Xmx2g -XX:UseSVE=0" -v "$(pwd)/data":/data openmaptiles/planetiler-openmaptiles:latest --download --force --area=germany
+mv data/output.mbtiles data/germany.mbtiles
 ```
-It took 0:30:42 and resulted in a file size of 2.9 GB.
+It took 0:56:52 and resulted in a file size of 2.9 GB.
 
 Finally I was able to create a dataset for the DACH region (Germany, Austria, Switzerland):
 ```
-docker run -e JAVA_TOOL_OPTIONS="-Xmx2g -XX:UseSVE=0" -v "$(pwd)/data":/data ghcr.io/onthegomap/planetiler:latest --download --area=dach
+docker run -e JAVA_TOOL_OPTIONS="-Xmx2g -XX:UseSVE=0" -v "$(pwd)/data":/data openmaptiles/planetiler-openmaptiles:latest --download --force --area=dach
+mv data/output.mbtiles data/dach.mbtiles
 ```
-It took 0:43:08 and resulted in a file size of 3.8 GB.
+It took 1:02:05 and resulted in a file size of 3.8 GB.
 
 For larger OSM regions like Europe, the internal SSD (245.11 GB) is to small to handle amount of data.
 
