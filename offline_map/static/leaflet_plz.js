@@ -22,6 +22,7 @@ const plzLayer = L.geoJSON([], {
             weight: 2,
         };
     },
+    pmIgnore: true,
     showMeasurements: false,
 }).addTo(map);
 layerControl.addOverlay(plzLayer, "PLZ");
@@ -38,7 +39,7 @@ async function plzChanged() {
         const geojson = await response.json();
         if (response.ok) {
             plzLayer.addData(geojson);
-            if (geojson.length > 0) {
+            if (geojson.length > 0 && map.hasLayer(plzLayer)) {
                 const bounds = plzLayer.getBounds();
                 map.fitBounds(bounds);
             }

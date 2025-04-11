@@ -1,4 +1,3 @@
-import re
 import sqlite3
 from pathlib import Path
 import point_in_geojson
@@ -8,11 +7,6 @@ script_dir = Path(__file__).parent
 db_path = script_dir / "germany.db"
 with open(script_dir / "communities_germany.json") as f:
     pig_communities = point_in_geojson.PointInGeoJSON(f.read())
-
-
-def sqlite_regexp(expr, item):
-    reg = re.compile(expr)
-    return reg.search(item) is not None
 
 
 def get_ags_metadata(ags: str) -> dict | None:
@@ -57,20 +51,18 @@ def get_features_for_ags(ags: str) -> list[dict]:
 
 
 def query_community(search_term, case_insensitive=False, ags=""):
-    search_term = re.escape(search_term)
-    regex = f"^(?:|.*[ \\-]){search_term}.*$"
-    if case_insensitive:
-        regex = f"(?i){regex}"
+    search_term = f"%{search_term}%"
     ags = ags.ljust(8, "_")
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
-        conn.create_function("REGEXP", 2, sqlite_regexp)
         cursor = conn.cursor()
+        if not case_insensitive:
+            cursor.execute("PRAGMA case_sensitive_like = ON;")
         cursor.execute(
             """
             SELECT * FROM community_view
-            WHERE community REGEXP ? AND ags LIKE ?
+            WHERE community LIKE ? AND ags LIKE ?
             """,
-            (regex, ags),
+            (search_term, ags),
         )
         columns = [column[0] for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]
@@ -78,23 +70,21 @@ def query_community(search_term, case_insensitive=False, ags=""):
 
 
 def query_location(search_term, case_insensitive=False, ags="", plz=""):
-    search_term = re.escape(search_term)
-    regex = f"^(?:|.*[ \\-]){search_term}.*$"
-    if case_insensitive:
-        regex = f"(?i){regex}"
+    search_term = f"%{search_term}%"
     ags = ags.ljust(8, "_")
     plz = plz.ljust(5, "_")
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
-        conn.create_function("REGEXP", 2, sqlite_regexp)
         cursor = conn.cursor()
+        if not case_insensitive:
+            cursor.execute("PRAGMA case_sensitive_like = ON;")
         cursor.execute(
             """
             SELECT l.plz, cv.*
             FROM location_ags_plz l
             JOIN community_view cv ON l.ags = cv.ags
-            WHERE community REGEXP ? AND l.ags LIKE ? AND l.plz LIKE ?
+            WHERE community LIKE ? AND l.ags LIKE ? AND l.plz LIKE ?
             """,
-            (regex, ags, plz),
+            (search_term, ags, plz),
         )
         columns = [column[0] for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]
@@ -104,22 +94,21 @@ def query_location(search_term, case_insensitive=False, ags="", plz=""):
 def query_distinct_location(
     search_term, case_insensitive=False, ags="", plz=""
 ):
-    regex = f"^(?:|.*[ \\-]){search_term}.*$"
-    if case_insensitive:
-        regex = f"(?i){regex}"
+    search_term = f"%{search_term}%"
     ags = ags.ljust(8, "_")
     plz = plz.ljust(5, "_")
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
-        conn.create_function("REGEXP", 2, sqlite_regexp)
         cursor = conn.cursor()
+        if not case_insensitive:
+            cursor.execute("PRAGMA case_sensitive_like = ON;")
         cursor.execute(
             """
             SELECT DISTINCT cv.*
             FROM location_ags_plz l
             JOIN community_view cv ON l.ags = cv.ags
-            WHERE community REGEXP ? AND l.ags LIKE ? AND l.plz LIKE ?
+            WHERE community LIKE ? AND l.ags LIKE ? AND l.plz LIKE ?
             """,
-            (regex, ags, plz),
+            (search_term, ags, plz),
         )
         columns = [column[0] for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]
@@ -127,21 +116,19 @@ def query_distinct_location(
 
 
 def query_places(search_term, case_insensitive=False, ags="", plz=""):
-    search_term = re.escape(search_term)
-    regex = f"^(?:|.*[ \\-]){search_term}.*$"
-    if case_insensitive:
-        regex = f"(?i){regex}"
+    search_term = f"%{search_term}%"
     ags = ags.ljust(8, "_")
     plz = plz.ljust(5, "_")
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
-        conn.create_function("REGEXP", 2, sqlite_regexp)
         cursor = conn.cursor()
+        if not case_insensitive:
+            cursor.execute("PRAGMA case_sensitive_like = ON;")
         cursor.execute(
             """
             SELECT * FROM osm_places
-            WHERE name REGEXP ? AND ags LIKE ? AND plz LIKE ?
+            WHERE name LIKE ? AND ags LIKE ? AND plz LIKE ?
             """,
-            (regex, ags, plz),
+            (search_term, ags, plz),
         )
         columns = [column[0] for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]

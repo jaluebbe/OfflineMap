@@ -26,6 +26,18 @@ const myMarker = L.marker([50, 8.6], {
     })
 });
 
+var coordinateControl = L.control({
+    position: 'bottomright'
+});
+coordinateControl.onAdd = function(map) {
+    this._div = L.DomUtil.create('div', 'coordinate-control');
+    let tempSource = document.getElementById('coordinateControlTemplate');
+    this._div.appendChild(tempSource.content.cloneNode(true));
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+}
+coordinateControl.addTo(map);
+
 const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
 let isEditing = false;
@@ -91,11 +103,11 @@ function updateTooltip(plz, metadata) {
     myMarker._tooltip.setContent(tooltipContent);
 }
 
-function fetchPlzAndAgs(latlng) {
-    const plzPromise = fetch(`/api/get_plz_from_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+function fetchPlzAndAgs(lat, lon) {
+    const plzPromise = fetch(`/api/get_plz_from_lat_lon?latitude=${lat}&longitude=${lon}`)
         .then(handleApiResponse)
         .catch(() => (''));
-    const agsPromise = fetch(`/api/get_ags_from_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
+    const agsPromise = fetch(`/api/get_ags_from_lat_lon?latitude=${lat}&longitude=${lon}`)
         .then(handleApiResponse)
         .catch(() => (''));
     Promise.all([plzPromise, agsPromise])
@@ -128,7 +140,8 @@ function processMapEvent(e) {
     }
     if (!isEditing) {
         convertPosition(e);
-        fetchPlzAndAgs(e.latlng.wrap());
+        const position = e.latlng.wrap()
+        fetchPlzAndAgs(position.lat, position.lng);
     }
 }
 
@@ -159,6 +172,7 @@ function handleCoordinateInput() {
             markerPositionedByInput = true;
             updateControl(data);
             updateMarker(data);
+            fetchPlzAndAgs(data.latitude, data.longitude);
         })
         .catch(error => {
             resultDiv.textContent = error.message;
