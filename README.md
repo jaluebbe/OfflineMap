@@ -16,7 +16,7 @@ database or shapefile.
 #### On a 64 bit quad-core Raspi
 As user with sudo privileges:
 ```
-sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-pyosmium
+sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-pyosmium iptables
 ```
 and as user gpstracker:
 ```
@@ -61,9 +61,29 @@ sudo cp /home/gpstracker/OfflineMap/etc/systemd/system/offline_map_api.service /
 sudo systemctl enable offline_map_api.service 
 sudo systemctl start offline_map_api.service 
 ```
+
+### Setup port forwarding
+If you would avoid to add :8000 to the hostname of the device you can create
+a port forwarding from port 80 to 8000.
+At first try if it works by calling
+```
+sudo /usr/sbin/iptables -A PREROUTING -t nat -i wlan0 -p tcp --dport 80 -j REDIRECT --to-port 8000
+```
+and test if you could call the device without the port number.
+Then call:
+```
+sudo apt install iptables-persistent
+```
+During installation, you will be prompted to save the current iptables rules. Select Yes.
+If you change your rules after the installation of iptables-persistent just
+call:
+```
+sudo netfilter-persistent save
+```
+
 ### Setup hotspot
-The hotspot setup for systems running bookwork mainly follows https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/203-automated-switching-accesspoint-wifi-network
-.
+The hotspot setup for systems running bookwork mainly follows this
+[Tutorial](https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/203-automated-switching-accesspoint-wifi-network).
 Type the following commands and set name and password for your hotspot
 network.
 You may also add multiple known networks where the device should join as a
