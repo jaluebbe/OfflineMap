@@ -30,7 +30,7 @@
                 </p>
                 <p><a href="https://2025.pycon.de/">PyConDE & PyData Darmstadt 2025</a></p>
                 <aside class="notes">
-                    Thanks for the introduction. Besides my work as Sensor Developer at ROSEN ...
+                    Thanks for the introduction. In addition to my work as a Sensor Developer at ROSEN ...
                 </aside>
             </section>
             <section>
@@ -50,7 +50,7 @@
                 </p>
                 <aside class="notes">
                     ..., I am also one of 88,000 volunteers at the THW, the German Federal Agency for Technical Relief.
-                    Internally, we call ourselves "helpers" and are organized in 668 local sections.
+                    Internally, we refer to ourselves as "helpers" and are organised into 668 local sections.
                 </aside>
             </section>
             <section>
@@ -74,9 +74,9 @@
                     <a href="https://www.thw-osnabrueck.de/" target="_blank">www.thw-osnabrueck.de</a>
                 </p>
                 <aside class="notes">
-                    Each local section houses at least one technical platoon consisting of about 30 helpers.
-                    The technical platoon consists of the command squad, the rescue squad and at the technical squad.
-                    The technical squad covers one out of more than 12 different specialities which may be electricity, infrastructure, water hazards, and many more.
+                    Each local section houses at least one technical platoon consisting of approximately 30 helpers.
+                    The technical platoon is made up of the command squad, the rescue squad and at the technical squad.
+                    The technical squad specialises in one of over 12 different areas, such as electricity, infrastructure, water hazards, and more.
                 </aside>
             </section>
             <section>
@@ -97,9 +97,10 @@
                 </div>
                 <aside class="notes">
                     I am a helper in the command squad.
-                    Our task is to support the decisions of our platoon leader by handling the radio communication,
-                    creating a situation map and providing a personnel overview.
-                    In this talk I will present a personal project inspired by a recent training on paper maps.
+                    Our role is to support the decisions of our platoon leader by managing the radio communication,
+                    creating a situation map, and maintaining a personnel overview.
+                    In this talk, I will present a personal project inspired
+                    by a recent training exercise involving paper maps.
                 </aside>
             </section>
             <section>
@@ -113,12 +114,13 @@
                     <li>Supports UTMREF coordinates</li>
                 </ul>
                 <aside class="notes">
-                    Let's take a look on the requirements for a digital situation map.
-                    When we are deployed to a disaster area beyond our home region we start without any local maps.
+                    Let us examine the requirements for a digital situation map.
+                    When deployed to a disaster area beyond our home region,
+                    we often start without any local maps.
                     Mobile phones and internet may be interupted due to power outages.
-                    We would like to be able to draw into the map.
+                    We would like the ability to draw directly onto the map.
                     The map should be accessible over WiFi.
-                    And here at the THW we are used to the UTMREF coordinate system.
+                    Additionally, at the THW we are accustomed to the UTMREF coordinate system.
                 </aside>
             </section>
             <section>
@@ -201,6 +203,13 @@
                     </table>
                 </div>
                 <aside class="notes">
+                    Now, let us explore the OpenStreetMap data for Germany.
+                    The download is approximately 4.2 GB in size and provided in the Protocolbuffer Binary Format (PBF).
+                    It primarily contains three types of objects: nodes, ways, and relations.
+                    Each object is associated with a set of tags.
+                    The fundamental element is a node, which is defined by its location.
+                    The second element is a way which is a collection of nodes.
+                    Finally, a relation is a collection of ways and nodes.
                 </aside>
             </section>
             <section>
@@ -214,6 +223,12 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
 </code>
 </pre>
                 </p>
+                <aside class="notes">
+                    The large OpenStreetMap file cannot be served directly to users.
+                    Instead, I used Plantiler to create an MBTiles file.
+                    MBTiles is based on SQLite and contains tiles of the relevant data for various zoom levels and locations.
+                    The tiles are served via FastAPI through the endpoint shown here.
+                </aside>
             </section>
             <section>
                 <h3>Raspberry Pi Zero 2 W</h3>
@@ -230,6 +245,8 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                 </ul>
                 <img src="img/raspi_zero_w.jpg" style="height: 200px;">
                 <aside class="notes">
+                    To host the map, I selected a Raspberry Pi Zero 2 W.
+                    It is low-cost, energy-efficient and can easily be powered by mobile power sources.
                 </aside>
             </section>
             <section>
@@ -240,6 +257,11 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                     <li>Creates a WiFi hotspot if no network is available</li>
                 </ul>
                 <aside class="notes">
+                    To create a WiFi access point with the Raspberry Pi,
+                    I used a script from raspberryconnect.com rather than reinventing the wheel.
+                    If no known WiFi network is found, it creates a hotspot.
+                    When a known network is detected, it connects to it.
+                    This simplifies system updates at the home base.
                 </aside>
             </section>
             <section>
@@ -252,6 +274,9 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                 </ul>
                 <img src="img/osm_leaflet_example.png" style="height: 300px; border: 1px solid #ccc;">
                 <aside class="notes">
+                    To display the map, I used Leaflet.js with the MapLibre plugin for vector maps.
+                    Geoman.io adds editing capabilities, while the leaflet-measure-path
+                    plugin enables the measurement of distances and areas.
                 </aside>
             </section>
             <section>
@@ -264,6 +289,11 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                     <div>OSM Liberty</div>
                 </div>
                 <aside class="notes">
+                    When using vector maps, the map is rendered in the browser.
+                    The style file determines how and whether features from the OSM tile are displayed.
+                    For the offline version, I modified the style files from OpenMapTiles to
+                    account for the local paths of tiles, fonts, and sprites (icons).
+                    I also ensured that the required fonts and sprites were available as open source.
                 </aside>
             </section>
             <section>
@@ -274,19 +304,26 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                 <p><a href="https://geopandas.org/">GeoPandas</a> converts shape files to GeoJSON</p>
                 <img src="img/regions_shapes.png" style="height: 400px; border: 1px solid #ccc;">
                 <aside class="notes">
+                    To prepare for the location search, I downloaded shapefiles describing
+                    administrative boundaries from the Federal Agency for Cartography and Geodesy.
+                    I converted these shapefiles to GeoJSON using GeoPandas.
                 </aside>
             </section>
             <section>
-                <h3>Post code regions</h3>
+                <h3>Postcode regions</h3>
                 <p>
                     Simplified GeoJSON and CSV file downloaded from <a href="https://www.suche-postleitzahl.org/downloads">www.suche-postleitzahl.org</a>
                 </p>
                 <img src="img/plz_shapes.png" style="height: 400px; border: 1px solid #ccc;">
                 <aside class="notes">
+                    For the postcode regions, a direct GeoJSON download is available.
+                    I selected a medium precision for the downloaded file to conserve memory and processing time.
+                    I conducted checks in my hometown to ensure the selected precision did not significantly affect the results.
+                    However, searching within the GeoJSON shapes remains computationally demanding.
                 </aside>
             </section>
             <section>
-                <h3>Post code search</h3>
+                <h3>Postcode search</h3>
                 <p>
                     Created a <a href="https://pyo3.rs/">PyO3</a> module in <a href="http://rust-lang.org/">Rust</a> to perform fast search operations on GeoJSON files</a>
                 </p>
@@ -308,6 +345,12 @@ def get_features_for_plz(plz: str) -> list[dict]:
 </pre>
                 <p><a href="https://github.com/jaluebbe/point_in_geojson">https://github.com/jaluebbe/point_in_geojson</a></p>
                 <aside class="notes">
+                    To address this, I created a Python module in Rust using PyO3 to accelerate the search.
+                    The main challenge was that most PyO3 tutorials did not include examples where
+                    a class is initialised once and accessed multiple times via instance methods.
+                    Here, we first read the GeoJSON containing the postcode areas.
+                    We can then either query the postcode for a given coordinate or
+                    retrieve the shapes matching a specific postcode fragment.
                 </aside>
             </section>
             <section>
@@ -327,6 +370,9 @@ def get_features_for_plz(plz: str) -> list[dict]:
                 </ul>
                 <p>Data stored as <b>SQLite</b> for further processing</p>
                 <aside class="notes">
+                    Now, let us return to the OpenStreetMap PBF data to extract places.
+                    I used PyOsmium to extract all nodes with a name tag and a place tag of the specified types.
+                    This data is stored in a preliminary SQLite database.
                 </aside>
             </section>
             <section>
@@ -346,12 +392,15 @@ def get_features_for_plz(plz: str) -> list[dict]:
                 </ul>
                 <p>Data stored as <b>SQLite</b> for further processing</p>
                 <aside class="notes">
+                    The extraction of streets works in a similar way.
+                    Here, I extract all named ways, including their location nodes,
+                    if they have a highway tag of any category corresponding to a public street.
+                    Once again, the results are stored in a preliminary SQLite database.
                 </aside>
             </section>
             <section>
                 <h3>Creation of the search database</h3>
                 <p>Cluster places and streets by post codes and administrative regions for a more efficient search.</p>
-                <p>Simplify streets to a single point.</p>
                 <p>Most common search results in Germany:</p>
                 <table style="border-collapse: collapse; font-size: 18px;">
                     <thead>
@@ -374,7 +423,14 @@ def get_features_for_plz(plz: str) -> list[dict]:
                         </tr>
                     </tbody>
                 </table>
+                <p>Simplify streets to a single point.</p>
                 <aside class="notes">
+                    In the next step, the extracted places and streets are matched
+                    to the administrative and postcode regions you have seen earlier.
+                    This clustering is important because their names are not unique.
+                    For example, there are 79 places named "Altstadt" (meaning historic city centre) in Germany.
+                    Similarly, "Hauptstraße" (meaning main street) is the most common street name, with 6,435 occurrences.
+                    To reduce the size of the data, I simplified the streets to a single point per cluster.
                 </aside>
             </section>
             <section>
@@ -396,6 +452,13 @@ def simplify_locations(locations):
                         each street is reduced from multiple lines to a single point on the street.</p>
                 </div>
                 <aside class="notes">
+                    For the simplification of streets,
+                    I sought a way to find a representative point that is still part of the street itself.
+                    For this procedure, I used the Shapely library.
+                    First, I created the centroid of the street segment.
+                    Then, I identified the point on the street closest to the centroid.
+                    If there were multiple segments of the same street,
+                    I repeated the procedure on the simplified points of the segments.
                 </aside>
             </section>
             <section>
@@ -462,12 +525,12 @@ def simplify_locations(locations):
                 </div>
                 <p><a href="https://github.com/mrJean1/PyGeodesy">PyGeodesy</a> for lat/lon conversion needs zero padding.</p>
                 <aside class="notes">
-                    You may be used to latitude and longitude coordinates describing a location on the globe.
-                    In the Military Grid Reference System (called UTMREF in Germany) the world is projected on 100 km squares with a two-letter code.
-                    Depending on the number of digits in the coordinate, the precision of the location within the square increases.
-                    For practical use, the 10 or 100 m precision is sufficient.
-                    The conversion between latitude/longitude and UTMREF can be done by using PyGeodesy.
-                    However, zero padding is required as PyGeodesy expects the coordinates as float values representing meters.
+                    You may be familiar with latitude and longitude coordinates describing a location on the globe.
+                    In the Military Grid Reference System (called UTMREF in Germany), the world is projected onto 100 km squares with a two-letter code.
+                    The precision of the location within the square increases with the number of digits in the coordinate.
+                    For practical purposes, 10 or 100 m precision is usually sufficient.
+                    The conversion between latitude/longitude and UTMREF can be performed using PyGeodesy.
+                    However, zero padding is required, as PyGeodesy expects the coordinates as float values representing metres.
                 </aside>
             </section>
             <section>
@@ -477,26 +540,41 @@ def simplify_locations(locations):
                     <button onclick="openDemo('/static/pycon_talk/map_demo.html');">Open demo in the web</button>
                 </div>
                 <aside class="notes">
+                    After all that theory, I will show a live demo hosted on this Raspberry Pi.
+                    As I mentioned earlier, we may be limited to spoken radio communication in the event of a disaster.
+                    Let us examine the incoming messages.
+                    ...
+                    After some time, the units become idle and request new missions.
+                    In such cases, it would be helpful to know which unit is closest to a specific street that needs to be cleared.
+                    This is why I am considering integrating LoRaWAN into the system.
                 </aside>
             </section>
             <section>
                 <h3>Long Range Wide Area Network (LoRaWAN)</h3>
                 <ul>
                     <li>Operates at <b>868 MHz</b> in Europe</li>
-                    <li>Long range</li>
-                    <li>Low power</li>
-                    <li>Low data rate</li>
+                    <li>Long range, low power, low data rate</li>
+                    <li>Battery powered sensor nodes<ul>
+                        <li>Temperature</li>
+                        <li>Water level</li>
+                        <li>GPS location</li>
+                    </ul></li>
+                    <li>Required infrastructure<ul>
+                        <li>Gateways</li>
+                        <li>Cloud</li>
+                    </ul></li>
                 </ul>
                 <aside class="notes">
+                    LoRaWAN operates at 868 MHz in Europe.
+                    It is designed for long-range, low-power, and low-data-rate applications.
+                    Its low energy consumption means that the battery of a sensor node measuring temperature or water level may last for several years.
+                    However, a GPS tracker may only last for a few days, depending on the update rate.
+                    Typically, the infrastructure consists of gateways that receive sensor node messages and forward them to a cloud server.
                 </aside>
             </section>
             <section>
                 <h3>LORAWAN experiments</h3>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
-                    <div>
-                        <img src="img/pressure_level_sensor.jpg" style="height: 400px;" />
-                        <div>Pressure sensor for level sensing</div>
-                    </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; text-align: center;">
                     <div>
                         <img src="img/lorawan_gateway.jpg" style="height: 400px;" />
                         <div>Gateway with server</div>
@@ -507,12 +585,22 @@ def simplify_locations(locations):
                     </div>
                 </div>
                 <aside class="notes">
+                    To be honest, I am a bit behind my personal schedule.
+                    However, let us take a look at my experiments.
+                    I started with a gateway and a temperature sensor node.
+                    Currently, the gateway is connected to the cloud,
+                    but I am planning to switch to its internal server based on ChirpStack.
                 </aside>
             </section>
             <section>
                 <h3>LORAWAN range test</h3>
                 <img src="img/lorawan_range_test.png" style="height: 530px;" />
                 <aside class="notes">
+                    The gateway is located on my balcony, about 5m above ground (blue circle).
+                    I took a short walk to check where data transmission was possible and where it was not.
+                    My maximum range exceeded 800m in a residential area.
+                    The next steps will involve creating a mobile stand-alone setup and adding GPS trackers as well as water level sensors.
+                    I will also ask my neighbours on the third floor if I can use their balcony for another test.
                 </aside>
             </section>
             <section>
@@ -525,6 +613,8 @@ def simplify_locations(locations):
                     <a href="https://github.com/jaluebbe/OfflineMap">https://github.com/jaluebbe/OfflineMap</a>
                 </p>
                 <aside class="notes">
+                    Thank you for your attention.
+                    If you have any questions, feel free to ask.
                 </aside>
             </section>
         </div>
