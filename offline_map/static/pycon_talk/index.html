@@ -75,7 +75,7 @@
                 </p>
                 <aside class="notes">
                     Each local section houses at least one technical platoon consisting of approximately 30 helpers.
-                    The technical platoon is made up of the command squad, the rescue squad and at the technical squad.
+                    The technical platoon is made up of the command squad, the rescue squad and the technical squad.
                     The technical squad specialises in one of over 12 different areas, such as electricity, infrastructure, water hazards, and more.
                 </aside>
             </section>
@@ -117,7 +117,7 @@
                     Let us examine the requirements for a digital situation map.
                     When deployed to a disaster area beyond our home region,
                     we often start without any local maps.
-                    Mobile phones and internet may be interupted due to power outages.
+                    Mobile phone networks and internet may be interupted due to power outages.
                     We would like the ability to draw directly onto the map.
                     The map should be accessible over WiFi.
                     Additionally, at the THW we are accustomed to the UTMREF coordinate system.
@@ -292,7 +292,8 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                     When using vector maps, the map is rendered in the browser.
                     The style file determines how and whether features from the OSM tile are displayed.
                     For the offline version, I modified the style files from OpenMapTiles to
-                    account for the local paths of tiles, fonts, and sprites (icons).
+                    account for the local paths of tiles, fonts, and sprites.
+                    The sprites are the icons visible in the image on the right.
                     I also ensured that the required fonts and sprites were available as open source.
                 </aside>
             </section>
@@ -355,19 +356,44 @@ def get_features_for_plz(plz: str) -> list[dict]:
             </section>
             <section>
                 <h3>Extraction of places</h3>
-                <p>Extract <b>nodes</b> from OSM PBF using <a href="https://osmcode.org/pyosmium/" target="_blank">PyOsmium</a></p>
-                <ul>
-                    <li><b>name</b> tag must exist</li>
-                    <li><b>place</b> tag must be one of:
+                <p>Extract <b><a href="https://wiki.openstreetmap.org/wiki/Node">nodes</a></b> from OSM PBF using <a href="https://osmcode.org/pyosmium/" target="_blank">PyOsmium</a></p>
+                <div style="display: grid; grid-template-columns: auto auto; gap: 5px; align-items: start;">
+                    <div>
+                        <img src="img/node_example_Weststadt.png" style="height: 193px;">
+                        <table style="border-collapse: collapse; font-size: 18px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">place</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">suburb</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
                         <ul>
-                            <li><b>city</b></li>
-                            <li><b>village</b></li>
-                            <li><b>suburb</b></li>
-                            <li><b>quarter</b></li>
-                            <li><b>neighbourhood</b></li>
+                            <li><b>name</b> tag must exist</li>
+                            <li><b>place</b> tag must be one of:
+                                <ul>
+                                    <li><b>city</b></li>
+                                    <li><b>village</b></li>
+                                    <li><b>suburb</b></li>
+                                    <li><b>quarter</b></li>
+                                    <li><b>neighbourhood</b></li>
+                                </ul>
+                            </li>
                         </ul>
-                    </li>
-                </ul>
+                    </div>
+                </div>
                 <p>Data stored as <b>SQLite</b> for further processing</p>
                 <aside class="notes">
                     Now, let us return to the OpenStreetMap PBF data to extract places.
@@ -377,19 +403,44 @@ def get_features_for_plz(plz: str) -> list[dict]:
             </section>
             <section>
                 <h3>Extraction of streets</h3>
-                <p>Extract <b>ways</b> with their <b>nodes</b> from OSM PBF</p>
-                <ul>
-                    <li><b>name</b> tag must exist</li>
-                    <li><b>highway</b> tag must be one of:
+                <p>Extract <b><a href="https://wiki.openstreetmap.org/wiki/Way">ways</a></b> with their <b>nodes</b> from OSM PBF</p>
+                <div style="display: grid; grid-template-columns: auto auto; gap: 5px; align-items: start;">
+                    <div>
+                        <img src="img/way_example_Ebereschenweg.png" style="height: 260px;">
+                        <table style="border-collapse: collapse; font-size: 18px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">Ebereschenweg</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">highway</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">residential</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
                         <ul>
-                            <li><b>primary</b></li>
-                            <li><b>tertiary</b></li>
-                            <li><b>residential</b></li>
-                            <li><b>pedestrian</b></li>
-                            <li><b>...</b></li>
+                            <li><b>name</b> tag must exist</li>
+                            <li><b>highway</b> tag must be one of:
+                                <ul>
+                                    <li><b>primary</b></li>
+                                    <li><b>tertiary</b></li>
+                                    <li><b>residential</b></li>
+                                    <li><b>pedestrian</b></li>
+                                    <li><b>...</b></li>
+                                </ul>
+                            </li>
                         </ul>
-                    </li>
-                </ul>
+                    </div>
+                </div>
                 <p>Data stored as <b>SQLite</b> for further processing</p>
                 <aside class="notes">
                     The extraction of streets works in a similar way.
@@ -453,13 +504,13 @@ def simplify_locations(locations):
                 </div>
                 <aside class="notes">
                     For the simplification of streets,
-                    I sought a way to find a representative point that is still part of the street itself.
+                    I sought a way to find a representative point that remains part of the street itself.
                     For this procedure, I used the Shapely library.
+                    In this example, you can see the Emsauenallee, which is distributed over two segments.
                     First, I created the centroid of the street segment.
                     Then, I identified the point on the street closest to the centroid.
                     If there were multiple segments of the same street,
-                    I repeated the procedure on the simplified points of the segments.
-                </aside>
+                    I repeated the procedure on the simplified points of the segments.                </aside>
             </section>
             <section>
                 <h3>Military Grid Reference System (MGRS/UTMREF)</h3>
@@ -526,7 +577,8 @@ def simplify_locations(locations):
                 <p><a href="https://github.com/mrJean1/PyGeodesy">PyGeodesy</a> for lat/lon conversion needs zero padding.</p>
                 <aside class="notes">
                     You may be familiar with latitude and longitude coordinates describing a location on the globe.
-                    In the Military Grid Reference System (called UTMREF in Germany), the world is projected onto 100 km squares with a two-letter code.
+                    In the Military Grid Reference System (called UTMREF in Germany),
+                    the world is projected onto 100 km squares with a two-letter code.
                     The precision of the location within the square increases with the number of digits in the coordinate.
                     For practical purposes, 10 or 100 m precision is usually sufficient.
                     The conversion between latitude/longitude and UTMREF can be performed using PyGeodesy.
@@ -567,9 +619,11 @@ def simplify_locations(locations):
                 <aside class="notes">
                     LoRaWAN operates at 868 MHz in Europe.
                     It is designed for long-range, low-power, and low-data-rate applications.
-                    Its low energy consumption means that the battery of a sensor node measuring temperature or water level may last for several years.
+                    Its low energy consumption means that the battery of a sensor node
+                    measuring temperature or water level may last for several years.
                     However, a GPS tracker may only last for a few days, depending on the update rate.
-                    Typically, the infrastructure consists of gateways that receive sensor node messages and forward them to a cloud server.
+                    Typically, the infrastructure consists of gateways that receive
+                    sensor node messages and forward them to a cloud server.
                 </aside>
             </section>
             <section>
@@ -585,22 +639,29 @@ def simplify_locations(locations):
                     </div>
                 </div>
                 <aside class="notes">
-                    To be honest, I am a bit behind my personal schedule.
+                    To be honest, I am a bit behind my personal schedule compared to my announcement in the abstract.
+                    I wrote it under the impression of several flood events, not knowing
+                    that so many bombs would be found in the new development area near the central station.
                     However, let us take a look at my experiments.
                     I started with a gateway and a temperature sensor node.
+                    You may ask why temperature and not water level?
+                    It as much cheaper and easier for testing.
                     Currently, the gateway is connected to the cloud,
-                    but I am planning to switch to its internal server based on ChirpStack.
+                    but I am planning to switch to its internal server based on ChirpStack.                    
                 </aside>
             </section>
             <section>
                 <h3>LORAWAN range test</h3>
                 <img src="img/lorawan_range_test.png" style="height: 530px;" />
                 <aside class="notes">
-                    The gateway is located on my balcony, about 5m above ground (blue circle).
-                    I took a short walk to check where data transmission was possible and where it was not.
+                    The gateway is located on my balcony, about 5m above ground.
+                    I took a short walk to check where data transmission was possible (green)
+                    and where it was not (red).
                     My maximum range exceeded 800m in a residential area.
-                    The next steps will involve creating a mobile stand-alone setup and adding GPS trackers as well as water level sensors.
-                    I will also ask my neighbours on the third floor if I can use their balcony for another test.
+                    The next steps beyond this presentation will involve creating a mobile
+                    stand-alone setup and adding GPS trackers as well as water level sensors.
+                    I will also ask my neighbours on the third floor if I can use their balcony
+                    for another test to improve the range by increasing the altitude.
                 </aside>
             </section>
             <section>
