@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+    <title>OfflineMap</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="/static/leaflet/leaflet.css">
+    <link rel="stylesheet" href="/static/maplibre-gl/maplibre-gl.css">
+    <link rel="stylesheet" href="/static/leaflet/leaflet-geoman.css">
+    <link rel="stylesheet" href="/static/leaflet/leaflet-measure-path.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #map {
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            min-height: 285px;
+        }
+
+        #region-control {
+            display: grid;
+            grid-gap: 5px;
+        }
+
+        #search-control {
+            padding-top: 5px;
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-gap: 5px;
+        }
+
+        .legend-control {
+            background: white;
+            line-height: 1.5;
+            color: #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .coordinate-control {
+            background: white;
+            line-height: 1.5;
+            color: #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .legend-header {
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        #coordinate-input {
+            min-width: 120px;
+        }
+
+        #coordinate-result {
+            padding: 5px;
+            font-size: 12px;
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-gap: 5px;
+        }
+
+        #textInput {
+            width: 120px;
+        }
+
+        #io-control {
+            display: grid;
+            grid-gap: 5px;
+            padding: 5px;
+        }
+
+        .io-buttons {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            grid-gap: 5px;
+        }
+
+        .popup {
+            position: fixed;
+            top: 10px;
+            left: 50px;
+            width: 300px;
+            padding: 10px 25px 10px 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .popup-close:hover {
+            color: #ff0000;
+        }
+
+        .radio-button {
+            position: fixed;
+            top: 10px;
+            left: 50px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .radio-icon {
+            width: 20px;
+            height: 40px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <template id="featureControlTemplate">
+        <div class="legend-header">Feature</div>
+        <div class="legend-item">
+            <input type="color" id="colorInput" name="colorInput" value="#3388ff" onchange="updateFeatureProperties()">
+            <input type="checkbox" id="measureCheckbox" name="measureCheckbox" onchange="updateFeatureProperties()">
+            <label for="measureCheckbox">measure</label>
+            <input type="checkbox" id="fillCheckbox" name="fillCheckbox" checked onchange="updateFeatureProperties()">
+            <label for="fillCheckbox">fill</label>
+        </div>
+        <div class="legend-item">
+            <input type="text" id="textInput" name="textInput" placeholder="Enter text" onchange="updateFeatureProperties()">
+        </div>
+    </template>
+    <div id="map"></div>
+    <script src="/static/leaflet/leaflet.js"></script>
+    <script src="/static/leaflet/leaflet-geoman.min.js"></script>
+    <script src="/static/leaflet/leaflet-measure-path.js"></script>
+    <script src="/static/leaflet/leaflet-color-markers.js"></script>
+    <script src="/static/maplibre-gl/maplibre-gl.js"></script>
+    <script src="/static/maplibre-gl/leaflet-maplibre-gl.js"></script>
+    <script src="/static/turf.min.js" charset="utf-8"></script>
+    <template id="coordinateControlTemplate">
+        <div id="io-control">
+            <input id="fileInput" name="fileInput" type="file" accept=".geojson,.json,application/geo+json,application/json" onchange="importEditor()" hidden>
+            <div class="io-buttons">
+                <button id="openButton" onclick="fileInput.click()">Open</button>
+                <button id="exportButton" onclick="exportEditor()">Export</button>
+                <button id="clearButton" onclick="clearEditor()">Clear</button>
+            </div>
+        </div>
+        <div id="region-control">
+            <select id="state-select" onchange="stateSelectionChanged()">
+                <option value="">State selection</option>
+            </select>
+            <select id="district-select" onchange="districtSelectionChanged()" hidden>
+                <option value="">District selection</option>
+            </select>
+            <select id="community-select" onchange="communitySelectionChanged()" hidden>
+                <option value="">Community selection</option>
+            </select>
+            <input type="text" id="plz-input" placeholder="Enter PLZ" oninput="plzChanged()">
+        </div>
+        <div id="search-control">
+            <input type="text" id="place-input" placeholder="Enter place name">
+            <button id="place-go-button">Go</button>
+            <input type="text" id="street-input" placeholder="Enter street name">
+            <button id="street-go-button">Go</button>
+            <input type="text" id="coordinate-input" placeholder="Enter coordinate">
+            <button id="coordinate-go-button">Go</button>
+        </div>
+        <div id="coordinate-result"></div>
+    </template>
+</body>
+<script src="/static/leaflet_map_offline.js"></script>
+<script src="/static/leaflet_location_picker.js"></script>
+<script src="/static/dop_layers.js"></script>
+<script src="/static/leaflet_plz.js"></script>
+<script src="/static/leaflet_regions.js"></script>
+<script src="/static/leaflet_search.js"></script>
+<script src="/static/leaflet_editor.js"></script>
+<script src="radio_replay.js"></script>
+
+</html>
