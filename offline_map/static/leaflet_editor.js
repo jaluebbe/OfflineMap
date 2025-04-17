@@ -50,7 +50,7 @@ map.on('click', function(eo) {
 });
 
 function resetInputsToDefault() {
-    colorInput.value = '#3388ff';
+//    colorInput.value = '#3388ff';
     colorInput.disabled = false;
     fillCheckbox.checked = true;
     fillCheckbox.disabled = false;
