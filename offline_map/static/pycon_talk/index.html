@@ -97,10 +97,17 @@
                 </div>
                 <aside class="notes">
                     I am a helper in the command squad.
-                    Our role is to support the decisions of our platoon leader by managing the radio communication,
+                    Our primary role is to support the platoon leader by managing radio communication,
                     creating a situation map, and maintaining a personnel overview.
-                    In this talk, I will present a personal project inspired
-                    by a recent training exercise involving paper maps.
+
+                    When deployed to disaster areas, mobile phone networks and the internet are often unavailable due to power outages.
+                    In such cases, we rely on this radio device, which resembles a mobile phone from the last century,
+                    as our only means of communication. Spoken communication can be challenging, especially in noisy environments.
+
+                    At the THW, we are trained to extract coordinates from paper maps using the UTMREF coordinate system.
+                    A recent, time-consuming exercise involving paper maps inspired me to explore a digital alternative to simplify this process.
+                    This is particularly important when we are deployed to disaster areas beyond our home region,
+                    where we often lack access to local maps.
                 </aside>
             </section>
             <section>
@@ -114,13 +121,12 @@
                     <li>Supports UTMREF coordinates</li>
                 </ul>
                 <aside class="notes">
-                    Let us examine the requirements for a digital situation map.
-                    When deployed to a disaster area beyond our home region,
-                    we often start without any local maps.
-                    Mobile phone networks and internet may be interupted due to power outages.
-                    We would like the ability to draw directly onto the map.
-                    The map should be accessible over WiFi.
-                    Additionally, at the THW we are accustomed to the UTMREF coordinate system.
+                    Let us summarise the requirements for a digital situation map.
+                    It should provide full coverage of Germany.
+                    It should function without internet access.
+                    We would like the ability to draw directly on the map.
+                    The map should be accessible via WiFi.
+                    Additionally, at the THW, we are accustomed to using the UTMREF coordinate system.
                 </aside>
             </section>
             <section>
@@ -225,7 +231,7 @@ GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
                 </p>
                 <aside class="notes">
                     The large OpenStreetMap file cannot be served directly to users.
-                    Instead, I used Plantiler to create an MBTiles file.
+                    Instead, I used Planetiler to create an MBTiles file.
                     MBTiles is based on SQLite and contains tiles of the relevant data for various zoom levels and locations.
                     The tiles are served via FastAPI through the endpoint shown here.
                 </aside>
@@ -480,7 +486,7 @@ def get_features_for_plz(plz: str) -> list[dict]:
                     to the administrative and postcode regions you have seen earlier.
                     This clustering is important because their names are not unique.
                     For example, there are 79 places named "Altstadt" (meaning historic city centre) in Germany.
-                    Similarly, "Hauptstraße" (meaning main street) is the most common street name, with 6,435 occurrences.
+                    Similarly, "Hauptstraße" (meaning main street) is the most common street name, with over 6,000 occurrences.
                     To reduce the size of the data, I simplified the streets to a single point per cluster.
                 </aside>
             </section>
