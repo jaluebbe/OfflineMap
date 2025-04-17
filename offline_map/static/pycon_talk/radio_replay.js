@@ -1,12 +1,12 @@
 const messages = [
-    "Go to Schlossgraben 1 in 64283 Darmstadt.",
-    "Explore a parking area for vehicles over 2m high next to the venue.",
-    "New mission: An unexploded World War II bomb was discovered during construction at 32UMC36339139. Evacuation in a 1000 m radius is required.",
-    "You handle operational area A southwest of the railway tracks.",
+    "Unexploded World War II bomb found during construction.",
+    "Provide coordinates for Stadtwerke parking lot entrance, Luisenstraße, 49074 Osnabrück.",
+    "Evacuation required in a 1000 m radius around 32UMC36339139.",
+    "Handle operational area A southwest of the railway tracks.",
     "Detmarstrasse is cleared.",
-    "A person in Kollegienwall 11 refuses evacuation, Police required.",
+    "Person at Kollegienwall 11 refuses evacuation. Police required.",
     "Schlagvorder Strasse is cleared.",
-    "Police arrived at Kollegienwall 11 and picked up the person. Kollegienwall is cleared.",
+    "Police arrived at Kollegienwall 11 and removed the person. Kollegienwall is cleared.",
 ];
 
 function createPopupManager() {
