@@ -11,31 +11,24 @@ You may start with a small region like Bremen to ensure everything is running.
 Depending on your hardware for file preparation your may create a file not just for Germany but also the DACH region or even the whole of Europe.
 
 ### Setup of Python environment (mandatory)
-You may skip geopandas and pyosmium if you do not intend to reprocess any
-database or shapefile.
-#### On a 64 bit quad-core Raspi
+You may install geopandas and pyosmium if you intend to reprocess any
+database or shapefile on the Raspi.
+On a 64 bit quad-core Raspi, I suggest to install geopandas via pip while
+on a 32 bit single-core Raspi python3-geopandas should be installed via apt.
+
 As user with sudo privileges:
 ```
-sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-pyosmium iptables
+sudo apt install python3-fastapi python3-uvicorn python3-numpy iptables git #python3-pyosmium python3-geopandas
+sudo useradd -m gpstracker
+sudo su - gpstracker
 ```
 and as user gpstracker:
 ```
-cd offline_map
-python -m venv venv
-source venv/bin/activate
-pip install pygeodesy point-in-geojson geopandas gdown
-```
-##### On a 32 bit single-core Raspi
-As user with sudo privileges:
-```
-sudo apt install python3-fastapi python3-uvicorn python3-numpy python3-geopandas python3-pyosmium
-```
-and as user gpstracker:
-```
-cd offline_map
+git clone https://github.com/jaluebbe/OfflineMap.git
+cd OfflineMap/offline_map
 python -m venv --system-site-packages venv
 source venv/bin/activate
-pip install pygeodesy point-in-geojson gdown
+pip install pygeodesy point-in-geojson gdown #geopandas
 ```
 #### Finally
 Check your Python version by calling:
@@ -52,10 +45,10 @@ gdown 'https://drive.google.com/uc?id=15LSW2EPb7X6Cd8dMHQCdyqUVVSWgMot3' -O ../g
 ```
 or start with a smaller one for Bremen:
 ```
-gdown 'https://drive.google.com/uc?id=15LSW2EPb7X6Cd8dMHQCdyqUVVSWgMot3' -O ../bremen.mbtiles
+gdown 'https://drive.google.com/uc?id=1WghHOWt0vVxYFars2oUMU4gPWy46LDn0' -O ../bremen.mbtiles
 ```
 ### Install as a system service
-As sudo user call:
+As sudo user call (if you are still user gpstracker type ctrl+d or do an additional login in another window):
 ```
 sudo cp /home/gpstracker/OfflineMap/etc/systemd/system/offline_map_api.service /etc/systemd/system/
 sudo systemctl enable offline_map_api.service 
