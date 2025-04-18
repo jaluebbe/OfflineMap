@@ -20,9 +20,19 @@ As user with sudo privileges:
 ```
 sudo apt install python3-fastapi python3-uvicorn python3-numpy iptables git #python3-pyosmium python3-geopandas
 sudo useradd -m gpstracker
+```
+To switch over to the user gpstracker call
+```
 sudo su - gpstracker
 ```
-and as user gpstracker:
+or if you would like to be able to login as user gpstracker with your existing ssh keys being used for your Raspi user call
+```
+sudo -u gpstracker mkdir -p /home/gpstracker/.ssh
+cat .ssh/authorized_keys | sudo -u gpstracker tee -a /home/gpstracker/.ssh/authorized_keys > /dev/null
+sudo -u gpstracker chmod 600 /home/gpstracker/.ssh/authorized_keys
+sudo -u gpstracker chmod 700 /home/gpstracker/.ssh
+```
+Continue as user gpstracker:
 ```
 git clone https://github.com/jaluebbe/OfflineMap.git
 cd OfflineMap/offline_map
