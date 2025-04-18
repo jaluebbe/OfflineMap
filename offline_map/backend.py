@@ -7,7 +7,7 @@ import routers.coordinates as coordinates
 import routers.locations as locations
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 app.mount("/fonts", StaticFiles(directory="fonts"), name="fonts")
 
 app.include_router(offline_map.router)
