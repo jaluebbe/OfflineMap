@@ -57,6 +57,11 @@ or start with a smaller one for Bremen:
 ```
 gdown 'https://drive.google.com/uc?id=1WghHOWt0vVxYFars2oUMU4gPWy46LDn0' -O ../bremen.mbtiles
 ```
+or download the DACH region (Germany, Switzerland, Austria):
+```
+gdown 'https://drive.google.com/uc?id=1UbYQqkIzHhtuAJpByeWr2JH-MSKn7HuY' -O ../dach.mbtiles
+```
+
 ### Install as a system service
 As sudo user call (if you are still user gpstracker type ctrl+d or do an additional login in another window):
 ```
