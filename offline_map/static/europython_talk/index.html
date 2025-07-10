@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+    <style type="text/css">
+        .reveal section img {
+            border: none;
+            box-shadow: none;
+        }
+    </style>
+    <title>Offline Disaster Relief Coordination with OpenStreetMap and FastAPI</title>
+    <meta name="author" content="Jannis Lübbe">
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h3>Offline Disaster Relief Coordination with OpenStreetMap and FastAPI</h3>
+                <p>Jannis Lübbe<br>
+                    <a href="https://github.com/jaluebbe"><svg width="32" height="32" viewBox="0 0 16 16">
+                            <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" fill="#fff"></path>
+                        </svg>&nbsp;jaluebbe</a>
+                </p>
+                <p><a href="https://ep2025.europython.eu/">EuroPython<br>Prague, 14-20 July, 2025</a></p>
+                <aside class="notes">
+                    Thanks for the introduction. In addition to my work as a Sensor Developer ...
+                </aside>
+            </section>
+            <section>
+                <h3>German Federal Agency for Technical Relief (THW)</h3>
+                <ul>
+                    <li>88,000 volunteers (helpers)</li>
+                    <li>668 local sections</li>
+                </ul>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+                    <img src="../pycon_talk/img/electricity_generator.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/local_section_vehicles.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/filling_sandbag.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/dike_defense.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                </div>
+                <p>
+                    <a href="https://www.thw.de" target="_blank">www.thw.de</a>
+                </p>
+                <aside class="notes">
+                    ..., I am also one of 88,000 volunteers at the THW, the German Federal Agency for Technical Relief.
+                    Internally, we refer to ourselves as "helpers" and are organised into 668 local sections.
+                </aside>
+            </section>
+            <section>
+                <h3>Technical Platoon</h3>
+                <p>~30 helpers</p>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
+                    <div>
+                        <img src="../pycon_talk/img/mtw.jpg" />
+                        <div>Command squad</div>
+                    </div>
+                    <div>
+                        <img src="../pycon_talk/img/gkw1.jpg" />
+                        <div>Rescue squad</div>
+                    </div>
+                    <div>
+                        <img src="../pycon_talk/img/mlw4.jpg" />
+                        <div>Technical squad</div>
+                    </div>
+                </div>
+                <p>
+                    <a href="https://www.thw-osnabrueck.de/" target="_blank">www.thw-osnabrueck.de</a>
+                </p>
+                <aside class="notes">
+                    Each local section houses at least one technical platoon consisting of approximately 30 helpers.
+                    The technical platoon is made up of the command squad, the rescue squad and the technical squad.
+                    The technical squad specialises in one of over 12 different areas, such as electricity, infrastructure, water hazards, and more.
+                </aside>
+            </section>
+            <section>
+                <h3>Command squad</h3>
+                <p>
+                    Supports the platoon leader with:
+                </p>
+                <ul>
+                    <li>(Radio) communication</li>
+                    <li>Situation map</li>
+                </ul>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+                    <img src="../pycon_talk/img/command_squad_at_night.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/radio.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/command_squad_inside.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/command_squad_busy.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                </div>
+                <aside class="notes">
+                    I am a helper in the command squad.
+                    Our primary role is to support the platoon leader by managing radio communication
+                    and creating a situation map.
+
+                    When deployed to disaster areas, mobile phone networks and the internet are often unavailable due to power outages.
+                    In such cases, we rely on this radio device, which resembles a mobile phone from the last century.
+                    But spoken communication can be challenging, especially in noisy environments.
+
+                    At the THW, we are trained to extract coordinates from paper maps using the UTMREF coordinate system.
+                    A recent, time-consuming exercise involving paper maps inspired me to explore a digital alternative to simplify this process.
+                    This is particularly important when we are deployed to disaster areas beyond our home region,
+                    where we often lack access to local maps.
+                </aside>
+            </section>
+            <section>
+                <h3>Outline</h3>
+                <ul>
+                    <li>Off-line and off-grid operation</li>
+                    <li>Access via a WiFi hotspot</li>
+                    <li>Full coverage of Germany</li>
+                    <li>Draw directly on the map</li>
+                    <li>Search places and streets using postcodes</li>
+                    <li>UTMREF coordinates supported</li>
+                    <li>Live demo</li>
+                    <li>Live updates via LORAWAN (work in progress)</li>
+                </ul>
+                <aside class="notes">
+                    Let us state the requirements for the digital situation map
+                    I developed here:
+                    It should function without internet access and
+                    electricity grid.
+                    The map should be accessible via WiFi.
+                    It should provide full coverage of Germany.
+                    We would like the ability to draw directly on the map.
+                    A search for places and streets based on the address
+                    would be desirable.
+                    Additionally, at the THW, we are accustomed to using the UTMREF coordinate system.
+                    I'll present a live demo of my solution which will be
+                    followed by a discussion of my ongoing LORAWAN
+                    experiments.
+                    And now I'm going through the solutions that I developed
+                    along the path.
+                </aside>
+            </section>
+            <section>
+                <h3>Raspberry Pi Zero 2 W</h3>
+                <ul>
+                    <li>Low-cost and energy-efficient</li>
+                    <li>64-bit quad-core CPU</li>
+                    <li>Can be powered by mobile power sources</li>
+                </ul>
+                <img src="../pycon_talk/img/raspi_zero_w.jpg" style="height: 200px;">
+                <aside class="notes">
+                    To host the map, I selected a Raspberry Pi Zero 2 W.
+                    It is low-cost, energy-efficient and can easily be powered by mobile power sources.
+                </aside>
+            </section>
+            <section>
+                <h3>WiFi access point</h3>
+                <p>Created using <a href="https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/203-automated-switching-accesspoint-wifi-network">AccessPopup</a> from <a href="https://www.raspberryconnect.com">www.raspberryconnect.com</a></p>
+                <ul>
+                    <li>Connects to a known WiFi network if available</li>
+                    <li>Creates a WiFi hotspot if no network is available</li>
+                </ul>
+                <aside class="notes">
+                    To create a WiFi access point with the Raspberry Pi,
+                    I used a script from raspberryconnect.com rather than reinventing the wheel.
+                    If no known WiFi network is found, it creates a hotspot.
+                    When a known network is detected, it connects to it.
+                    This simplifies system updates at the home base.
+                </aside>
+            </section>
+            <section>
+                <h3>OpenStreetMap data</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+                    <img src="../pycon_talk/img/node_name_Weststadt_place_suburb.png">
+                    <img src="../pycon_talk/img/way_boundary_administrative_admin_level_10.png">
+                    <img src="../pycon_talk/img/relation_type_boundary_name_Weststadt_boundary_administrative_admin_level_10.png">
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Node</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">place</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">suburb</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Way</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">admin_level</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">boundary</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">administrative</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Relation</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">type</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">boundary</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">admin_level</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">boundary</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">administrative</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><a href="https://download.geofabrik.de/europe/germany-latest.osm.pbf">germany-latest.osm.pbf</a> (4.2 GB)</p>
+                <aside class="notes">
+                    Now, my talk uses OpenStreetMap and to bring you up to
+                    speed, the fundamental element is a node which is
+                    defined by its location.
+                    The second element is a way which is a collection of nodes.
+                    Finally, a relation is a collection of ways and nodes.
+                    Each of these objects is associated with a set of tags.
+                    OpenStreetMap is distributed in the Protocolbuffer Binary Format (PBF)
+                    where the data for Germany is is approximately 4.2 GB in
+                    size.
+                </aside>
+            </section>
+            <section>
+                <h3>MBTiles</h3>
+                <p>The <a href="https://github.com/mapbox/mbtiles-spec">MBTiles</a> format is based on SQLite</p>
+                <p><a href="https://github.com/onthegomap/planetiler">Planetiler</a> generates germany.mbtiles (2.8 GB) from the raw OpenStreetMap data.</p>
+                <p>Data is provided via FastAPI (region='germany'):
+                <pre>
+<code class="hljs http">
+GET /api/vector/tiles/{region}/{zoom_level}/{x}/{y}.pbf
+</code>
+</pre>
+                </p>
+                <aside class="notes">
+                    The large OpenStreetMap file cannot be served directly to users.
+                    Instead, I used Planetiler to create an MBTiles file.
+                    MBTiles is based on SQLite and contains tiles of the relevant data for various zoom levels and locations.
+                    The tiles are served via FastAPI through the endpoint shown here.
+                </aside>
+            </section>
+            <section>
+                <h3>Display the map</h3>
+                <ul>
+                    <li>Using <a href="https://leafletjs.com/" target="_blank">Leaflet.js</a> for map rendering</li>
+                    <li><a href="https://maplibre.org/" target="_blank">MapLibre</a> plugin for vector map support</li>
+                    <li><a href="https://geoman.io/" target="_blank">Geoman.io</a> adds editing capabilities</li>
+                    <li><a href="https://github.com/ProminentEdge/leaflet-measure-path">leaflet-measure-path</a> (length and area)</li>
+                </ul>
+                <img src="../pycon_talk/img/osm_leaflet_example.png" style="height: 300px; border: 1px solid #ccc;">
+                <aside class="notes">
+                    To display the map, I used Leaflet.js with the MapLibre plugin for vector maps.
+                    Geoman.io adds editing capabilities, while the leaflet-measure-path
+                    plugin enables the measurement of distances and areas.
+                </aside>
+            </section>
+            <section>
+                <h3>Map styles</h3>
+                <p>Modified styles from <a href="https://openmaptiles.org">OpenMapTiles</a> to consider local paths of tiles, fonts and sprites.</p>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
+                    <img src="../pycon_talk/img/osm_style_basic.png">
+                    <img src="../pycon_talk/img/osm_style_liberty.png">
+                    <div>OSM Basic</div>
+                    <div>OSM Liberty</div>
+                </div>
+                <aside class="notes">
+                    When using vector maps, the map is rendered in the browser.
+                    The style file determines how and whether features from the OSM tile are displayed.
+                    For the offline version, I modified the style files from OpenMapTiles to
+                    account for the local paths of tiles, fonts, and sprites.
+                    The sprites are the icons visible in the image on the right.
+                    I also ensured that the required fonts and sprites were available as open source.
+                </aside>
+            </section>
+            <section>
+                <h3>Postcode regions</h3>
+                <p>
+                    Simplified GeoJSON and CSV file downloaded from <a href="https://www.suche-postleitzahl.org/downloads">www.suche-postleitzahl.org</a>
+                </p>
+                <img src="../pycon_talk/img/plz_shapes.png" style="height: 400px; border: 1px solid #ccc;">
+                <aside class="notes">
+                    For an efficient location search, I downloaded a GeoJSON
+                    file describing the postcode regions.
+                    I selected a medium precision for the shapes to conserve memory and processing time.
+                    I conducted checks in my hometown to ensure the selected precision did not significantly affect the results.
+                    However, searching within the GeoJSON shapes remains computationally demanding.
+                </aside>
+            </section>
+            <section>
+                <h3>Postcode search</h3>
+                <p>
+                    Created a <a href="https://pyo3.rs/">PyO3</a> module in <a href="http://rust-lang.org/">Rust</a> to perform fast search operations on GeoJSON files</a>
+                </p>
+                <pre style="width: 100%">
+<code class="hljs python" data-trim>
+from point_in_geojson import PointInGeoJSON
+
+with open("post_codes_germany.json") as f:
+    pig = PointInGeoJSON(f.read())
+
+def get_plz_from_lat_lon(lat: float, lon: float) -> str | None:
+    result = pig.point_included_with_properties(lon, lat)
+    return result[0]["plz"] if len(result) == 1 else None
+
+def get_features_for_plz(plz: str) -> list[dict]:
+    return pig.features_with_property_str(
+        "plz", plz, "starts_with")
+</code>
+</pre>
+                <p><a href="https://github.com/jaluebbe/point_in_geojson">https://github.com/jaluebbe/point_in_geojson</a></p>
+                <aside class="notes">
+                    To address this, I created a Python module in Rust using PyO3 to accelerate the search.
+                    The main challenge was that most PyO3 tutorials did not include examples where
+                    a class is initialised once and accessed multiple times via instance methods.
+                    Here, we first read the GeoJSON containing the postcode areas.
+                    We can then either query the postcode for a given coordinate or
+                    retrieve the shapes matching a specific postcode fragment.
+                </aside>
+            </section>
+            <section>
+                <h3>Extraction of places</h3>
+                <p>Extract <b><a href="https://wiki.openstreetmap.org/wiki/Node">nodes</a></b> from OSM PBF using <a href="https://osmcode.org/pyosmium/" target="_blank">PyOsmium</a></p>
+                <div style="display: grid; grid-template-columns: auto auto; gap: 5px; align-items: start;">
+                    <div>
+                        <img src="../pycon_talk/img/node_example_Weststadt.png" style="height: 193px;">
+                        <table style="border-collapse: collapse; font-size: 18px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">place</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">suburb</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><b>name</b> tag must exist</li>
+                            <li><b>place</b> tag must be one of:
+                                <ul>
+                                    <li><b>city</b></li>
+                                    <li><b>village</b></li>
+                                    <li><b>suburb</b></li>
+                                    <li><b>quarter</b></li>
+                                    <li><b>neighbourhood</b></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <p>Data stored as <b>SQLite</b> for further processing</p>
+                <aside class="notes">
+                    Now, let us return to the OpenStreetMap PBF data to extract places.
+                    I used PyOsmium to extract all nodes with a name tag and a place tag of the specified types.
+                    This data is stored in a preliminary SQLite database.
+                </aside>
+            </section>
+            <section>
+                <h3>Extraction of streets</h3>
+                <p>Extract <b><a href="https://wiki.openstreetmap.org/wiki/Way">ways</a></b> with their <b>nodes</b> from OSM PBF</p>
+                <div style="display: grid; grid-template-columns: auto auto; gap: 5px; align-items: start;">
+                    <div>
+                        <img src="../pycon_talk/img/way_example_Ebereschenweg.png" style="height: 260px;">
+                        <table style="border-collapse: collapse; font-size: 18px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">Ebereschenweg</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">highway</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">residential</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><b>name</b> tag must exist</li>
+                            <li><b>highway</b> tag must be one of:
+                                <ul>
+                                    <li><b>primary</b></li>
+                                    <li><b>tertiary</b></li>
+                                    <li><b>residential</b></li>
+                                    <li><b>pedestrian</b></li>
+                                    <li><b>...</b></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <p>Data stored as <b>SQLite</b> for further processing</p>
+                <aside class="notes">
+                    The extraction of streets works in a similar way.
+                    Here, I extract all named ways, including their location nodes,
+                    if they have a highway tag of any category corresponding to a public street.
+                    Once again, the results are stored in a preliminary SQLite database.
+                </aside>
+            </section>
+            <section>
+                <h3>Creation of the search database</h3>
+                <p>Cluster places and streets by post codes and administrative regions for a more efficient search.</p>
+                <p>Most common search results in Germany:</p>
+                <table style="border-collapse: collapse; font-size: 18px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Type</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Name</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Occurrences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Place</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Altstadt</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">79</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Street</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Hauptstraße</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">6,435</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Simplify streets to a single point.</p>
+                <aside class="notes">
+                    In the next step, the extracted places and streets are matched
+                    to the postcode regions you have seen earlier.
+                    This clustering is important because their names are not unique.
+                    For example, there are 79 places named "Altstadt" (meaning historic city centre) in Germany.
+                    Similarly, "Hauptstraße" (meaning main street) is the most common street name, with over 6,000 occurrences.
+                    To reduce the size of the data, I simplified the streets to a single point per cluster.
+                </aside>
+            </section>
+            <section>
+                <h3>Line string simplification</h3>
+                <pre>
+<code class="hljs python" data-trim>
+def simplify_locations(locations):
+    multipoint = MultiPoint(locations)
+    centroid = multipoint.centroid
+    return min(
+        locations,
+        key=lambda point: Point(point).distance(centroid)
+    )
+</code>
+</pre>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; align-items: center;">
+                    <img src="../pycon_talk/img/Emsauenallee_way_example.png" style="height: 320px;">
+                    <p>Using <a href="https://shapely.readthedocs.io/en/stable/" target="_blank">Shapely</a>
+                        each street is reduced from multiple lines to a single point on the street.</p>
+                </div>
+                <aside class="notes">
+                    For an efficient search of street names, I would like to
+                    reduce each street to a single point that remains part of the street itself.
+                    For this procedure, I used the Shapely library.
+                    In this example, you can see the Emsauenallee, which is distributed over two segments.
+                    First, I created the centroid of the street segment.
+                    Then, I identified the point on the street closest to the centroid.
+                    If there are several segments of a street, for instance
+                    the red one here, I repeat the procedure to find a
+                    simplified point for this segment and ultimatively
+                    arrive at a point representing the whole street.
+                </aside>
+            </section>
+            <section>
+                <h3>Military Grid Reference System (MGRS/UTMREF)</h3>
+                <div style="display: grid; grid-template-columns: auto auto auto; gap: 5px; align-items: center;">
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Conversion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">Lat., Lon.</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">52.538484, 7.295975</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">UTM</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32 N 384431 5822297</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">MGRS/UTMREF</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 84431 22297</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a href="https://commons.wikimedia.org/wiki/File:Utmzonenugitterp.png" target="_blank">
+                        <img src="../pycon_talk/img/Utmzonenugitterp.png" alt="UTM Zone Grid" style="border: 1px solid #ccc; height: 400px; background-color: white;" />
+                    </a>
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Coordinate</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Precision</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">100 km</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 8 2</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10 km</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 84 22</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">1 km</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 844 222</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">100 m</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 8443 2229</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10 m</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 84431 22297</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">1 m</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><a href="https://github.com/mrJean1/PyGeodesy">PyGeodesy</a> for lat/lon conversion needs zero padding.</p>
+                <aside class="notes">
+                    You may be familiar with latitude and longitude coordinates describing a location on the globe.
+                    In the Military Grid Reference System (called UTMREF in Germany),
+                    the world is projected onto 100 km squares with a two-letter code.
+                    The precision of the location within the square increases with the number of digits in the coordinate.
+                    For practical purposes, 10 or 100 m precision is usually sufficient.
+                    The conversion between latitude/longitude and UTMREF can be performed using PyGeodesy.
+                    However, zero padding is required, as PyGeodesy expects the coordinates as float values representing metres.
+                </aside>
+            </section>
+            <section>
+                <h3>Live demo: WW2 bomb evacuation</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
+                    <div>
+                        <img src="img/construction_area.jpg">
+                        <div>construction area</div>
+                    </div>
+                    <div>
+                        <img src="img/thw_aerial_image.jpg">
+                        <div>assembly point</div>
+                    </div>
+                    <div>
+                        <img src="img/defused_ww2_bomb.jpg">
+                        <div>defused bomb</div>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="openDemo('/static/europython_talk/map_demo.html');">Open demo in the web</button>
+                </div>
+                <aside class="notes">
+                    After all that theory, I will show a live demo hosted on this Raspberry Pi
+                    based on a common scenario in my home town.
+                    This year about ten WW2 bombs have been found in the
+                    construction area close to the central station.
+                    Before the state's specialists defuse the bomb or detonate it in a controlled
+                    manner, more than hundred volunteers are alerted to
+                    clear the area.
+                    This means that people are demanded to leave their homes until the area is safe again.
+                    ...
+                    This demo is not representative in all detail and I
+                    simulate the typical workflow by the messages that
+                    appear here in the upper left.
+                    ...
+                    For the whole mission, it would be helpful to have a
+                    live view of all unit's positions.
+                    So let me now switch gears and let me present the
+                    infrastructure that I'm currently developing to
+                    implement this in my situation map.
+                    This is why I am considering integrating LoRaWAN into the system.
+                </aside>
+            </section>
+            <section>
+                <h3>Long Range Wide Area Network (LoRaWAN)</h3>
+                <ul>
+                    <li>Operates at <b>868 MHz</b> in Europe</li>
+                    <li>Long range, low power, low data rate</li>
+                    <li>Encrypted transmissions</li>
+                </ul>
+                <aside class="notes">
+                    LoRaWAN operates at 868 MHz in Europe.
+                    It is designed for long-range, low-power, and low-data-rate applications.
+                    All messages are encrypted.
+                </aside>
+            </section>
+            <section>
+                <h3>Battery powered sensor nodes</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
+                    <div>
+                        <img src="../pycon_talk/img/lorawan_temperature_node.jpg">
+                        <div>Temperature</div>
+                    </div>
+                    <div>
+                        <img src="img/water_level_node.jpg">
+                        <div>Water level</div>
+                    </div>
+                    <div>
+                        <img src="img/gps_tracker_node.jpg">
+                        <div>GPS location</div>
+                    </div>
+                </div>
+                <aside class="notes">
+                    Its low energy consumption means that the battery of a sensor node
+                    measuring temperature or water level may last for several years.
+                    However, a GPS tracker may only last for a few days, depending on the update rate.                
+                </aside>
+            </section>
+            <section>
+                <h3>LORAWAN gateway</h3>
+                <div style="display: grid; grid-template-columns: 0.9fr 2.1fr; gap: 0px; text-align: left; align-items: center;">
+                    <img src="../pycon_talk/img/lorawan_gateway.jpg"/>
+                    <div>
+                        <ul>
+                            <li>
+                                Messages are forwarded to
+                                <a href="https://www.thethingsindustries.com/docs/concepts/ttn/">
+                                The&nbsp;Things&nbsp;Stack&nbsp;Sandbox</a>.
+                            </li>
+                            <li>
+                                Messages are decrypted and decoded on the
+                                Network Server, not on the gateway.
+                            </li>
+                            <li>
+                                <a href="https://www.chirpstack.io/">ChirpStack</a>
+                                as local Network Server is available on the device.
+                            </li>
+                        </ul>
+                    </div>
+                <aside class="notes">
+                    Typically, the infrastructure consists of gateways that receive
+                    sensor node messages and forward them to the Network Server.
+                    Here, I am using The Things Stack Sandbox which is connected
+                    to many gateways all over Europe.
+                    The gateway cannot see the message content as it is
+                    decrypted and decoded on the Network Server.
+                    An alternative would be to run a local Network Server
+                    like ChirpStack directly on the the device.
+                </aside>
+            </section>
+            <section>
+                <h3>LORAWAN range test</h3>
+                <img src="../pycon_talk/img/lorawan_range_test.png" style="height: 530px;" />
+                <aside class="notes">
+                    Now, let us take a look at my range experiments.
+                    I started with a gateway connected to TTSS and a
+                    temperature sensor node.
+                    The gateway is located on my balcony, about 5m above ground.
+                    I took a short walk to check where data transmission was possible (green)
+                    and where it was not (red).
+                    The range limitations began at approximately 400m in a residential area,
+                    but it extended beyond 2000m in areas with mostly free line of sight.
+                </aside>
+            </section>
+            <section>
+                <h3>Mobile gateway (work in progress)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0px; text-align: left; align-items: center;">
+                    <img src="img/mobile_gateway.jpg">
+                    <ul>
+                        <li>Act as a TTSS gateway.</li>
+                        <li>Duplicate own session keys to this device.</li>
+                        <li>Decrypt and decode own data in case of an
+                        internet outage.</li>
+                    </ul>
+                </div>
+                <p><a href="https://github.com/jaluebbe/ttn-message-interceptor">https://github.com/jaluebbe/ttn-message-interceptor</a></p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <h3>Thank your for your attention</h3>
+                <p>
+                    <img src="../pycon_talk/img/group_photo_oosn.jpg" style="height: 280px;">
+                    <img src="img/qrcode.svg" style="height: 280px;">
+                </p>
+                <p>
+                    <a href="https://github.com/jaluebbe/OfflineMap">https://github.com/jaluebbe/OfflineMap</a>
+                </p>
+                <aside class="notes">
+                    Thank you for your attention.
+                    If you have any questions, feel free to ask.
+                </aside>
+            </section>
+        </div>
+    </div>
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            plugins: [RevealHighlight, RevealNotes],
+        });
+    </script>
+    <script>
+        function openDemo(url) {
+            let demoWindow = window.open(
+                url,
+                "demo",
+                "width=1000,height=680"
+            )
+        }
+    </script>
+</body>
+
+</html>
