@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+    <style type="text/css">
+        .reveal section img {
+            border: none;
+            box-shadow: none;
+        }
+    </style>
+    <title>Digitale Lagekarte im Katastrophenschutz mit OpenStreetMap</title>
+    <meta name="author" content="Jannis Lübbe">
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h3>Digitale Lagekarte im Katastrophenschutz mit OpenStreetMap</h3>
+                <p>Jannis Lübbe<br>
+                <a href="https://github.com/jaluebbe"><svg width="32" height="32" viewBox="0 0 16 16">
+                        <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" fill="#fff"></path>
+                    </svg>&nbsp;jaluebbe</a>
+                <br><a href="https://www.rosen-group.com/">ROSEN Gruppe</a>
+                </p>
+                <p><a href="https://ep2025.europython.eu/">Digitale
+                Woche<br>Osnabrück, 22.-26. September 2025</a></p>
+            </section>
+            <section>
+                <h3>Bundesanstalt Technisches Hilfswerk (THW)</h3>
+                <ul>
+                    <li>88.000 Ehrenamtliche Helfer</li>
+                    <li>1 <a href="https://www.thw.de/SharedDocs/Einheiten/DE/006_vost.html">virtueller</a> + 668 lokale Ortsverbände</li>
+                </ul>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+                    <img src="../pycon_talk/img/electricity_generator.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/local_section_vehicles.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/filling_sandbag.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/dike_defense.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                </div>
+                <p>
+                    <a href="https://www.thw.de" target="_blank">www.thw.de</a>
+                </p>
+            </section>
+            <section>
+                <h3>Techischer Zug</h3>
+                <p>~30 Helfer</p>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
+                    <div>
+                        <img src="../pycon_talk/img/mtw.jpg" />
+                        <div>Zugtrupp</div>
+                    </div>
+                    <div>
+                        <img src="../pycon_talk/img/gkw1.jpg" />
+                        <div>Bergungsgruppe</div>
+                    </div>
+                    <div>
+                        <img src="../pycon_talk/img/mlw4.jpg" />
+                        <div>Fachgruppe</div>
+                    </div>
+                </div>
+                <p>
+                    <a href="https://www.thw-osnabrueck.de/" target="_blank">www.thw-osnabrueck.de</a>
+                </p>
+            </section>
+            <section>
+                <h3>Zugtrupp</h3>
+                <p>
+                    Unterstützung des Zugführers:
+                </p>
+                <ul>
+                    <li>Sprechfunk / Kommunikation</li>
+                    <li>Lagekarte</li>
+                </ul>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+                    <img src="../pycon_talk/img/command_squad_at_night.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/radio.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/command_squad_inside.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                    <img src="../pycon_talk/img/command_squad_busy.jpg" style="height: 245px;border: 1px solid #ccc;" />
+                </div>
+            </section>
+            <section>
+                <h3>Ausblick</h3>
+                <ul>
+                    <li>Off-Line und Off-Grid Betrieb</li>
+                    <li>Zugang über WLAN Hotspot</li>
+                    <li>Deutschlandweite Abdeckung</li>
+                    <li>Direkt auf die Karte zeichnen</li>
+                    <li>Suche nach Orten und Straßen mit Postleitzahlen</li>
+                    <li>UTMREF-Koordinaten</li>
+                    <li>Live-Demo</li>
+                    <li>Live-Updates über LORAWAN (in Arbeit)</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Raspberry Pi Zero 2 W</h3>
+                <ul>
+                    <li>Kostengünstig und energieeffizient</li>
+                    <li>64-bit quad-core CPU</li>
+                    <li>Kann über mobile Stromquellen versorgt werden</li>
+                </ul>
+                <img src="../pycon_talk/img/raspi_zero_w.jpg" style="height: 200px;">
+            </section>
+            <section>
+                <h3>WiFi access point</h3>
+                <p>Nach Tutorial <a href="https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/203-automated-switching-accesspoint-wifi-network">AccessPopup</a> von <a href="https://www.raspberryconnect.com">www.raspberryconnect.com</a></p>
+                <ul>
+                    <li>Verbindet sich mit bekannten WLAN-Netzen</li>
+                    <li>Erzeugt einen WLAN-Hotspot, wenn kein WLAN gefunden
+                    wurde</li>
+                </ul>
+            </section>
+            <section>
+                <h3>OpenStreetMap Daten</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+                    <img src="../pycon_talk/img/node_name_Weststadt_place_suburb.png">
+                    <img src="../pycon_talk/img/way_boundary_administrative_admin_level_10.png">
+                    <img src="../pycon_talk/img/relation_type_boundary_name_Weststadt_boundary_administrative_admin_level_10.png">
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Node</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Wert</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">place</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">suburb</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Way</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Wert</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">admin_level</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">boundary</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">administrative</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Relation</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Wert</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">type</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">boundary</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">admin_level</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">boundary</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">administrative</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section>
+                <h3>Darstellung der Karte</h3>
+                <ul>
+                    <li>Verwendung von <a href="https://leafletjs.com/" target="_blank">Leaflet.js</a> für die Karte</li>
+                    <li><a href="https://maplibre.org/" target="_blank">MapLibre</a> Plugin für Vektorkacheln</li>
+                    <li><a href="https://geoman.io/" target="_blank">Geoman.io</a> für eine Werkzeugleiste</li>
+                    <li><a href="https://github.com/ProminentEdge/leaflet-measure-path">leaflet-measure-path</a> (Länge und Fläche)</li>
+                </ul>
+                <img src="../pycon_talk/img/osm_leaflet_example.png" style="height: 300px; border: 1px solid #ccc;">
+            </section>
+            <section>
+                <h3>Map Styles</h3>
+                <p>Angepasste Styles von <a href="https://openmaptiles.org">OpenMapTiles</a> berücksichtigen lokale Pfade von Kacheln, Schriftarten und Sprites.</p>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
+                    <img src="../pycon_talk/img/osm_style_basic.png">
+                    <img src="../pycon_talk/img/osm_style_liberty.png">
+                    <div>OSM Basic</div>
+                    <div>OSM Liberty</div>
+                </div>
+            </section>
+            <section>
+                <h3>Postleitzahlengebiete</h3>
+                <p>
+                    Vereinfachtes GeoJSON und CSV-Daten von <a href="https://www.suche-postleitzahl.org/downloads">www.suche-postleitzahl.org</a>
+                </p>
+                <img src="../pycon_talk/img/plz_shapes.png" style="height: 400px; border: 1px solid #ccc;">
+            </section>
+            <section>
+                <h3>Exktraktion der Orte</h3>
+                <p><b><a href="https://wiki.openstreetmap.org/wiki/Node">Nodes</a></b> mit <a href="https://osmcode.org/pyosmium/" target="_blank">PyOsmium</a> aus OSM Daten extrahiert</p>
+                <div style="display: grid; grid-template-columns: auto auto; gap: 5px; align-items: start;">
+                    <div>
+                        <img src="../pycon_talk/img/node_example_Weststadt.png" style="height: 193px;">
+                        <table style="border-collapse: collapse; font-size: 18px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Wert</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">Weststadt</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">place</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">suburb</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><b>name</b> tag muss vorhanden sein</li>
+                            <li><b>place</b> tag muss vom Typ sein:
+                                <ul>
+                                    <li><b>city</b></li>
+                                    <li><b>village</b></li>
+                                    <li><b>suburb</b></li>
+                                    <li><b>quarter</b></li>
+                                    <li><b>neighbourhood</b></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h3>Extraction von Straßen</h3>
+                <p><b><a href="https://wiki.openstreetmap.org/wiki/Way">Ways</a></b> mit ihren <b>Nodes</b> aus OSM-Daten extrahiert</p>
+                <div style="display: grid; grid-template-columns: auto auto; gap: 5px; align-items: start;">
+                    <div>
+                        <img src="../pycon_talk/img/way_example_Ebereschenweg.png" style="height: 260px;">
+                        <table style="border-collapse: collapse; font-size: 18px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Tag</th>
+                                    <th style="border: 1px solid #ccc; padding: 8px;">Wert</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">name</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">Ebereschenweg</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">highway</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">residential</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><b>name</b> tag muss vorhanden sein</li>
+                            <li><b>highway</b> tag muss vom Typ sein:
+                                <ul>
+                                    <li><b>primary</b></li>
+                                    <li><b>tertiary</b></li>
+                                    <li><b>residential</b></li>
+                                    <li><b>pedestrian</b></li>
+                                    <li><b>...</b></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h3>Datenbank für die Suche</h3>
+                <p>Für eine effiziente Suche werden Orte und Straßen nach Postleitzahlen gruppiert.</p>
+                <p>Straßen werden zu einem einzelnen Punkt vereinfacht.</p>
+                <p>Häufigste Suchergebnisse in Deutschland:</p>
+                <table style="border-collapse: collapse; font-size: 18px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Type</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Name</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Vorkommen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Place</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Altstadt</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">79</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Street</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">Hauptstraße</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">6.435</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+                <h3>Military Grid Reference System (MGRS/UTMREF)</h3>
+                <div style="display: grid; grid-template-columns: auto auto auto; gap: 5px; align-items: center;">
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="border: 1px solid #ccc; padding: 8px; text-align: center;">Conversion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">Lat., Lon.</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">52.538484, 7.295975</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">UTM</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32 N 384431 5822297</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">MGRS/UTMREF</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 84431 22297</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a href="https://commons.wikimedia.org/wiki/File:Utmzonenugitterp.png" target="_blank">
+                        <img src="../pycon_talk/img/Utmzonenugitterp.png" alt="UTM Zone Grid" style="border: 1px solid #ccc; height: 400px; background-color: white;" />
+                    </a>
+                    <table style="border-collapse: collapse; font-size: 18px;">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Coordinate</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Precision</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">100 km</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 8 2</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10 km</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 84 22</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">1 km</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 844 222</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">100 m</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 8443 2229</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">10 m</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ccc; padding: 8px;">32U LD 84431 22297</td>
+                                <td style="border: 1px solid #ccc; padding: 8px;">1 m</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><a href="https://github.com/mrJean1/PyGeodesy">PyGeodesy</a> für lat/lon Konvertierung</p>
+            </section>
+            <section>
+                <h3>Live Demo: 2.WK Bombenräumung</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
+                    <div>
+                        <img src="../europython_talk/img/construction_area.jpg">
+                        <div>Lokviertel</div>
+                    </div>
+                    <div>
+                        <img src="../europython_talk/img/thw_aerial_image.jpg">
+                        <div>Bereitstellungsraum</div>
+                    </div>
+                    <div>
+                        <img src="../europython_talk/img/defused_ww2_bomb.jpg">
+                        <div>Entschärfte Bombe</div>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="openDemo('/static/diwo_vortrag/map_demo.html');">Open demo in the web</button>
+                </div>
+            </section>
+            <section>
+                <h3>Long Range Wide Area Network (LoRaWAN)</h3>
+                <ul>
+                    <li>Betrieb bei <b>868 MHz</b> in Europa</li>
+                    <li>Große Reichweite</li>
+                    <li>Niedriger Stromverbrauch</li>
+                    <li>Niedrige Datenrate</li>
+                    <li>Verschlüsselte Übertragung</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Sensor Nodes mit Batterie/Akku</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; text-align: center;">
+                    <div>
+                        <img src="../pycon_talk/img/lorawan_temperature_node.jpg">
+                        <div>Temperatur</div>
+                    </div>
+                    <div>
+                        <img src="../europython_talk/img/water_level_node.jpg">
+                        <div>Pegelstand</div>
+                    </div>
+                    <div>
+                        <img src="../europython_talk/img/gps_tracker_node.jpg">
+                        <div>GPS Position</div>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h3>LORAWAN Gateway</h3>
+                <div style="display: grid; grid-template-columns: 0.9fr 2.1fr; gap: 0px; text-align: left; align-items: center;">
+                    <img src="../pycon_talk/img/lorawan_gateway.jpg"/>
+                    <div>
+                        <ul>
+                            <li>
+                                Messages weiterleiten zu
+                                <a href="https://www.thethingsindustries.com/docs/concepts/ttn/">
+                                The&nbsp;Things&nbsp;Stack&nbsp;Sandbox</a>.
+                            </li>
+                            <li>
+                                Entschlüsselung auf dem Network Server, nicht auf dem Gateway.
+                            </li>
+                            <li>
+                                <a href="https://www.chirpstack.io/">ChirpStack</a>
+                                als lokaler Network Server auf dem Gerät verfügbar.
+                            </li>
+                        </ul>
+                    </div>
+            </section>
+            <section>
+                <h3>Test der LORAWAN-Reichweite</h3>
+                <img src="../pycon_talk/img/lorawan_range_test.png" style="height: 530px;" />
+            </section>
+            <section>
+                <h3>Mobiles Gateway (in Arbeit)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0px; text-align: left; align-items: center;">
+                    <img src="../europython_talk/img/mobile_gateway.jpg" style="height: 450px;"/>
+                    <ul>
+                        <li>Ist ein TTSS Gateway.</li>
+                        <li>Dupliziert eigene Session Keys.</li>
+                        <li>Entschlüsselt eigene Daten im Falle eines
+                        Internetausfalls.</li>
+                    </ul>
+                </div>
+                <p><a href="https://github.com/jaluebbe/ttn-message-interceptor">https://github.com/jaluebbe/ttn-message-interceptor</a></p>
+            </section>
+            <section>
+                <h3>Vielen Dank für Ihre/Eure Aufmerksamkeit</h3>
+                <p>
+                    <img src="../pycon_talk/img/group_photo_oosn.jpg" style="height: 280px;">
+                    <img src="img/qrcode.svg" style="height: 280px;">
+                </p>
+                <p>
+                    <a href="https://github.com/jaluebbe/OfflineMap">https://github.com/jaluebbe/OfflineMap</a>
+                </p>
+            </section>
+        </div>
+    </div>
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            plugins: [RevealHighlight, RevealNotes],
+        });
+    </script>
+    <script>
+        function openDemo(url) {
+            let demoWindow = window.open(
+                url,
+                "demo",
+                "width=1000,height=680"
+            )
+        }
+    </script>
+</body>
+
+</html>
