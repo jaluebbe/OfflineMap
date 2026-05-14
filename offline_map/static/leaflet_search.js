@@ -64,25 +64,6 @@ const streetsLayer = L.geoJSON([], {
 const searchLayer = L.layerGroup([streetsLayer, placesLayer]).addTo(map);
 layerControl.addOverlay(searchLayer, "Search results");
 
-function fitBoundsToLayers() {
-    const bounds = L.latLngBounds([]);
-    if (streetsLayer.getLayers().length > 0) {
-        bounds.extend(streetsLayer.getBounds());
-    }
-    if (placesLayer.getLayers().length > 0) {
-        bounds.extend(placesLayer.getBounds());
-    }
-    if (typeof editorLayer !== 'undefined' && editorLayer.getLayers().length > 0) {
-        bounds.extend(editorLayer.getBounds());
-    }
-    if (bounds.isValid()) {
-        if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
-            map.setView(bounds.getCenter(), 16);
-        } else {
-            map.fitBounds(bounds);
-        }
-    }
-}
 
 async function handleStreetInput() {
     const streetInput = document.getElementById('street-input').value;

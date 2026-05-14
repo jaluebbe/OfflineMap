@@ -34,6 +34,27 @@ function addOSMVectorLayer(styleName, region, layerLabel) {
     return myLayer;
 };
 
+function fitBoundsToLayers() {
+    const candidates = [
+        typeof streetsLayer !== 'undefined' ? streetsLayer : null,
+        typeof placesLayer !== 'undefined' ? placesLayer : null,
+        typeof editorLayer !== 'undefined' ? editorLayer : null,
+    ];
+    const bounds = L.latLngBounds([]);
+    candidates.forEach(layer => {
+        if (layer && layer.getLayers().length > 0) {
+            bounds.extend(layer.getBounds());
+        }
+    });
+    if (bounds.isValid()) {
+        if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+            map.setView(bounds.getCenter(), 16);
+        } else {
+            map.fitBounds(bounds);
+        }
+    }
+}
+
 L.control.scale({
     'imperial': false
 }).addTo(map);

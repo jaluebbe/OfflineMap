@@ -42,13 +42,18 @@ const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
 let isEditing = false;
 
+const _locationPickerFields = window.locationPickerFields || ['latlon', 'utm', 'mgrs'];
+
 function updateControl(position) {
     const resultDiv = document.getElementById('coordinate-result');
-    resultDiv.innerHTML = `
-        <div><b>Lat., Lon.</b></div>${position.latitude}, ${position.longitude}</div>
-        <div><b>UTM</b></div><div>${position.utm}</div>
-        <div><b>MGRS</b></div><div>${position.mgrs}</div>
-    `;
+    const rows = [];
+    if (_locationPickerFields.includes('latlon'))
+        rows.push(`<div><b>Lat., Lon.</b></div><div>${position.latitude}, ${position.longitude}</div>`);
+    if (_locationPickerFields.includes('utm'))
+        rows.push(`<div><b>UTM</b></div><div>${position.utm}</div>`);
+    if (_locationPickerFields.includes('mgrs'))
+        rows.push(`<div><b>MGRS</b></div><div>${position.mgrs}</div>`);
+    resultDiv.innerHTML = rows.join('');
     resultDiv.style.color = "black";
     document.getElementById('coordinate-input').value = '';
 }
