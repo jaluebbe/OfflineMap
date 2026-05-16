@@ -92,9 +92,6 @@ function setupAttribution() {
     attrControl.innerHTML =
         '<span id="attr-toggle" style="cursor:pointer;padding-right:2px;flex-shrink:0">ℹ️</span>' +
         '<span id="attr-content" style="display:none">' + attrContent + '</span>';
-    attrControl.querySelectorAll('a').forEach(function(a) {
-        a.setAttribute('target', '_blank');
-    });
     document.getElementById('attr-toggle').addEventListener('click', function() {
         var content = document.getElementById('attr-content');
         content.style.display = content.style.display === 'none' ? 'inline' : 'none';
