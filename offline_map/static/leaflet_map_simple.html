@@ -4,7 +4,7 @@
 <head>
     <link rel="manifest" href="/static/manifest.json">
     <link rel="apple-touch-icon" href="/static/img/icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="OfflineMap">
     <meta name="theme-color" content="#1e64a0">
@@ -107,7 +107,6 @@
 
 <body>
     <template id="featureControlTemplate">
-        <div class="legend-header">Feature</div>
         <div class="legend-item">
             <input type="color" id="colorInput" name="colorInput" value="#3388ff" onchange="updateFeatureProperties()">
             <input type="checkbox" id="measureCheckbox" name="measureCheckbox" onchange="updateFeatureProperties()">
@@ -152,6 +151,7 @@ window.pmControlOptions = {
     cutPolygon: false,
     rotateMode: false
 };
+map.zoomControl.setPosition('topright');
 </script>
 <script src="/static/leaflet_location_picker.js"></script>
 <script src="/static/dop_layers.js"></script>
