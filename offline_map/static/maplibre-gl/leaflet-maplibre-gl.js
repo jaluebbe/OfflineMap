@@ -70,6 +70,31 @@
             };
         },
 
+        // https://leafletjs.com/reference.html#layer-getattribution
+        getAttribution: function () {
+            // Return custom attribution if specified in options
+            if (this.options.attributionControl) {
+                return this.options.attributionControl.customAttribution;
+            }
+
+            // Gather attributions from MapLibre styles
+            var map = this._glMap;
+            if (map && this.options.attributionControl !== false) {
+                var style = map.getStyle();
+                if (style && style.sources) {
+                    return Object.keys(style.sources)
+                        .map(function (sourceId) {
+                            var source = map.getSource(sourceId);
+                            return (source && typeof source.attribution === 'string') ? source.attribution.trim() : null;
+                        })
+                        .filter(Boolean) // Remove null/undefined values
+                        .join(', ');
+                }
+            }
+
+            return '';
+        },
+
         getMaplibreMap: function () {
             return this._glMap;
         },
@@ -106,15 +131,19 @@
 
         _initContainer: function () {
             var container = this._container = L.DomUtil.create('div', 'leaflet-gl-layer');
+            this._resizeContainer();
 
-            var size = this.getSize();
             var offset = this._map.getSize().multiplyBy(this.options.padding);
-            container.style.width = size.x + 'px';
-            container.style.height = size.y + 'px';
 
             var topLeft = this._map.containerPointToLayerPoint([0, 0]).subtract(offset);
 
             L.DomUtil.setPosition(container, this._roundPoint(topLeft));
+        },
+
+        _resizeContainer: function () {
+            var size = this.getSize();
+            this._container.style.width = size.x + 'px';
+            this._container.style.height = size.y + 'px';
         },
 
         _initGL: function () {
@@ -129,9 +158,40 @@
 
             this._glMap = new maplibregl.Map(options);
 
+            var _map = this._map;
+            var _currentAttribution = this.getAttribution();
+            var _getAttribution = this.getAttribution.bind(this);
+            this._glMap.on('load', function () {
+                // Force attribution update
+                if (_map && _map.attributionControl) {
+                    _map.attributionControl.removeAttribution(_currentAttribution);
+                    _map.attributionControl.addAttribution(_getAttribution());
+                }
+            });
+
             // allow GL base map to pan beyond min/max latitudes
-            this._glMap.transform.latRange = null;
-            this._glMap.transform.maxValidLatitude = Infinity;
+            // Defensively check if properties are writable before setting them,
+            // ensuring compatibility with both old and new versions of MapLibre GL JS.
+            var transformProto = Object.getPrototypeOf(this._glMap.transform);
+
+            var latRangeDescriptor = Object.getOwnPropertyDescriptor(transformProto, 'latRange');
+            if (!latRangeDescriptor || latRangeDescriptor.set || latRangeDescriptor.writable) {
+                this._glMap.transform.latRange = null;
+            }
+
+            // Although this property is obsolete in modern versions, we apply the same
+            // defensive check for robust backward compatibility.
+            var maxValidLatitudeDescriptor = Object.getOwnPropertyDescriptor(transformProto, 'maxValidLatitude');
+            if (!maxValidLatitudeDescriptor || maxValidLatitudeDescriptor.set || maxValidLatitudeDescriptor.writable) {
+                this._glMap.transform.maxValidLatitude = Infinity;
+            }
+
+
+            // check for the existence of _helper and _latRange in MapLibre
+            // this supports MapLibre v5
+            if (this._glMap.transform._helper && this._glMap.transform._helper._latRange) {
+                this._glMap.transform._helper._latRange = [-Infinity, Infinity];
+            }
 
             this._transformGL(this._glMap);
 
@@ -142,10 +202,12 @@
                 this._glMap._actualCanvas = this._glMap._canvas;
             }
 
+
             // treat child <canvas> element like L.ImageOverlay
             var canvas = this._glMap._actualCanvas;
             L.DomUtil.addClass(canvas, 'leaflet-image-layer');
             L.DomUtil.addClass(canvas, 'leaflet-zoom-animated');
+
             if (this.options.interactive) {
                 L.DomUtil.addClass(canvas, 'leaflet-interactive');
             }
@@ -165,8 +227,7 @@
                 return;
             }
 
-            var size = this.getSize(),
-                container = this._container,
+            var container = this._container,
                 gl = this._glMap,
                 offset = this._map.getSize().multiplyBy(this.options.padding),
                 topLeft = this._map.containerPointToLayerPoint([0, 0]).subtract(offset);
@@ -182,7 +243,7 @@
             // gl.setView([center.lat, center.lng], this._map.getZoom() - 1, 0);
             // calling setView directly causes sync issues because it uses requestAnimFrame
 
-            let tr = gl._getTransformForUpdate(); // .clone() ?
+            var tr = gl._getTransformForUpdate(); // .clone() ?
 
             if (tr.setCenter) {
                 // maplibre 5.0.0 and higher:
@@ -195,6 +256,7 @@
                 tr.center = maplibregl.LngLat.convert([center.lng, center.lat]);
                 tr.zoom = this._map.getZoom() - 1;
             }
+
             gl._fireMoveEvents();
         },
 
@@ -254,6 +316,7 @@
                 var offset = this._map.latLngToContainerPoint(
                     this._map.getBounds().getNorthWest()
                 );
+                this._resizeContainer();
 
                 // reset the scale and offset
                 L.DomUtil.setTransform(this._glMap._actualCanvas, offset, 1);
