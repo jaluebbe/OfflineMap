@@ -2,6 +2,7 @@
   "name": "OfflineMap",
   "short_name": "OfflineMap",
   "start_url": "/static/leaflet_map.html",
+  "scope": "/static/leaflet_map.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1e64a0",
