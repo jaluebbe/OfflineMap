@@ -61,7 +61,7 @@ L.control.scale({
 var baseLayers = {};
 var other_layers = {};
 var layerControl = L.control.layers(baseLayers, other_layers, {
-    collapsed: L.Browser.mobile, // hide on mobile devices
+    collapsed: L.Browser.mobile,
     position: 'topright'
 }).addTo(map);
 
@@ -82,3 +82,34 @@ fetch('/api/vector/regions')
     .catch(error => {
         console.error('Error fetching regions:', error);
     });
+
+function setupAttribution() {
+    var attrControl = document.querySelector('.leaflet-control-attribution');
+    if (!attrControl || document.getElementById('attr-toggle')) return;
+    var attrContent = attrControl.innerHTML;
+    attrControl.style.display = 'flex';
+    attrControl.style.alignItems = 'center';
+    attrControl.innerHTML =
+        '<span id="attr-toggle" style="cursor:pointer;padding-right:2px;flex-shrink:0">ℹ️</span>' +
+        '<span id="attr-content" style="display:none">' + attrContent + '</span>';
+    document.getElementById('attr-toggle').addEventListener('click', function() {
+        var content = document.getElementById('attr-content');
+        content.style.display = content.style.display === 'none' ? 'inline' : 'none';
+    });
+}
+
+map.whenReady(function() {
+    setupAttribution();
+    var observer = new MutationObserver(function() {
+        if (!document.getElementById('attr-toggle')) {
+            setupAttribution();
+        }
+    });
+    observer.observe(document.querySelector('.leaflet-control-attribution'), {
+        childList: true, subtree: true, characterData: true
+    });
+});
+
+map.on('baselayerchange', function() {
+    setTimeout(setupAttribution, 50);
+});
