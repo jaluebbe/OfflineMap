@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <link rel="manifest" href="/static/manifest.json">
+    <link rel="manifest" href="/static/manifest_simple.json">
     <link rel="apple-touch-icon" href="/static/img/icon-192.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,6 +14,7 @@
     <title>OfflineMap</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
     <link rel="stylesheet" href="leaflet/leaflet.css">
     <link rel="stylesheet" href="maplibre-gl/maplibre-gl.css">
@@ -128,7 +129,6 @@
 
 <body>
     <template id="featureControlTemplate">
-        <div class="legend-header">Feature</div>
         <div class="legend-item">
             <input type="color" id="colorInput" name="colorInput" value="#3388ff" onchange="updateFeatureProperties()">
             <input type="checkbox" id="measureCheckbox" name="measureCheckbox" onchange="updateFeatureProperties()">
@@ -157,23 +157,7 @@
                 <button id="clearButton" onclick="clearEditor()">Clear</button>
             </div>
         </div>
-        <div id="region-control">
-            <select id="state-select" onchange="stateSelectionChanged()">
-                <option value="">State selection</option>
-            </select>
-            <select id="district-select" onchange="districtSelectionChanged()" hidden>
-                <option value="">District selection</option>
-            </select>
-            <select id="community-select" onchange="communitySelectionChanged()" hidden>
-                <option value="">Community selection</option>
-            </select>
-            <input type="text" id="plz-input" placeholder="Enter PLZ" oninput="plzChanged()">
-        </div>
         <div id="search-control">
-            <input type="text" id="place-input" placeholder="Enter place name">
-            <button id="place-go-button">Go</button>
-            <input type="text" id="street-input" placeholder="Enter street name">
-            <button id="street-go-button">Go</button>
             <input type="text" id="coordinate-input" placeholder="Enter coordinate">
             <button id="coordinate-go-button">Go</button>
         </div>
@@ -181,14 +165,19 @@
     </template>
 </body>
 <script src="/static/leaflet_map_offline.js"></script>
+<script>
+    window.locationPickerFields = ['latlon', 'mgrs'];
+    window.pmControlOptions = {
+        drawMarker: false,
+        drawRectangle: false,
+        cutPolygon: false,
+        rotateMode: false
+    };
+</script>
 <script src="/static/leaflet_location_picker.js"></script>
 <script src="/static/dop_layers.js"></script>
-<script src="/static/leaflet_plz.js"></script>
-<script src="/static/leaflet_regions.js"></script>
-<script src="/static/leaflet_search.js"></script>
 <script src="/static/leaflet_editor.js"></script>
 <script>
     map.zoomControl.setPosition('topright');
 </script>
-
 </html>

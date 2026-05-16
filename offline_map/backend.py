@@ -17,7 +17,7 @@ app.include_router(locations.router)
 
 @app.get("/", include_in_schema=False)
 async def root():
-    return RedirectResponse("/static/leaflet_map.html")
+    return RedirectResponse("/static/leaflet_map_simple.html")
 
 
 if __name__ == "__main__":

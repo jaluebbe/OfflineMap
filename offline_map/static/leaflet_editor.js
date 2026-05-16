@@ -192,18 +192,26 @@ editorLayer.on('add', function() {
     });
 });
 
+function clearField(id) {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+}
+
 function clearEditor() {
     const confirmation = confirm("Do you really want to clear the editor layer?");
     if (confirmation) {
         editorLayer.clearLayers();
         dataChanged();
-        document.getElementById('state-select').selectedIndex = 0;
-        stateSelectionChanged();
-        document.getElementById('plz-input').value = '';
-        plzChanged();
-        document.getElementById('place-input').value = '';
-        document.getElementById('street-input').value = '';
-        document.getElementById('coordinate-input').value = '';
+        const stateSelect = document.getElementById('state-select');
+        if (stateSelect) {
+            stateSelect.selectedIndex = 0;
+            stateSelectionChanged();
+        }
+        clearField('plz-input');
+        if (typeof plzChanged === 'function') plzChanged();
+        clearField('place-input');
+        clearField('street-input');
+        clearField('coordinate-input');
         document.getElementById('coordinate-result').innerHTML = '';
     }
 }
@@ -287,9 +295,9 @@ const pmEvents = [
     'pm:globalremovalmodetoggled'
 ];
 pmEvents.forEach(event => map.on(event, toggleMapClick));
-map.pm.addControls({
+map.pm.addControls(Object.assign({
     oneBlock: true,
-});
+}, window.pmControlOptions || {}));
 
 map.on('pm:create', function(eo) {
     const layer = eo.layer;
@@ -391,7 +399,7 @@ L.Polygon.prototype.options.measurementOptions = {
 L.Polyline.prototype.options.showMeasurements = true;
 
 var featureControl = L.control({
-    position: 'topleft'
+    position: 'bottomleft'
 });
 featureControl.onAdd = function(map) {
     this._div = L.DomUtil.create('div', 'legend-control');
