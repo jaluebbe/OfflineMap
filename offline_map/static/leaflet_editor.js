@@ -399,7 +399,7 @@ L.Polygon.prototype.options.measurementOptions = {
 L.Polyline.prototype.options.showMeasurements = true;
 
 var featureControl = L.control({
-    position: 'topleft'
+    position: 'bottomleft'
 });
 featureControl.onAdd = function(map) {
     this._div = L.DomUtil.create('div', 'legend-control');
