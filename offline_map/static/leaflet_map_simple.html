@@ -144,17 +144,18 @@
 </body>
 <script src="/static/leaflet_map_offline.js"></script>
 <script>
-window.locationPickerFields = ['latlon', 'mgrs'];
-window.pmControlOptions = {
-    drawMarker: false,
-    drawRectangle: false,
-    cutPolygon: false,
-    rotateMode: false
-};
-map.zoomControl.setPosition('topright');
+    window.locationPickerFields = ['latlon', 'mgrs'];
+    window.pmControlOptions = {
+        drawMarker: false,
+        drawRectangle: false,
+        cutPolygon: false,
+        rotateMode: false
+    };
 </script>
 <script src="/static/leaflet_location_picker.js"></script>
 <script src="/static/dop_layers.js"></script>
 <script src="/static/leaflet_editor.js"></script>
-
+<script>
+    map.zoomControl.setPosition('topright');
+</script>
 </html>
