@@ -11,7 +11,7 @@ var gpsMarker = L.marker([0, 0], {
         iconAnchor: [5, 121],
     })
 });
-var gpsCircle = L.circle([0, 0], { radius: 0, color: 'blue', fillOpacity: 0.1 });
+var gpsCircle = L.circle([0, 0], { radius: 0, color: 'blue', fill: false });
 var gpsHeadingLine = L.polyline([], { color: 'red', weight: 2 });
 
 var gpsControl = L.control({ position: 'bottomright' });
@@ -28,7 +28,6 @@ gpsControl.onAdd = function(map) {
 };
 gpsControl.addTo(map);
 
-var _followGPS = true;
 var _compassHeading = null;
 var _lastPosition = null;
 
@@ -66,8 +65,6 @@ function updateGpsControl(position, speed, heading, accuracy) {
         rows.push(`<div><b>Lat., Lon.</b></div><div>${position.latitude}, ${position.longitude}</div>`);
     if (fields.includes('mgrs') && position)
         rows.push(`<div><b>MGRS</b></div><div>${position.mgrs}</div>`);
-    if (fields.includes('utm') && position)
-        rows.push(`<div><b>UTM</b></div><div>${position.utm}</div>`);
     if (speed !== null && speed !== undefined)
         rows.push(`<div><b>Speed</b></div><div>${(speed * 3.6).toFixed(1)} km/h</div>`);
     if (heading !== null && heading !== undefined)
@@ -92,7 +89,7 @@ function onLocationFound(e) {
         gpsHeadingLine.addTo(map);
     }
 
-    if (_followGPS && !map.getBounds().contains(latlng)) {
+    if (!map.getBounds().contains(latlng)) {
         map.setView(latlng);
     }
 
@@ -126,12 +123,10 @@ function connectGPS() {
     map.locate({ watch: true, enableHighAccuracy: true });
     noSleep.enable();
     requestCompass();
-    _followGPS = true;
     document.getElementById('gps-status').textContent = 'connected';
     document.getElementById('gps-status').style.color = 'green';
 }
 
-map.on('dragstart', function() { _followGPS = false; });
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
 map.whenReady(function() {
