@@ -1,7 +1,7 @@
 # OfflineMap
 
 ## Setup
-This repository contains as pre-filled database file with streets and places in Germany extracted from OpenStreetMap (OSM).
+This repository previously contained a pre-filled database file with streets and places in Germany extracted from OpenStreetMap (OSM). This file is now available for download via Google Drive and will be updated occasionally.
 All the data is related to the German postal code (PLZ) regions as well as adminstrative boundaries (states, districts, communities).
 This repository contains all scripts to refresh this data if required.
 If this setup should be extended to another country, consider either to adapt the postal code and boundary system to your country or remove that dependency and rely completely on the data extracted from OSM. It may be also possible to extract the boundaries from OSM depending on how well they are maintained for your country.
