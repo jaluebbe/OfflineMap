@@ -81,17 +81,15 @@ function handleApiResponse(response) {
 function convertPosition(e) {
     if (!map.hasLayer(locationPickerLayer)) return;
     const latlng = e.latlng.wrap();
-    fetch(`/api/convert_lat_lon?latitude=${latlng.lat}&longitude=${latlng.lng}`)
-        .then(handleApiResponse)
-        .then(position => {
-            if (e.type === 'click' || e.type === 'locationfound') {
-                updateMarker(position);
-            }
-            updateControl(position);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+    try {
+        const position = window.convertLatlon(latlng.lat, latlng.lng);
+        if (e.type === 'click' || e.type === 'locationfound') {
+            updateMarker(position);
+        }
+        updateControl(position);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 myMarker.bindTooltip("", {
@@ -171,18 +169,31 @@ function handleCoordinateInput() {
         map.locate();
         return;
     }
-    fetch(`/api/parse_coordinate?coordinate=${encodeURIComponent(coordinateInput)}`)
-        .then(handleApiResponse)
-        .then(data => {
+    if (window.parseCoordinate) {
+        const data = window.parseCoordinate(coordinateInput);
+        if (data) {
             markerPositionedByInput = true;
             updateControl(data);
             updateMarker(data);
             fetchPlzAndAgs(data.latitude, data.longitude);
-        })
-        .catch(error => {
-            resultDiv.textContent = error.message;
+        } else {
+            resultDiv.textContent = "Invalid coordinate";
             resultDiv.style.color = "red";
-        });
+        }
+    } else {
+        fetch(`/api/parse_coordinate?coordinate=${encodeURIComponent(coordinateInput)}`)
+            .then(handleApiResponse)
+            .then(data => {
+                markerPositionedByInput = true;
+                updateControl(data);
+                updateMarker(data);
+                fetchPlzAndAgs(data.latitude, data.longitude);
+            })
+            .catch(error => {
+                resultDiv.textContent = error.message;
+                resultDiv.style.color = "red";
+            });
+    }
 }
 
 layerControl.addOverlay(locationPickerLayer, "Location picker")

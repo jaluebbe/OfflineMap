@@ -180,4 +180,9 @@
 <script>
     map.zoomControl.setPosition('topright');
 </script>
+<script type="module">
+    import { parseCoordinate, convertLatlon } from '/static/coordinate_parser.js';
+    window.parseCoordinate = parseCoordinate;
+    window.convertLatlon = convertLatlon;
+</script>
 </html>
