@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="manifest" href="/static/manifest_gps.json">
+    <link rel="apple-touch-icon" href="/static/img/icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GPS Map">
+    <meta name="theme-color" content="#1e64a0">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+    <title>GPS Map</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+    <link rel="stylesheet" href="leaflet/leaflet.css">
+    <link rel="stylesheet" href="maplibre-gl/maplibre-gl.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #000;
+        }
+
+        #map {
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            min-height: 285px;
+        }
+
+        .coordinate-control {
+            background: white;
+            line-height: 1.5;
+            color: #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .leaflet-bottom {
+            padding-bottom: calc(env(safe-area-inset-bottom, 0px) * 0.25);
+        }
+
+        .leaflet-left {
+            padding-left: calc(env(safe-area-inset-left, 0px) * 0.75);
+        }
+
+        .leaflet-right {
+            padding-right: calc(env(safe-area-inset-right, 0px) * 0.75);
+        }
+
+        .leaflet-top {
+            padding-top: calc(env(safe-area-inset-top, 0px) * 0.75);
+        }
+
+        .leaflet-control-attribution {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script src="leaflet/leaflet.js"></script>
+    <script src="maplibre-gl/maplibre-gl.js"></script>
+    <script src="maplibre-gl/leaflet-maplibre-gl.js"></script>
+    <script src="turf.min.js" charset="utf-8"></script>
+    <script src="no_sleep.min.js"></script>
+</body>
+<script src="/static/leaflet_map_offline.js"></script>
+<script src="/static/dop_layers.js"></script>
+<script src="/static/leaflet_gps.js"></script>
+<script>
+    map.zoomControl.setPosition('topleft');
+</script>
+<script type="module">
+    import { convertLatlon } from '/static/coordinate_parser.js';
+    window.convertLatlon = convertLatlon;
+</script>
+
+</html>
