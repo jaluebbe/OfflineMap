@@ -12,8 +12,8 @@ var gpsMarker = L.marker([0, 0], {
     })
 });
 var gpsCircle = L.circle([0, 0], { radius: 0, color: 'blue', weight: 2, fill: false });
-var gpsHeadingLine = L.polyline([], { color: 'red', weight: 2 });
-var gpsCompassLine = L.polyline([], { color: 'orange', weight: 2 });
+var gpsHeadingLine = L.polyline([], { color: 'red', weight: 2, showMeasurements: false });
+var gpsCompassLine = L.polyline([], { color: 'orange', weight: 2, showMeasurements: false });
 
 var gpsControl = L.control({ position: 'bottomright' });
 gpsControl.onAdd = function(map) {
