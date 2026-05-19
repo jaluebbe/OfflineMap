@@ -25,19 +25,8 @@ const myMarker = L.marker([50, 8.6], {
         tooltipAnchor: [0, -121]
     })
 });
-
-var coordinateControl = L.control({
-    position: 'bottomright'
-});
-coordinateControl.onAdd = function(map) {
-    this._div = L.DomUtil.create('div', 'coordinate-control');
-    let tempSource = document.getElementById('coordinateControlTemplate');
-    this._div.appendChild(tempSource.content.cloneNode(true));
-    L.DomEvent.disableClickPropagation(this._div);
-    return this._div;
-}
-coordinateControl.addTo(map);
-
+var locationPickerMarker = myMarker;
+var allowAutoSetPicker = false;
 const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
 let isEditing = false;
@@ -141,9 +130,15 @@ function processMapEvent(e) {
         markerPositionedByInput = false;
         return;
     }
+    if (e.type === 'locationfound' && !allowAutoSetPicker) {
+        return;
+    }
+    if (e.type === 'locationfound') {
+        allowAutoSetPicker = false;
+    }
     if (!isEditing) {
         convertPosition(e);
-        const position = e.latlng.wrap()
+        const position = e.latlng.wrap();
         fetchPlzAndAgs(position.lat, position.lng);
     }
 }
@@ -166,7 +161,14 @@ function handleCoordinateInput() {
     const coordinateInput = document.getElementById('coordinate-input').value;
     const resultDiv = document.getElementById('coordinate-result');
     if (coordinateInput.trim() === "") {
-        map.locate();
+        if (typeof gpsActive !== 'undefined' && gpsActive && typeof _lastLatlng !== 'undefined' && _lastLatlng) {
+            allowAutoSetPicker = true;
+            const e = { type: 'locationfound', latlng: _lastLatlng };
+            processMapEvent(e);
+        } else {
+            allowAutoSetPicker = true;
+            map.locate();
+        }
         return;
     }
     if (window.parseCoordinate) {
