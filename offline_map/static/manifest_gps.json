@@ -5,7 +5,7 @@
   "scope": "/static/leaflet_map_gps.html",
   "display": "standalone",
   "orientation": "any",
-  "lang": "de",
+  "lang": "en",
   "background_color": "#1e64a0",
   "theme_color": "#1e64a0",
   "categories": ["navigation", "utilities"],
