@@ -26,11 +26,22 @@ const myMarker = L.marker([50, 8.6], {
     })
 });
 
+var coordinateControl = L.control({
+    position: 'bottomright'
+});
+coordinateControl.onAdd = function(map) {
+    this._div = L.DomUtil.create('div', 'coordinate-control');
+    let tempSource = document.getElementById('coordinateControlTemplate');
+    this._div.appendChild(tempSource.content.cloneNode(true));
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+}
+coordinateControl.addTo(map);
+
 const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
 let isEditing = false;
-let allowAutoSetPicker = false;
-let gpsActive = false;
+
 const _locationPickerFields = window.locationPickerFields || ['latlon', 'utm', 'mgrs'];
 
 function updateControl(position) {
@@ -155,8 +166,7 @@ function handleCoordinateInput() {
     const coordinateInput = document.getElementById('coordinate-input').value;
     const resultDiv = document.getElementById('coordinate-result');
     if (coordinateInput.trim() === "") {
-        allowAutoSetPicker = true;
-        map.locate({ watch: true, enableHighAccuracy: true });
+        map.locate();
         return;
     }
     if (window.parseCoordinate) {

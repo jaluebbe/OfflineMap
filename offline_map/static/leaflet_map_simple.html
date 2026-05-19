@@ -20,132 +20,20 @@
     <link rel="stylesheet" href="maplibre-gl/maplibre-gl.css">
     <link rel="stylesheet" href="leaflet/leaflet-geoman.css">
     <link rel="stylesheet" href="leaflet/leaflet-measure-path.css">
+    <link rel="stylesheet" href="/static/leaflet_map_common.css">
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #000;
-        }
-
-        #map {
-            position: fixed;
-            height: 100%;
-            width: 100%;
-            min-height: 285px;
-        }
-
-        #search-control {
-            padding-top: 5px;
-            display: grid;
-            grid-template-columns: auto auto;
-            gap: 5px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        #coordinate-input {
-            min-width: 120px;
-        }
-
-        #coordinate-result {
-            padding: 5px;
-            font-size: 12px;
-            display: grid;
-            grid-template-columns: auto auto;
-            gap: 5px;
-        }
-
         #textInput {
             width: 100px;
         }
 
         #io-control {
-            display: grid;
-            gap: 5px;
-            padding: 0px;
+            padding: 0;
         }
 
-        .io-buttons {
-            display: grid;
-            grid-template-columns: auto auto auto;
-            gap: 5px;
-        }
-
-        .leaflet-bottom {
-            padding-bottom: calc(env(safe-area-inset-bottom, 0px) * 0.25);
-        }
-
-        .leaflet-left {
-            padding-left: calc(env(safe-area-inset-left, 0px) * 0.75);
-        }
-
-        .leaflet-right {
-            padding-right: calc(env(safe-area-inset-right, 0px) * 0.75);
-        }
-
-        .leaflet-top {
-            padding-top: calc(env(safe-area-inset-top, 0px) * 0.75);
-        }
-
-        .leaflet-control-attribution {
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
-        }
-
-        .combined-control {
-            background: white;
-            color: #333;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 6px;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: max-content;
-        }
-
-        .section {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .section-header {
-            background: #f0f0f0;
-            padding: 6px 8px;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .section-header .arrow {
-            transition: transform 0.25s ease;
-        }
-
-        .section.collapsed .arrow {
-            transform: rotate(-90deg);
-        }
-
-        .section-content {
-            padding: 4px 6px;
-            background: white;
-            transition: max-height 0.25s ease-out, opacity 0.25s ease-out, padding 0.25s ease-out;
-            max-height: 500px;
-            opacity: 1;
-        }
-
-        .section.collapsed .section-content {
-            max-height: 0;
-            opacity: 0;
-            padding-top: 0;
-            padding-bottom: 0;
+        #utm-display {
+            font-size: 12px;
+            padding-top: 4px;
+            color: #444;
         }
     </style>
 </head>
@@ -261,7 +149,15 @@
 <script src="/static/leaflet_location_picker.js"></script>
 <script src="/static/dop_layers.js"></script>
 <script src="/static/leaflet_editor.js"></script>
+<script src="/static/leaflet_compass.js"></script>
 <script>
+    const gpsCompassLine = L.polyline([], {
+        color: 'orange',
+        weight: 2,
+        pmIgnore: true,
+        interactive: false
+    });
+
     const gpsCircle = L.circle([0, 0], {
         radius: 0,
         color: 'blue',
@@ -269,79 +165,19 @@
         fill: false
     });
 
-    const gpsCompassLine = L.polyline([], {
-        color: 'orange',
-        weight: 2,
-        showMeasurements: false,
-        pmIgnore: true,
-        interactive: false
-    });
+    const gpsCompassLayer = L.layerGroup([gpsCircle, gpsCompassLine]);
+    layerControl.addOverlay(gpsCompassLayer, 'GPS + Compass');
 
-    const gpsCompassLayer = L.layerGroup([
-        gpsCircle,
-        gpsCompassLine
-    ]);
-
-    layerControl.addOverlay(gpsCompassLayer, "GPS + Compass");
-
-    let _compassHeading = null;
+    let gpsActive = false;
     let _lastLatlng = null;
-
-    function onDeviceOrientation(e) {
-        if (e.absolute && e.alpha != null) {
-            _compassHeading = (360 - e.alpha) % 360;
-        } else if (e.webkitCompassHeading !== undefined) {
-            _compassHeading = e.webkitCompassHeading;
-        }
-        updateCompassLine();
-    }
-
-    function requestCompass() {
-        if (typeof DeviceOrientationEvent !== 'undefined' &&
-            typeof DeviceOrientationEvent.requestPermission === 'function') {
-
-            DeviceOrientationEvent.requestPermission()
-                .then(state => {
-                    if (state === 'granted') {
-                        window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
-                        window.addEventListener('deviceorientation', onDeviceOrientation, true);
-                    }
-                })
-                .catch(console.error);
-
-        } else {
-            window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
-            window.addEventListener('deviceorientation', onDeviceOrientation, true);
-        }
-    }
-
-    function updateCompassLine() {
-        if (_compassHeading == null || _lastLatlng == null) return;
-        if (!map.hasLayer(gpsCompassLine)) return;
-
-        const dest = turf.destination(
-            turf.point([_lastLatlng.lng, _lastLatlng.lat]),
-            0.05,
-            _compassHeading
-        );
-
-        const destLatLng = [
-            dest.geometry.coordinates[1],
-            dest.geometry.coordinates[0]
-        ];
-
-        gpsCompassLine.setLatLngs([_lastLatlng, destLatLng]);
-    }
 
     map.on('locationfound', e => {
         const latlng = e.latlng.wrap();
         _lastLatlng = latlng;
-
+        _gpsCenter = latlng;
         gpsCircle.setLatLng(latlng);
         if (isFinite(e.accuracy)) gpsCircle.setRadius(e.accuracy);
-
         updateCompassLine();
-
         if (allowAutoSetPicker) {
             locationPickerMarker.setLatLng(latlng);
             allowAutoSetPicker = false;
@@ -360,27 +196,13 @@
         if (e.layer === gpsCompassLayer) {
             gpsActive = false;
             map.stopLocate();
-
-            window.removeEventListener('deviceorientationabsolute', onDeviceOrientation, true);
-            window.removeEventListener('deviceorientation', onDeviceOrientation, true);
-
+            removeCompassListeners();
             gpsCompassLine.setLatLngs([]);
             gpsCircle.setRadius(0);
         }
     });
 
     map.zoomControl.setPosition('topright');
-    function fixIOSResize() {
-        setTimeout(() => {
-            map.invalidateSize({ animate: false });
-            if (_lastLatlng) {
-                map.setView(_lastLatlng, map.getZoom(), { animate: false });
-            }
-        }, 250);
-    }
-
-    window.addEventListener("orientationchange", fixIOSResize);
-    window.addEventListener("resize", fixIOSResize);
 </script>
 <script type="module">
     import { parseCoordinate, convertLatlon } from '/static/coordinate_parser.js';
