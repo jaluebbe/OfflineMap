@@ -262,7 +262,125 @@
 <script src="/static/dop_layers.js"></script>
 <script src="/static/leaflet_editor.js"></script>
 <script>
+    const gpsCircle = L.circle([0, 0], {
+        radius: 0,
+        color: 'blue',
+        weight: 2,
+        fill: false
+    });
+
+    const gpsCompassLine = L.polyline([], {
+        color: 'orange',
+        weight: 2,
+        showMeasurements: false,
+        pmIgnore: true,
+        interactive: false
+    });
+
+    const gpsCompassLayer = L.layerGroup([
+        gpsCircle,
+        gpsCompassLine
+    ]);
+
+    layerControl.addOverlay(gpsCompassLayer, "GPS + Compass");
+
+    let _compassHeading = null;
+    let _lastLatlng = null;
+
+    function onDeviceOrientation(e) {
+        if (e.absolute && e.alpha != null) {
+            _compassHeading = (360 - e.alpha) % 360;
+        } else if (e.webkitCompassHeading !== undefined) {
+            _compassHeading = e.webkitCompassHeading;
+        }
+        updateCompassLine();
+    }
+
+    function requestCompass() {
+        if (typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+
+            DeviceOrientationEvent.requestPermission()
+                .then(state => {
+                    if (state === 'granted') {
+                        window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
+                        window.addEventListener('deviceorientation', onDeviceOrientation, true);
+                    }
+                })
+                .catch(console.error);
+
+        } else {
+            window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
+            window.addEventListener('deviceorientation', onDeviceOrientation, true);
+        }
+    }
+
+    function updateCompassLine() {
+        if (_compassHeading == null || _lastLatlng == null) return;
+        if (!map.hasLayer(gpsCompassLine)) return;
+
+        const dest = turf.destination(
+            turf.point([_lastLatlng.lng, _lastLatlng.lat]),
+            0.05,
+            _compassHeading
+        );
+
+        const destLatLng = [
+            dest.geometry.coordinates[1],
+            dest.geometry.coordinates[0]
+        ];
+
+        gpsCompassLine.setLatLngs([_lastLatlng, destLatLng]);
+    }
+
+    map.on('locationfound', e => {
+        const latlng = e.latlng.wrap();
+        _lastLatlng = latlng;
+
+        gpsCircle.setLatLng(latlng);
+        if (isFinite(e.accuracy)) gpsCircle.setRadius(e.accuracy);
+
+        updateCompassLine();
+
+        if (allowAutoSetPicker) {
+            locationPickerMarker.setLatLng(latlng);
+            allowAutoSetPicker = false;
+        }
+    });
+
+    map.on('overlayadd', e => {
+        if (e.layer === gpsCompassLayer) {
+            gpsActive = true;
+            map.locate({ watch: true, enableHighAccuracy: true });
+            requestCompass();
+        }
+    });
+
+    map.on('overlayremove', e => {
+        if (e.layer === gpsCompassLayer) {
+            gpsActive = false;
+            map.stopLocate();
+
+            window.removeEventListener('deviceorientationabsolute', onDeviceOrientation, true);
+            window.removeEventListener('deviceorientation', onDeviceOrientation, true);
+
+            gpsCompassLine.setLatLngs([]);
+            gpsCircle.setRadius(0);
+        }
+    });
+
     map.zoomControl.setPosition('topright');
+    function fixIOSResize() {
+        setTimeout(() => {
+            map.invalidateSize({ animate: false });
+            if (_lastLatlng) {
+                map.setView(_lastLatlng, map.getZoom(), { animate: false });
+            }
+        }, 250);
+    }
+
+    window.addEventListener("orientationchange", fixIOSResize);
+    window.addEventListener("resize", fixIOSResize);
 </script>
 <script type="module">
     import { parseCoordinate, convertLatlon } from '/static/coordinate_parser.js';

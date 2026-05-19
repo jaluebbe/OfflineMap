@@ -29,7 +29,8 @@ const myMarker = L.marker([50, 8.6], {
 const locationPickerLayer = L.layerGroup();
 let markerPositionedByInput = false;
 let isEditing = false;
-
+let allowAutoSetPicker = false;
+let gpsActive = false;
 const _locationPickerFields = window.locationPickerFields || ['latlon', 'utm', 'mgrs'];
 
 function updateControl(position) {
@@ -154,7 +155,8 @@ function handleCoordinateInput() {
     const coordinateInput = document.getElementById('coordinate-input').value;
     const resultDiv = document.getElementById('coordinate-result');
     if (coordinateInput.trim() === "") {
-        map.locate();
+        allowAutoSetPicker = true;
+        map.locate({ watch: true, enableHighAccuracy: true });
         return;
     }
     if (window.parseCoordinate) {
