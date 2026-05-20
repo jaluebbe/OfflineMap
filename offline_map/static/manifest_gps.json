@@ -1,8 +1,8 @@
 {
-  "name": "OfflineMap Mobile",
-  "short_name": "OfflineMap",
-  "start_url": "/static/leaflet_map_simple.html",
-  "scope": "/static/leaflet_map_simple.html",
+  "name": "OfflineMap GPS",
+  "short_name": "GPS Map",
+  "start_url": "/static/leaflet_map_gps.html",
+  "scope": "/static/leaflet_map_gps.html",
   "display": "standalone",
   "orientation": "any",
   "lang": "en",

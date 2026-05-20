@@ -1,0 +1,144 @@
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #000;
+}
+
+#map {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    min-height: 285px;
+}
+
+/* ── Safe-area / PWA ────────────────────────────────────────────────────── */
+.leaflet-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) * 0.25);
+}
+
+.leaflet-left {
+    padding-left: calc(env(safe-area-inset-left, 0px) * 0.75);
+}
+
+.leaflet-right {
+    padding-right: calc(env(safe-area-inset-right, 0px) * 0.75);
+}
+
+.leaflet-top {
+    padding-top: calc(env(safe-area-inset-top, 0px) * 0.75);
+}
+
+.leaflet-control-attribution {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* ── Controls ───────────────────────────────────────────────────────────── */
+.coordinate-control {
+    background: white;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.combined-control {
+    background: white;
+    color: #333;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: max-content;
+}
+
+.section {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.section-header {
+    background: #f0f0f0;
+    padding: 6px 8px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-header .arrow {
+    transition: transform 0.25s ease;
+}
+
+.section.collapsed .arrow {
+    transform: rotate(-90deg);
+}
+
+.section-content {
+    padding: 6px 8px;
+    background: white;
+    transition: max-height 0.25s ease-out, opacity 0.25s ease-out, padding 0.25s ease-out;
+    max-height: 1000px;
+    opacity: 1;
+}
+
+.section.collapsed .section-content {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* ── Form elements ──────────────────────────────────────────────────────── */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+#coordinate-input {
+    min-width: 120px;
+}
+
+#coordinate-result {
+    padding: 5px;
+    font-size: 12px;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5px;
+}
+
+#search-control {
+    padding-top: 5px;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5px;
+}
+
+#region-control {
+    display: grid;
+    gap: 5px;
+}
+
+#io-control {
+    display: grid;
+    gap: 5px;
+    padding: 5px;
+}
+
+.io-buttons {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 5px;
+}
+
+#textInput {
+    width: 120px;
+}

@@ -398,16 +398,4 @@ L.Polygon.prototype.options.measurementOptions = {
 };
 L.Polyline.prototype.options.showMeasurements = true;
 
-var featureControl = L.control({
-    position: 'bottomleft'
-});
-featureControl.onAdd = function(map) {
-    this._div = L.DomUtil.create('div', 'legend-control');
-    let tempSource = document.getElementById('featureControlTemplate');
-    this._div.appendChild(tempSource.content.cloneNode(true));
-    L.DomEvent.disableClickPropagation(this._div);
-    return this._div;
-}
-featureControl.addTo(map);
-
 loadEditorLayerFromLocalStorage();

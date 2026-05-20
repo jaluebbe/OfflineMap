@@ -74,7 +74,7 @@ fetch('/api/vector/regions')
             addOSMVectorLayer("osm_bright", mapRegion, "OSM Bright");
             addOSMVectorLayer("osm_liberty", mapRegion, "OSM Liberty");
             addOSMVectorLayer("osm_positron", mapRegion, "OSM Positron");
-            map.setView([52.2775, 8.0415], 12);
+            map.setView([52.2775, 8.0415], 16);
         } else {
             console.warn('No regions available.');
         }
@@ -113,3 +113,14 @@ map.whenReady(function() {
 map.on('baselayerchange', function() {
     setTimeout(setupAttribution, 50);
 });
+
+function fixIOSResize() {
+    setTimeout(() => {
+        map.invalidateSize({ animate: false });
+        if (typeof _gpsCenter !== 'undefined' && _gpsCenter) {
+            map.setView(_gpsCenter, map.getZoom(), { animate: false });
+        }
+    }, 250);
+}
+window.addEventListener('orientationchange', fixIOSResize);
+window.addEventListener('resize', fixIOSResize);

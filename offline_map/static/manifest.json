@@ -5,6 +5,7 @@
   "scope": "/static/leaflet_map.html",
   "display": "standalone",
   "orientation": "any",
+  "lang": "en",
   "background_color": "#1e64a0",
   "theme_color": "#1e64a0",
   "categories": ["navigation", "utilities"],
