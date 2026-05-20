@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfflineMap</title>
+
+    <style>
+        :root {
+            --bg: #0a1520;
+            --fg: #e8edf2;
+            --muted: #7a9ab5;
+            --accent-full: #2a7fc4;
+            --accent-mobile: #4db87a;
+            --accent-gps: #e07b2a;
+            --card-bg: rgba(255,255,255,0.04);
+            --card-border: rgba(255,255,255,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.25rem;
+            gap: 2rem;
+        }
+
+        header { text-align: center; }
+
+        .logo {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 2.4rem;
+            font-weight: 600;
+        }
+
+        .logo span { color: var(--accent-full); }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.3rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-left: 3px solid var(--accent, var(--accent-full));
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.15s;
+        }
+
+        .card:active {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .card-icon {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .card-title {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .card-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .card-full   { --accent: var(--accent-full); }
+        .card-mobile { --accent: var(--accent-mobile); }
+        .card-gps    { --accent: var(--accent-gps); }
+
+        footer {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            opacity: 0.6;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Offline<span>Map</span></div>
+        <div class="subtitle">Select a map</div>
+    </header>
+
+    <div class="grid">
+        <a href="/static/leaflet_map.html" class="card card-full">
+            <div class="card-icon">🗺️</div>
+            <div class="card-body">
+                <div class="card-title">Full Map</div>
+                <div class="card-desc">
+                    Editor, region &amp; PLZ lookup, place &amp; street search, location picker,
+                    coordinate tools, optional GPS &amp; compass layer.
+                </div>
+            </div>
+        </a>
+
+        <a href="/static/leaflet_map_simple.html" class="card card-mobile">
+            <div class="card-icon">📱</div>
+            <div class="card-body">
+                <div class="card-title">Mobile Map</div>
+                <div class="card-desc">
+                    Optimised for smartphones. Editor, coordinate input, location picker,
+                    optional GPS &amp; compass layer.
+                </div>
+            </div>
+        </a>
+
+        <a href="/static/leaflet_map_gps.html" class="card card-gps">
+            <div class="card-icon">📡</div>
+            <div class="card-body">
+                <div class="card-title">GPS Navigation</div>
+                <div class="card-desc">
+                    Live GPS position, accuracy circle, compass, heading, speed &amp; altitude.
+                    No editor or search tools.
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <footer id="legal-footer">
+        <a href="https://github.com/jaluebbe/OfflineMap" target="_blank">Source on GitHub</a>
+    </footer>
+
+    <script>
+    (function addPrivacyStatement() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('HEAD', '/static/datenschutz.html', true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const footer = document.getElementById('legal-footer');
+                const link = document.createElement('a');
+                link.href = '/static/datenschutz.html';
+                link.target = '_blank';
+                link.textContent = 'Impressum & Datenschutzerklärung';
+                footer.appendChild(document.createTextNode(' · '));
+                footer.appendChild(link);
+            }
+        };
+
+        xhr.send();
+    })();
+    </script>
+</body>
+
+</html>
