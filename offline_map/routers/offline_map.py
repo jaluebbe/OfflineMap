@@ -2,18 +2,14 @@ import sqlite3
 import json
 from fastapi import APIRouter, HTTPException, Request, Response
 from pathlib import Path
+import logging
 
 router = APIRouter(tags=["offline_map"])
 
 osm_path = Path("..")
 natural_earth_vector_path = Path("natural_earth_vector.mbtiles")
 natural_earth_shaded_relief_path = Path("natural_earth_2_shaded_relief.mbtiles")
-planet_path = Path("planet.mbtiles")
-
-FALLBACK_STEMS = {
-    natural_earth_vector_path.stem,
-    planet_path.stem,
-}
+planet_path = Path("..") / "planet_fallback.mbtiles"
 
 
 def get_db_connection(db_file_name: Path):
@@ -48,10 +44,12 @@ planet_max_zoom = get_mbtiles_maxzoom(planet_path)
 @router.get("/api/vector/regions")
 def list_vector_regions():
     mbtiles_files = sorted(
-        osm_path.glob("*.mbtiles"), key=lambda f: f.stat().st_size, reverse=True
+        osm_path.glob("*.mbtiles"),
+        key=lambda f: f.stat().st_size,
+        reverse=True,
     )
     return [
-        file.stem for file in mbtiles_files if file.stem not in FALLBACK_STEMS
+        file.stem for file in mbtiles_files if file.stem != planet_path.stem
     ]
 
 
@@ -92,22 +90,20 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
     db_file_name = osm_path / f"{region}.mbtiles"
+    result = None
 
-    with get_db_connection(db_file_name) as db_connection:
-        result = fetch_tile_data(
-            db_connection, zoom_level, tile_column, tile_row
-        )
-
-    # Fall back to planet, reducing zoom level to planet's maximum if needed
-    if result is None and planet_max_zoom is not None:
-        fallback_zoom = min(zoom_level, planet_max_zoom)
-        scale = 2 ** (zoom_level - fallback_zoom)
+    if planet_max_zoom is not None and zoom_level <= planet_max_zoom:
+        # Planet has priority at low zoom levels
         with get_db_connection(planet_path) as db_connection:
             result = fetch_tile_data(
-                db_connection,
-                fallback_zoom,
-                tile_column // scale,
-                tile_row // scale,
+                db_connection, zoom_level, tile_column, tile_row
+            )
+
+    if result is None:
+        # Regional data for higher zoom levels or if planet has no tile
+        with get_db_connection(db_file_name) as db_connection:
+            result = fetch_tile_data(
+                db_connection, zoom_level, tile_column, tile_row
             )
 
     # Last resort: natural earth
