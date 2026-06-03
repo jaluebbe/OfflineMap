@@ -74,6 +74,17 @@ sudo systemctl enable offline_map_api.service
 sudo systemctl start offline_map_api.service 
 ```
 
+### Disable unnecessary services
+On a Raspberry Pi running Bookworm Lite the following services are enabled by
+default but not needed for this application. Disabling them frees up a small
+amount of RAM and reduces background activity:
+```
+sudo systemctl disable --now bluetooth.service
+sudo systemctl disable --now ModemManager.service
+sudo systemctl disable --now triggerhappy.service
+sudo systemctl disable --now triggerhappy.socket
+```
+
 ### Setup port forwarding
 If you would avoid to add :8000 to the hostname of the device you can create
 a port forwarding from port 80 to 8000.
