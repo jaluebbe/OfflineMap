@@ -35,6 +35,67 @@
             padding-top: 4px;
             color: #444;
         }
+
+        #snapshot-list {
+            max-height: 90px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+
+        .snapshot-empty {
+            color: #888;
+            padding: 4px 0;
+        }
+
+        .snapshot-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+            border-bottom: 1px solid #e0e0e0;
+            gap: 6px;
+        }
+
+        .snapshot-item:last-child {
+            border-bottom: none;
+        }
+
+        .snapshot-date {
+            color: #1e64a0;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #b0c8e0;
+            font-size: 12px;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .snapshot-date:hover {
+            background: #e8f0f8;
+        }
+
+        .snapshot-latest {
+            font-weight: bold;
+            border-color: #1e64a0;
+        }
+
+        #history-watermark {
+            display: none;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.45);
+            color: #fff;
+            font-size: 13px;
+            font-family: monospace;
+            padding: 4px 12px;
+            border-radius: 4px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -50,9 +111,7 @@
 
     <template id="featureControlTemplate">
         <div id="io-control">
-            <input id="fileInput" name="fileInput" type="file"
-                   accept=".geojson,.json,application/geo+json,application/json"
-                   onchange="importEditor()" hidden>
+            <input id="fileInput" name="fileInput" type="file" accept=".geojson,.json,application/geo+json,application/json" onchange="importEditor()" hidden>
 
             <div class="io-buttons">
                 <button id="openButton" onclick="fileInput.click()">Open</button>
@@ -62,21 +121,23 @@
         </div>
 
         <div class="legend-item">
-            <input type="color" id="colorInput" name="colorInput"
-                   value="#3388ff" onchange="updateFeatureProperties()">
+            <input type="color" id="colorInput" name="colorInput" value="#3388ff" onchange="updateFeatureProperties()">
 
-            <input type="checkbox" id="measureCheckbox" name="measureCheckbox"
-                   onchange="updateFeatureProperties()">
+            <input type="checkbox" id="measureCheckbox" name="measureCheckbox" onchange="updateFeatureProperties()">
             <label for="measureCheckbox">measure</label>
 
-            <input type="checkbox" id="fillCheckbox" name="fillCheckbox"
-                   checked onchange="updateFeatureProperties()">
+            <input type="checkbox" id="fillCheckbox" name="fillCheckbox" checked onchange="updateFeatureProperties()">
             <label for="fillCheckbox">fill</label>
         </div>
 
         <div class="legend-item">
-            <input type="text" id="textInput" name="textInput"
-                   placeholder="Enter text" onchange="updateFeatureProperties()">
+            <input type="text" id="textInput" name="textInput" placeholder="Enter text" onchange="updateFeatureProperties()">
+        </div>
+    </template>
+
+    <template id="historyControlTemplate">
+        <div id="history-control">
+            <div id="snapshot-list"></div>
         </div>
     </template>
 
@@ -127,7 +188,21 @@
             document.getElementById('featureControlTemplate').content.cloneNode(true)
         );
 
+        let historySection = L.DomUtil.create('div', 'section', this._div);
+        let historyHeader = L.DomUtil.create('div', 'section-header', historySection);
+        historyHeader.innerHTML = `
+            <span>History</span>
+            <span class="arrow">&#9662;</span>
+        `;
+        let historyContent = L.DomUtil.create('div', 'section-content', historySection);
+        historyContent.appendChild(
+            document.getElementById('historyControlTemplate').content.cloneNode(true)
+        );
+        historySection.classList.add("collapsed");
+        historyHeader.addEventListener("click", () => historySection.classList.toggle("collapsed"));
+
         L.DomEvent.disableClickPropagation(this._div);
+        L.DomEvent.disableScrollPropagation(this._div);
 
         coordHeader.addEventListener("click", () => {
             coordSection.classList.toggle("collapsed");
@@ -188,7 +263,10 @@
     map.on('overlayadd', e => {
         if (e.layer === gpsCompassLayer) {
             gpsActive = true;
-            map.locate({ watch: true, enableHighAccuracy: true });
+            map.locate({
+                watch: true,
+                enableHighAccuracy: true
+            });
             requestCompass();
         }
     });
@@ -206,8 +284,12 @@
     map.zoomControl.setPosition('topright');
 </script>
 <script type="module">
-    import { parseCoordinate, convertLatlon } from '/static/coordinate_parser.js';
+    import {
+        parseCoordinate,
+        convertLatlon
+    } from '/static/coordinate_parser.js';
     window.parseCoordinate = parseCoordinate;
     window.convertLatlon = convertLatlon;
 </script>
+
 </html>

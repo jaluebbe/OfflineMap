@@ -3,6 +3,169 @@ map.getPane('editor').style.zIndex = 392;
 
 var selectedShape = undefined;
 
+// --- Snapshot history ---------------------------------------------------
+
+const SNAPSHOT_MIN_INTERVAL_MS = 30_000;
+const SNAPSHOT_BUDGET_BYTES = 2 * 1024 * 1024;
+const SNAPSHOT_STORAGE_KEY = 'editorSnapshots';
+
+let _lastSnapshotTime = 0;
+let _lastSnapshotJson = null;
+
+function loadSnapshots() {
+    try {
+        return JSON.parse(localStorage.getItem(SNAPSHOT_STORAGE_KEY) || '[]');
+    } catch {
+        return [];
+    }
+}
+
+function saveSnapshot(geoJsonString) {
+    const now = Date.now();
+    if (now - _lastSnapshotTime < SNAPSHOT_MIN_INTERVAL_MS) return;
+    if (geoJsonString === _lastSnapshotJson) return;
+
+    const parsed = JSON.parse(geoJsonString);
+    if (parsed.features.length === 0) return;
+
+    const snapshots = loadSnapshots();
+    if (snapshots.length > 0 && snapshots[snapshots.length - 1].data === geoJsonString) return;
+    snapshots.push({
+        ts: now,
+        count: parsed.features.length,
+        data: geoJsonString,
+    });
+
+    let serialized;
+    do {
+        if (snapshots.length === 0) return;
+        serialized = JSON.stringify(snapshots);
+        if (serialized.length <= SNAPSHOT_BUDGET_BYTES) break;
+        snapshots.shift();
+    } while (true);
+
+    localStorage.setItem(SNAPSHOT_STORAGE_KEY, serialized);
+    _lastSnapshotTime = now;
+    _lastSnapshotJson = geoJsonString;
+    renderSnapshotList();
+}
+
+function formatRelativeTime(ts) {
+    const diffMs = Date.now() - ts;
+    const diffMin = Math.round(diffMs / 60_000);
+    if (diffMin < 1) return 'just now';
+    if (diffMin === 1) return '1 min ago';
+    if (diffMin < 60) return `${diffMin} min ago`;
+    const diffH = Math.floor(diffMin / 60);
+    const remMin = diffMin % 60;
+    if (remMin === 0) return `${diffH} h ago`;
+    return `${diffH} h ${remMin} min ago`;
+}
+
+function showHistoryWatermark(snap) {
+    let el = document.getElementById('history-watermark');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'history-watermark';
+        document.getElementById('map').appendChild(el);
+    }
+    const date = new Date(snap.ts);
+    const dateStr = date.getFullYear() + '-' +
+        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(date.getDate()).padStart(2, '0') + ' ' +
+        String(date.getHours()).padStart(2, '0') + ':' +
+        String(date.getMinutes()).padStart(2, '0');
+    el.textContent = '\u23f1 ' + dateStr + ' (' + snap.count + ')';
+    el.style.display = 'block';
+}
+
+function hideHistoryWatermark() {
+    const el = document.getElementById('history-watermark');
+    if (el) el.style.display = 'none';
+}
+
+function restoreSnapshot(index) {
+    const snapshots = loadSnapshots();
+    const snap = snapshots[index];
+    if (!snap) return;
+    const currentData = localStorage.getItem('editorLayerData');
+    if (currentData && currentData !== _lastSnapshotJson) {
+        _lastSnapshotTime = 0;
+        saveSnapshot(currentData);
+    }
+    const geoJSONData = JSON.parse(snap.data);
+    editorLayer.clearLayers();
+    editorLayer.addData(geoJSONData);
+    fitBoundsToLayers();
+    // Don't overwrite editorLayerData so a page refresh returns to the latest state.
+    _lastSnapshotJson = snap.data;
+    _lastSnapshotTime = Date.now();
+    const snapshots2 = loadSnapshots();
+    if (snap.ts === snapshots2[snapshots2.length - 1].ts) {
+        hideHistoryWatermark();
+    } else {
+        showHistoryWatermark(snap);
+    }
+}
+
+function exportSnapshot(index) {
+    const snapshots = loadSnapshots();
+    const snap = snapshots[index];
+    if (!snap) return;
+    const date = new Date(snap.ts);
+    const dateStr = date.getFullYear() + '-' +
+        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(date.getDate()).padStart(2, '0') + '_' +
+        String(date.getHours()).padStart(2, '0') + '-' +
+        String(date.getMinutes()).padStart(2, '0');
+    const fileName = `editor_${dateStr}.json`;
+    const pom = document.createElement('a');
+    pom.setAttribute('href', 'data:application/geo+json;charset=utf-8,' +
+        encodeURIComponent(snap.data));
+    pom.setAttribute('download', fileName);
+    pom.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+    }));
+}
+
+function renderSnapshotList() {
+    const container = document.getElementById('snapshot-list');
+    if (!container) return;
+    const snapshots = loadSnapshots();
+    if (snapshots.length === 0) {
+        container.innerHTML = '<div class="snapshot-empty">No snapshots yet.</div>';
+        return;
+    }
+    container.innerHTML = [...snapshots].reverse().map((snap, i) => {
+        const originalIndex = snapshots.length - 1 - i;
+        const isLatest = i === 0;
+        return `<div class="snapshot-item">
+            <span class="snapshot-date${isLatest ? ' snapshot-latest' : ''}"
+                  onclick="restoreSnapshot(${originalIndex})">
+                ${formatRelativeTime(snap.ts)} (${snap.count})
+            </span>
+        </div>`;
+    }).join('');
+}
+
+// Refresh relative timestamps every 30 seconds.
+setInterval(renderSnapshotList, 30_000);
+
+// Snapshot periodically even without user interaction, using the live
+// layer state to avoid snapshotting a restored historical view.
+setInterval(() => {
+    const liveJson = JSON.stringify(editorLayer.toGeoJSON());
+    if (liveJson === _lastSnapshotJson) return;
+    const count = JSON.parse(liveJson).features.length;
+    if (count === 0) return;
+    _lastSnapshotTime = 0;
+    saveSnapshot(liveJson);
+}, 30_000);
+
+// --- End snapshot history -----------------------------------------------
+
 function getDateString() {
     let date = new Date();
     return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "_" + date.getHours() + "-" + date.getMinutes();
@@ -21,6 +184,7 @@ function updateEditorTooltip(layer, text) {
 }
 
 function dataChanged() {
+    hideHistoryWatermark();
     editorLayer.eachLayer(layer => {
         if (layer.feature && layer.feature.properties) {
             if (layer.options && layer.options.text) {
@@ -29,7 +193,9 @@ function dataChanged() {
         }
     });
     const data = editorLayer.toGeoJSON();
-    localStorage.setItem('editorLayerData', JSON.stringify(data));
+    const geoJsonString = JSON.stringify(data);
+    localStorage.setItem('editorLayerData', geoJsonString);
+    saveSnapshot(geoJsonString);
 }
 
 function clickedShape(eo) {
@@ -50,7 +216,7 @@ map.on('click', function(eo) {
 });
 
 function resetInputsToDefault() {
-//    colorInput.value = '#3388ff';
+    //    colorInput.value = '#3388ff';
     colorInput.disabled = false;
     fillCheckbox.checked = true;
     fillCheckbox.disabled = false;
@@ -399,3 +565,4 @@ L.Polygon.prototype.options.measurementOptions = {
 L.Polyline.prototype.options.showMeasurements = true;
 
 loadEditorLayerFromLocalStorage();
+renderSnapshotList();
