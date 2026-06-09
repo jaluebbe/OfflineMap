@@ -85,7 +85,7 @@ var layerControl = L.control.layers(baseLayers, other_layers, {
 let labelsOverlay = null;
 let labelsEnabled = false;
 let activeBaseLayerName = 'OSM Basic';
-const rasterLayerNames = ["GEBCO", "Blue Marble"];
+const rasterLayerNames = ["GEBCO", "Blue Marble", "DOP"];
 
 function showLabelsOverlay() {
     if (!labelsOverlay) return;
@@ -172,7 +172,8 @@ const rasterPromises = [
 
 Promise.all([regionsPromise, ...rasterPromises]).then(([mapRegion, ...rasterResults]) => {
     const availableRasterLayers = rasterResults.filter(Boolean);
-    if (mapRegion && availableRasterLayers.length > 0) {
+    const hasHttps = location.protocol === 'https:';
+    if (mapRegion && (availableRasterLayers.length > 0 || hasHttps)) {
         labelsOverlay = L.maplibreGL({
             style: `/api/vector/style/${mapRegion}/map_labels.json`,
             attribution: '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
