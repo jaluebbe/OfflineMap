@@ -1,0 +1,185 @@
+{
+  "version": 8,
+  "name": "map labels",
+  "sources": {
+    "openmaptiles": {
+      "type": "vector",
+      "url": "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key={key}"
+    }
+  },
+  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key={key}",
+  "layers": [
+    {
+      "id": "admin_country",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "minzoom": 0,
+      "maxzoom": 22,
+      "filter": [
+        "all",
+        ["<=", "admin_level", 2],
+        ["==", "$type", "LineString"]
+      ],
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "rgba(255,255,255,0.5)",
+        "line-width": {
+            "base": 1.2,
+            "stops": [[0, 0.6], [4, 1.4], [9, 2.2]]
+        }
+       }
+    },
+    {
+      "id": "admin_sub",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "minzoom": 7,
+      "maxzoom": 22,
+      "filter": ["in", "admin_level", 4, 6],
+      "paint": {
+        "line-color": "rgba(255,255,255,0.5)",
+        "line-dasharray": [4, 3],
+        "line-width": 0.8
+      }
+    },
+    {
+      "id": "country_label",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 0,
+      "maxzoom": 22,
+      "filter": [
+        "all",
+        ["==", "$type", "Point"],
+        ["==", "class", "country"]
+      ],
+      "layout": {
+        "text-field": "{name:latin}",
+        "text-font": ["KlokanTech Noto Sans Bold"],
+        "text-size": {
+          "stops": [[0, 8], [3, 12], [6, 18]]
+        },
+        "text-max-width": 10
+      },
+      "paint": {
+        "text-color": "#111",
+        "text-halo-color": "rgba(255,255,255,0.75)",
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "city_large",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 3,
+      "maxzoom": 22,
+      "filter": [
+        "all",
+        ["==", "$type", "Point"],
+        ["==", "class", "city"],
+        [">=", "rank", 1]
+      ],
+      "layout": {
+        "text-field": "{name:latin}",
+        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-size": {"stops": [[3, 10], [6, 14], [9, 18]]}
+      },
+      "paint": {
+        "text-color": "#000",
+        "text-halo-color": "rgba(255,255,255,0.75)",
+        "text-halo-width": 2
+      }
+    },
+
+    {
+      "id": "city_medium",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 5,
+      "maxzoom": 22,
+      "filter": [
+        "all",
+        ["==", "$type", "Point"],
+        ["==", "class", "city"],
+        ["<", "rank", 1]
+      ],
+      "layout": {
+        "text-field": "{name:latin}",
+        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-size": {"stops": [[5, 10], [8, 14]]}
+      },
+      "paint": {
+        "text-color": "#222",
+        "text-halo-color": "rgba(255,255,255,0.75)",
+        "text-halo-width": 2
+      }
+    },
+
+    {
+      "id": "town_small",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 7,
+      "maxzoom": 22,
+      "filter": [
+        "all",
+        ["==", "$type", "Point"],
+        ["in", "class", "town", "village"]
+      ],
+      "layout": {
+        "text-field": "{name:latin}",
+        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-size": {"stops": [[7, 9], [9, 12]]}
+      },
+      "paint": {
+        "text-color": "#333",
+        "text-halo-color": "white",
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "water_name_major",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "water_name",
+      "minzoom": 0,
+      "maxzoom": 22,
+      "filter": [
+        "all",
+        ["==", "$type", "Point"],
+        [
+          "any",
+          ["in", "class",
+            "ocean", "sea", "lake",
+            "gulf", "bay", "strait", "channel",
+            "sea_area", "ocean_area"
+          ],
+          ["!has", "class"]
+        ]
+      ],
+      "layout": {
+        "text-field": "{name:latin}",
+        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-size": {
+          "stops": [[1, 10], [4, 14], [7, 18]]
+        },
+        "text-max-width": 12
+      },
+      "paint": {
+        "text-color": "#4a4fcf",
+        "text-halo-color": "rgba(255,255,255,0.7)",
+        "text-halo-width": 1.5
+      }
+    }
+
+  ]
+}

@@ -34,6 +34,23 @@ function addOSMVectorLayer(styleName, region, layerLabel) {
     return myLayer;
 };
 
+async function checkRasterLayerAvailable(url, options, label) {
+    try {
+        const testUrl = url.replace('{z}', '0').replace('{x}', '0').replace('{y}', '0');
+        const response = await fetch(testUrl, {
+            method: 'HEAD'
+        });
+        if (response.ok) {
+            const layer = L.tileLayer(url, options);
+            layerControl.addBaseLayer(layer, label);
+            return label;
+        }
+    } catch (e) {
+        console.warn(`Raster layer '${label}' not available:`, e);
+    }
+    return null;
+}
+
 function fitBoundsToLayers() {
     const candidates = [
         typeof streetsLayer !== 'undefined' ? streetsLayer : null,
@@ -65,7 +82,55 @@ var layerControl = L.control.layers(baseLayers, other_layers, {
     position: 'topright'
 }).addTo(map);
 
-fetch('/api/vector/regions')
+let labelsOverlay = null;
+let labelsEnabled = false;
+let activeBaseLayerName = 'OSM Basic';
+const rasterLayerNames = ["GEBCO", "Blue Marble", "DOP"];
+
+function showLabelsOverlay() {
+    if (!labelsOverlay) return;
+    if (!map.hasLayer(labelsOverlay)) {
+        labelsOverlay.addTo(map);
+        labelsOverlay._update();
+    }
+    setTimeout(() => {
+        const container = labelsOverlay.getContainer();
+        if (container) container.style.zIndex = 400;
+    }, 50);
+}
+
+function hideLabelsOverlay() {
+    if (labelsOverlay && map.hasLayer(labelsOverlay)) {
+        map.removeLayer(labelsOverlay);
+    }
+}
+
+map.on('baselayerchange', function(e) {
+    activeBaseLayerName = e.name;
+    if (labelsEnabled && rasterLayerNames.includes(e.name)) {
+        showLabelsOverlay();
+    } else {
+        hideLabelsOverlay();
+    }
+});
+
+map.on('overlayadd', function(e) {
+    if (e.name === 'Labels') {
+        labelsEnabled = true;
+        if (rasterLayerNames.includes(activeBaseLayerName)) {
+            showLabelsOverlay();
+        }
+    }
+});
+
+map.on('overlayremove', function(e) {
+    if (e.name === 'Labels') {
+        labelsEnabled = false;
+        hideLabelsOverlay();
+    }
+});
+
+const regionsPromise = fetch('/api/vector/regions')
     .then(response => response.json())
     .then(data => {
         if (data.length > 0) {
@@ -76,13 +141,47 @@ fetch('/api/vector/regions')
             addOSMVectorLayer("osm_positron", mapRegion, "OSM Positron");
             addOSMVectorLayer("osm_openmaptiles", mapRegion, "OSM OpenMapTiles");
             map.setView([52.2775, 8.0415], 16);
+            return mapRegion;
         } else {
             console.warn('No regions available.');
+            return null;
         }
     })
     .catch(error => {
         console.error('Error fetching regions:', error);
+        return null;
     });
+
+const rasterPromises = [
+    checkRasterLayerAvailable(
+        '/api/raster/gebco/{z}/{x}/{y}.webp', {
+            maxNativeZoom: 9,
+            maxZoom: 22,
+            attribution: '&copy; <a href="https://www.gebco.net/data-products-gridded-bathymetry-data/gebco2026-grid">GEBCO_2026 Grid</a>'
+        },
+        'GEBCO'
+    ),
+    checkRasterLayerAvailable(
+        '/api/raster/bluemarble/{z}/{x}/{y}.webp', {
+            maxNativeZoom: 8,
+            maxZoom: 22,
+            attribution: '&copy; <a href="https://github.com/freetiler/nasa-bluemarble">FreeTiler.com | NASA Earth Observatory</a>'
+        },
+        'Blue Marble'
+    ),
+];
+
+Promise.all([regionsPromise, ...rasterPromises]).then(([mapRegion, ...rasterResults]) => {
+    const availableRasterLayers = rasterResults.filter(Boolean);
+    const hasHttps = location.protocol === 'https:';
+    if (mapRegion && (availableRasterLayers.length > 0 || hasHttps)) {
+        labelsOverlay = L.maplibreGL({
+            style: `/api/vector/style/${mapRegion}/map_labels.json`,
+            attribution: '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        });
+        layerControl.addOverlay(labelsOverlay, "Labels");
+    }
+});
 
 function setupAttribution() {
     var attrControl = document.querySelector('.leaflet-control-attribution');
@@ -107,7 +206,9 @@ map.whenReady(function() {
         }
     });
     observer.observe(document.querySelector('.leaflet-control-attribution'), {
-        childList: true, subtree: true, characterData: true
+        childList: true,
+        subtree: true,
+        characterData: true
     });
 });
 
@@ -117,9 +218,13 @@ map.on('baselayerchange', function() {
 
 function fixIOSResize() {
     setTimeout(() => {
-        map.invalidateSize({ animate: false });
+        map.invalidateSize({
+            animate: false
+        });
         if (typeof _gpsCenter !== 'undefined' && _gpsCenter) {
-            map.setView(_gpsCenter, map.getZoom(), { animate: false });
+            map.setView(_gpsCenter, map.getZoom(), {
+                animate: false
+            });
         }
     }, 250);
 }
