@@ -11,6 +11,12 @@ natural_earth_vector_path = Path("natural_earth_vector.mbtiles")
 natural_earth_shaded_relief_path = Path("natural_earth_2_shaded_relief.mbtiles")
 planet_path = Path("..") / "planet_fallback.mbtiles"
 
+raster_sources = {
+    "natural_earth_2_shaded_relief": natural_earth_shaded_relief_path,
+    "bluemarble": Path("bluemarble.mbtiles"),
+    "gebco": Path("gebco_z0-9.mbtiles"),
+}
+
 
 def get_db_connection(db_file_name: Path):
     if not db_file_name.is_file():
@@ -93,20 +99,17 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
     result = None
 
     if planet_max_zoom is not None and zoom_level <= planet_max_zoom:
-        # Planet has priority at low zoom levels
         with get_db_connection(planet_path) as db_connection:
             result = fetch_tile_data(
                 db_connection, zoom_level, tile_column, tile_row
             )
 
     if result is None:
-        # Regional data for higher zoom levels or if planet has no tile
         with get_db_connection(db_file_name) as db_connection:
             result = fetch_tile_data(
                 db_connection, zoom_level, tile_column, tile_row
             )
 
-    # Last resort: natural earth
     if result is None and zoom_level <= 7:
         with get_db_connection(natural_earth_vector_path) as db_connection:
             result = fetch_tile_data(
@@ -149,13 +152,19 @@ def get_vector_style(region: str, style_name: str, request: Request):
     return style
 
 
-@router.get(
-    "/api/raster/natural_earth_2_shaded_relief/{zoom_level}/{x}/{y}.webp"
+@router.api_route(
+    "/api/raster/{source}/{zoom_level}/{x}/{y}.webp",
+    methods=["GET", "HEAD"],
 )
-def get_raster_natural_earth_2_shaded_relief(zoom_level: int, x: int, y: int):
+def get_raster_tile(source: str, zoom_level: int, x: int, y: int):
+    if source not in raster_sources:
+        raise HTTPException(
+            status_code=404, detail=f"Raster source '{source}' not known."
+        )
+    path = raster_sources[source]
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
-    with get_db_connection(natural_earth_shaded_relief_path) as db_connection:
+    with get_db_connection(path) as db_connection:
         result = fetch_tile_data(
             db_connection, zoom_level, tile_column, tile_row
         )
