@@ -26,13 +26,8 @@ function addOSMVectorLayer(styleName, region, layerLabel) {
     });
     vectorBaseLayers[layerLabel] = myLayer;
     layerControl.addBaseLayer(myLayer, layerLabel);
-    map.on('baselayerchange', function(eo) {
-        if (eo.name === layerLabel) {
-            myLayer._update();
-        }
-    });
     return myLayer;
-};
+}
 
 async function checkRasterLayerAvailable(url, options, label) {
     try {
@@ -75,9 +70,7 @@ function fitBoundsToLayers() {
 L.control.scale({
     'imperial': false
 }).addTo(map);
-var baseLayers = {};
-var other_layers = {};
-var layerControl = L.control.layers(baseLayers, other_layers, {
+const layerControl = L.control.layers({}, {}, {
     collapsed: L.Browser.mobile,
     position: 'topright'
 }).addTo(map);
@@ -171,13 +164,31 @@ async function applyRailwayOverlay(label) {
             mlMap.once('style.load', doInject);
         }
     } else {
-        overlay.injectedInto = null;
-        showMaplibreOverlay(overlay.standaloneLayer);
+        // Raster base layer: share the labelsOverlay MapLibre instance to avoid stacking two opaque WebGL canvases
+        const style = await _fetchRailwayStyle(overlay);
+        if (labelsEnabled && labelsOverlay) {
+            if (map.hasLayer(overlay.standaloneLayer)) map.removeLayer(overlay.standaloneLayer);
+            const mlMap = labelsOverlay.getMaplibreMap();
+            if (!mlMap) return;
+            const doInject = () => {
+                _injectRailwayIntoMap(mlMap, style);
+                overlay.injectedInto = mlMap;
+            };
+            if (mlMap.isStyleLoaded()) doInject();
+            else mlMap.once('style.load', doInject);
+        } else {
+            if (overlay.injectedInto) {
+                _ejectRailwayFromMap(overlay.injectedInto, style);
+                overlay.injectedInto = null;
+            }
+            showMaplibreOverlay(overlay.standaloneLayer);
+        }
     }
 }
 
 map.on('baselayerchange', function(e) {
     activeBaseLayerName = e.name;
+    vectorBaseLayers[e.name]?._update();
     if (labelsEnabled && rasterLayerNames.includes(e.name)) {
         showLabelsOverlay();
     } else {
@@ -194,6 +205,10 @@ map.on('overlayadd', function(e) {
         labelsEnabled = true;
         if (rasterLayerNames.includes(activeBaseLayerName)) {
             showLabelsOverlay();
+            // Migrate enabled railway overlays into the shared labelsOverlay MapLibre instance
+            Object.keys(railwayOverlays).forEach(lbl => {
+                if (railwayOverlays[lbl].enabled) applyRailwayOverlay(lbl);
+            });
         }
         return;
     }
@@ -207,6 +222,16 @@ map.on('overlayremove', function(e) {
     if (e.name === 'Labels') {
         labelsEnabled = false;
         hideLabelsOverlay();
+        // labelsOverlay was removed from map (MapLibre destroyed) – fall back to standalone canvas
+        if (rasterLayerNames.includes(activeBaseLayerName)) {
+            Object.keys(railwayOverlays).forEach(lbl => {
+                const ov = railwayOverlays[lbl];
+                if (ov.enabled) {
+                    ov.injectedInto = null;
+                    applyRailwayOverlay(lbl);
+                }
+            });
+        }
         return;
     }
     if (e.name in railwayOverlays) {
