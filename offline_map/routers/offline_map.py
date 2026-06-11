@@ -2,11 +2,11 @@ import sqlite3
 import json
 from fastapi import APIRouter, HTTPException, Request, Response
 from pathlib import Path
-import logging
 
 router = APIRouter(tags=["offline_map"])
 
 osm_path = Path("../osm")
+overlays_path = Path("../overlays")
 natural_earth_vector_path = Path("natural_earth_vector.mbtiles")
 natural_earth_shaded_relief_path = Path("natural_earth_2_shaded_relief.mbtiles")
 planet_path = Path("..") / "planet_fallback.mbtiles"
@@ -44,6 +44,12 @@ def get_mbtiles_maxzoom(path: Path) -> int | None:
     return int(row[0]) if row else None
 
 
+def _base_url(request: Request) -> str:
+    scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
+    port_suffix = f":{request.url.port}" if request.url.port else ""
+    return f"{scheme}://{request.url.hostname}{port_suffix}"
+
+
 planet_max_zoom = get_mbtiles_maxzoom(planet_path)
 
 
@@ -67,24 +73,18 @@ def get_vector_metadata(region: str, request: Request):
         result = cursor.fetchall()
     if result is None:
         raise HTTPException(status_code=404, detail="Metadata not found.")
-    scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
-    port_suffix = f":{request.url.port}" if request.url.port else ""
+    base = _base_url(request)
     metadata = {
         "tilejson": "2.0.0",
         "scheme": "xyz",
-        "tiles": [
-            f"{scheme}://{request.url.hostname}{port_suffix}"
-            f"/api/vector/tiles/{region}/{{z}}/{{x}}/{{y}}.pbf"
-        ],
+        "tiles": [f"{base}/api/vector/tiles/{region}/{{z}}/{{x}}/{{y}}.pbf"],
     }
     for key, value in result:
         if key == "json":
             metadata.update(json.loads(value))
         elif key in ("minzoom", "maxzoom"):
             metadata[key] = int(value)
-        elif key == "center":
-            continue
-        elif key == "bounds":
+        elif key in ("center", "bounds"):
             continue
         else:
             metadata[key] = value
@@ -134,21 +134,26 @@ def get_vector_style(region: str, style_name: str, request: Request):
         )
     with open(style_file_name) as f:
         style = json.load(f)
-    scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
-    port_suffix = f":{request.url.port}" if request.url.port else ""
-    style["sources"]["openmaptiles"]["url"] = (
-        f"{scheme}://{request.url.hostname}{port_suffix}"
-        f"/api/vector/metadata/{region}.json"
-    )
-    style["glyphs"] = (
-        f"{scheme}://{request.url.hostname}{port_suffix}"
-        "/fonts/{fontstack}/{range}.pbf"
-    )
-    if style.get("sprite") is not None:
-        style["sprite"] = (
-            f"{scheme}://{request.url.hostname}{port_suffix}"
-            f"/static/sprites/{style_name}"
+    base = _base_url(request)
+    vector_source_key = (
+        "openmaptiles"
+        if "openmaptiles" in style["sources"]
+        else next(
+            (
+                k
+                for k, v in style["sources"].items()
+                if v.get("type") == "vector" and "url" in v
+            ),
+            None,
         )
+    )
+    if vector_source_key:
+        style["sources"][vector_source_key][
+            "url"
+        ] = f"{base}/api/vector/metadata/{region}.json"
+    style["glyphs"] = f"{base}/fonts/{{fontstack}}/{{range}}.pbf"
+    if style.get("sprite") is not None:
+        style["sprite"] = f"{base}/static/sprites/{style_name}"
     return style
 
 
@@ -171,3 +176,85 @@ def get_raster_tile(source: str, zoom_level: int, x: int, y: int):
     if result is None:
         raise HTTPException(status_code=404, detail="Tile not found.")
     return Response(content=result[0], media_type="image/webp")
+
+
+@router.get("/api/vector/overlays")
+def list_vector_overlays():
+    if not overlays_path.exists():
+        return []
+    mbtiles_files = sorted(
+        overlays_path.glob("*.mbtiles"),
+        key=lambda f: f.stat().st_size,
+        reverse=True,
+    )
+    return [file.stem for file in mbtiles_files]
+
+
+@router.get("/api/vector/overlay/metadata/{overlay}.json")
+def get_overlay_metadata(overlay: str, request: Request):
+    db_file_name = overlays_path / f"{overlay}.mbtiles"
+    with get_db_connection(db_file_name) as db_connection:
+        cursor = db_connection.execute("SELECT * FROM metadata")
+        result = cursor.fetchall()
+    if result is None:
+        raise HTTPException(status_code=404, detail="Metadata not found.")
+    base = _base_url(request)
+    metadata = {
+        "tilejson": "2.0.0",
+        "scheme": "xyz",
+        "tiles": [
+            f"{base}/api/vector/overlay/tiles/{overlay}/{{z}}/{{x}}/{{y}}.pbf"
+        ],
+    }
+    for key, value in result:
+        if key == "json":
+            metadata.update(json.loads(value))
+        elif key in ("minzoom", "maxzoom"):
+            metadata[key] = int(value)
+        elif key in ("center", "bounds"):
+            continue
+        else:
+            metadata[key] = value
+    return metadata
+
+
+@router.get("/api/vector/overlay/tiles/{overlay}/{zoom_level}/{x}/{y}.pbf")
+def get_overlay_tiles(overlay: str, zoom_level: int, x: int, y: int):
+    tile_column = x
+    tile_row = 2**zoom_level - 1 - y
+    db_file_name = overlays_path / f"{overlay}.mbtiles"
+    with get_db_connection(db_file_name) as db_connection:
+        result = fetch_tile_data(
+            db_connection, zoom_level, tile_column, tile_row
+        )
+    if result is None:
+        raise HTTPException(status_code=404, detail="Tile not found.")
+    return Response(
+        content=result[0],
+        media_type="application/octet-stream",
+        headers={"Content-Encoding": "gzip"},
+    )
+
+
+@router.get("/api/vector/overlay/style/{overlay}/{style_name}.json")
+def get_overlay_style(overlay: str, style_name: str, request: Request):
+    style_file_name = f"{style_name}_style.json"
+    if not Path(style_file_name).is_file():
+        raise HTTPException(
+            status_code=404, detail=f"Style '{style_name}' not known."
+        )
+    with open(style_file_name) as f:
+        raw = f.read()
+    base = _base_url(request)
+    overlay_metadata_url = f"{base}/api/vector/overlay/metadata/{overlay}.json"
+    raw = raw.replace(
+        "/api/vector/overlay/metadata/__OVERLAY__/.json",
+        overlay_metadata_url,
+    )
+    style = json.loads(raw)
+    style["glyphs"] = f"{base}/fonts/{{fontstack}}/{{range}}.pbf"
+    if style.get("sprite") is not None:
+        for entry in style["sprite"]:
+            if entry["url"].startswith("/"):
+                entry["url"] = base + entry["url"]
+    return style
