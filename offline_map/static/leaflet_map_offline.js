@@ -78,7 +78,7 @@ const layerControl = L.control.layers({}, {}, {
 let labelsOverlay = null;
 let labelsEnabled = false;
 let activeBaseLayerName = 'OSM Basic';
-const rasterLayerNames = ["GEBCO", "Blue Marble", "DOP"];
+const rasterLayerNames = ["GEBCO", "Blue Marble", "Land Cover", "DOP"];
 
 const vectorBaseLayers = {}; // label → L.maplibreGL instance
 const railwayOverlays = {}; // label → { styleUrl, standaloneLayer, enabled, fetchedStyle, injectedInto }
@@ -299,6 +299,15 @@ const rasterPromises = [
             attribution: '&copy; <a href="https://github.com/freetiler/nasa-bluemarble">FreeTiler.com | NASA Earth Observatory</a>'
         },
         'Blue Marble'
+    ),
+    checkRasterLayerAvailable(
+        '/api/raster/landcover/{z}/{x}/{y}.webp', {
+            maxNativeZoom: 9,
+            maxZoom: 22,
+            attribution: '&copy; <a href="https://cds.climate.copernicus.eu/">Copernicus Climate Change Service (C3S) 2024</a>',
+            className: 'pixelated-layer'
+        },
+        'Land Cover'
     ),
 ];
 
