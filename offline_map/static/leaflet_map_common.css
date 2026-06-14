@@ -142,3 +142,8 @@ body {
 #textInput {
     width: 120px;
 }
+
+/* ── Raster layers ──────────────────────────────────────────────────────── */
+.pixelated-layer {
+    image-rendering: pixelated;
+}
