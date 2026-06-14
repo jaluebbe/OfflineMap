@@ -15,6 +15,7 @@ raster_sources = {
     "natural_earth_2_shaded_relief": natural_earth_shaded_relief_path,
     "bluemarble": Path("..") / "bluemarble.mbtiles",
     "gebco": Path("..") / "gebco_z0-9.mbtiles",
+    "landcover": Path("..") / "landcover.mbtiles",
 }
 
 
