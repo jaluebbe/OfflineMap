@@ -940,6 +940,269 @@
       }
     },
     {
+      "id": "railway_line_industrial_tunnel",
+      "type": "line",
+      "source": "high",
+      "source-layer": "railway_line_high",
+      "minzoom": 10,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "state"
+          ],
+          "present"
+        ],
+        [
+          "==",
+          [
+            "get",
+            "tunnel"
+          ],
+          true
+        ],
+        [
+          "==",
+          [
+            "get",
+            "feature"
+          ],
+          "rail"
+        ],
+        [
+          "in",
+          [
+            "get",
+            "usage"
+          ],
+          [
+            "literal",
+            [
+              "industrial",
+              "freight",
+              "military",
+              "siding"
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "line-join": "round",
+        "line-cap": "butt"
+      },
+      "paint": {
+        "line-color": "#aaaaaa",
+        "line-width": [
+          "interpolate",
+          [
+            "exponential",
+            1.2
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          0.8,
+          16,
+          1.5
+        ],
+        "line-dasharray": [
+          4,
+          3
+        ],
+        "line-opacity": 0.45
+      }
+    },
+    {
+      "id": "railway_line_industrial_fill",
+      "type": "line",
+      "source": "high",
+      "source-layer": "railway_line_high",
+      "minzoom": 10,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "state"
+          ],
+          "present"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "tunnel"
+          ],
+          true
+        ],
+        [
+          "==",
+          [
+            "get",
+            "feature"
+          ],
+          "rail"
+        ],
+        [
+          "in",
+          [
+            "get",
+            "usage"
+          ],
+          [
+            "literal",
+            [
+              "industrial",
+              "freight",
+              "military",
+              "siding"
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#aaaaaa",
+        "line-width": [
+          "interpolate",
+          [
+            "exponential",
+            1.2
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          0.8,
+          16,
+          1.5
+        ],
+        "line-opacity": 0.5
+      }
+    },
+    {
+      "id": "railway_line_tourism_tunnel",
+      "type": "line",
+      "source": "high",
+      "source-layer": "railway_line_high",
+      "minzoom": 9,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "state"
+          ],
+          "present"
+        ],
+        [
+          "==",
+          [
+            "get",
+            "tunnel"
+          ],
+          true
+        ],
+        [
+          "==",
+          [
+            "get",
+            "usage"
+          ],
+          "tourism"
+        ]
+      ],
+      "layout": {
+        "line-join": "round",
+        "line-cap": "butt"
+      },
+      "paint": {
+        "line-color": "#9b4dca",
+        "line-width": [
+          "interpolate",
+          [
+            "exponential",
+            1.2
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          1.5,
+          16,
+          2
+        ],
+        "line-dasharray": [
+          4,
+          3
+        ],
+        "line-opacity": 0.55
+      }
+    },
+    {
+      "id": "railway_line_tourism_fill",
+      "type": "line",
+      "source": "high",
+      "source-layer": "railway_line_high",
+      "minzoom": 9,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "state"
+          ],
+          "present"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "tunnel"
+          ],
+          true
+        ],
+        [
+          "==",
+          [
+            "get",
+            "usage"
+          ],
+          "tourism"
+        ]
+      ],
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#9b4dca",
+        "line-width": [
+          "interpolate",
+          [
+            "exponential",
+            1.2
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          1.5,
+          16,
+          2
+        ]
+      }
+    },
+    {
       "id": "railway_line_light_rail_tunnel",
       "type": "line",
       "source": "high",
