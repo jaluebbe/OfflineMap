@@ -26,7 +26,6 @@ function saveSnapshot(geoJsonString) {
     if (geoJsonString === _lastSnapshotJson) return;
 
     const parsed = JSON.parse(geoJsonString);
-    if (parsed.features.length === 0) return;
 
     const snapshots = loadSnapshots();
     if (snapshots.length > 0 && snapshots[snapshots.length - 1].data === geoJsonString) return;
@@ -158,8 +157,6 @@ setInterval(renderSnapshotList, 30_000);
 setInterval(() => {
     const liveJson = JSON.stringify(editorLayer.toGeoJSON());
     if (liveJson === _lastSnapshotJson) return;
-    const count = JSON.parse(liveJson).features.length;
-    if (count === 0) return;
     _lastSnapshotTime = 0;
     saveSnapshot(liveJson);
 }, 30_000);
