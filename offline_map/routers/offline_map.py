@@ -18,18 +18,35 @@ raster_sources = {
     "landcover": Path("..") / "landcover.mbtiles",
 }
 
+# Persistent read-only connections, opened once at module load time.
+# check_same_thread=False is required because FastAPI uses a thread pool.
+_db_connections: dict[Path, sqlite3.Connection] = {}
 
-def get_db_connection(db_file_name: Path):
-    if not db_file_name.is_file():
-        raise HTTPException(
-            status_code=404, detail=f"File '{db_file_name}' not found."
+
+def get_db_connection(db_file_name: Path) -> sqlite3.Connection:
+    if db_file_name not in _db_connections:
+        if not db_file_name.is_file():
+            raise HTTPException(
+                status_code=404,
+                detail=f"File '{db_file_name}' not found.",
+            )
+        conn = sqlite3.connect(
+            f"file:{db_file_name}?mode=ro",
+            uri=True,
+            check_same_thread=False,
         )
-    return sqlite3.connect(f"file:{db_file_name}?mode=ro", uri=True)
+        # 8 MB page cache per connection; no mmap to keep VSZ low
+        conn.execute("PRAGMA cache_size = -8192")
+        conn.execute("PRAGMA mmap_size = 0")
+        conn.execute("PRAGMA temp_store = MEMORY")
+        _db_connections[db_file_name] = conn
+    return _db_connections[db_file_name]
 
 
 def fetch_tile_data(db_connection, zoom_level, tile_column, tile_row):
     cursor = db_connection.execute(
-        "SELECT tile_data FROM tiles WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
+        "SELECT tile_data FROM tiles"
+        " WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
         (zoom_level, tile_column, tile_row),
     )
     return cursor.fetchone()
@@ -38,10 +55,10 @@ def fetch_tile_data(db_connection, zoom_level, tile_column, tile_row):
 def get_mbtiles_maxzoom(path: Path) -> int | None:
     if not path.is_file():
         return None
-    with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as conn:
-        row = conn.execute(
-            "SELECT value FROM metadata WHERE name = 'maxzoom'"
-        ).fetchone()
+    conn = get_db_connection(path)
+    row = conn.execute(
+        "SELECT value FROM metadata WHERE name = 'maxzoom'"
+    ).fetchone()
     return int(row[0]) if row else None
 
 
@@ -69,9 +86,9 @@ def list_vector_regions():
 @router.get("/api/vector/metadata/{region}.json")
 def get_vector_metadata(region: str, request: Request):
     db_file_name = osm_path / f"{region}.mbtiles"
-    with get_db_connection(db_file_name) as db_connection:
-        cursor = db_connection.execute("SELECT * FROM metadata")
-        result = cursor.fetchall()
+    db_connection = get_db_connection(db_file_name)
+    cursor = db_connection.execute("SELECT * FROM metadata")
+    result = cursor.fetchall()
     if result is None:
         raise HTTPException(status_code=404, detail="Metadata not found.")
     base = _base_url(request)
@@ -100,22 +117,28 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
     result = None
 
     if planet_max_zoom is not None and zoom_level <= planet_max_zoom:
-        with get_db_connection(planet_path) as db_connection:
-            result = fetch_tile_data(
-                db_connection, zoom_level, tile_column, tile_row
-            )
+        result = fetch_tile_data(
+            get_db_connection(planet_path),
+            zoom_level,
+            tile_column,
+            tile_row,
+        )
 
     if result is None:
-        with get_db_connection(db_file_name) as db_connection:
-            result = fetch_tile_data(
-                db_connection, zoom_level, tile_column, tile_row
-            )
+        result = fetch_tile_data(
+            get_db_connection(db_file_name),
+            zoom_level,
+            tile_column,
+            tile_row,
+        )
 
     if result is None and zoom_level <= 7:
-        with get_db_connection(natural_earth_vector_path) as db_connection:
-            result = fetch_tile_data(
-                db_connection, zoom_level, tile_column, tile_row
-            )
+        result = fetch_tile_data(
+            get_db_connection(natural_earth_vector_path),
+            zoom_level,
+            tile_column,
+            tile_row,
+        )
 
     if result is None:
         raise HTTPException(status_code=404, detail="Tile not found.")
@@ -131,7 +154,8 @@ def get_vector_style(region: str, style_name: str, request: Request):
     style_file_name = f"{style_name}_style.json"
     if not Path(style_file_name).is_file():
         raise HTTPException(
-            status_code=404, detail=f"Style '{style_name}' not known."
+            status_code=404,
+            detail=f"Style '{style_name}' not known.",
         )
     with open(style_file_name) as f:
         style = json.load(f)
@@ -170,10 +194,12 @@ def get_raster_tile(source: str, zoom_level: int, x: int, y: int):
     path = raster_sources[source]
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
-    with get_db_connection(path) as db_connection:
-        result = fetch_tile_data(
-            db_connection, zoom_level, tile_column, tile_row
-        )
+    result = fetch_tile_data(
+        get_db_connection(path),
+        zoom_level,
+        tile_column,
+        tile_row,
+    )
     if result is None:
         raise HTTPException(status_code=404, detail="Tile not found.")
     return Response(content=result[0], media_type="image/webp")
