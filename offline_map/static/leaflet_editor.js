@@ -561,5 +561,60 @@ L.Polygon.prototype.options.measurementOptions = {
 };
 L.Polyline.prototype.options.showMeasurements = true;
 
+let _lastAddedCircleMarkerLatLng = null;
+
+function addCircleMarkerFeature(lat, lng) {
+    if (_lastAddedCircleMarkerLatLng &&
+        _lastAddedCircleMarkerLatLng.lat === lat &&
+        _lastAddedCircleMarkerLatLng.lng === lng) {
+        return;
+    }
+    const properties = {
+        color: colorInput.value,
+        fill: fillCheckbox.checked,
+    };
+    const text = textInput.value;
+    if (text) {
+        properties.text = text;
+    }
+    editorLayer.addData({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [lng, lat] },
+        properties: properties,
+    });
+    dataChanged();
+    _lastAddedCircleMarkerLatLng = { lat: lat, lng: lng };
+}
+
+function handleCoordinateAddButton() {
+    const coordinateInput = document.getElementById('coordinate-input').value.trim();
+    if (coordinateInput === '') {
+        if (!map.hasLayer(myMarker)) return;
+        const latlng = myMarker.getLatLng();
+        addCircleMarkerFeature(latlng.lat, latlng.lng);
+        return;
+    }
+    const resultDiv = document.getElementById('coordinate-result');
+    if (window.parseCoordinate) {
+        const data = window.parseCoordinate(coordinateInput);
+        if (data) {
+            addCircleMarkerFeature(data.latitude, data.longitude);
+        } else {
+            resultDiv.textContent = "Invalid coordinate";
+            resultDiv.style.color = "red";
+        }
+    } else {
+        fetch(`/api/parse_coordinate?coordinate=${encodeURIComponent(coordinateInput)}`)
+            .then(handleApiResponse)
+            .then(data => addCircleMarkerFeature(data.latitude, data.longitude))
+            .catch(error => {
+                resultDiv.textContent = error.message;
+                resultDiv.style.color = "red";
+            });
+    }
+}
+
+document.getElementById('coordinate-add-button').addEventListener('click', handleCoordinateAddButton);
+
 loadEditorLayerFromLocalStorage();
 renderSnapshotList();

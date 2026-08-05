@@ -118,8 +118,14 @@ body {
 #search-control {
     padding-top: 5px;
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 1fr auto auto;
     gap: 5px;
+}
+
+#coordinate-add-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
 }
 
 #region-control {
