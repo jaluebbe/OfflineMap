@@ -43,7 +43,12 @@ function saveSnapshot(geoJsonString) {
         snapshots.shift();
     } while (true);
 
-    localStorage.setItem(SNAPSHOT_STORAGE_KEY, serialized);
+    try {
+        localStorage.setItem(SNAPSHOT_STORAGE_KEY, serialized);
+    } catch (error) {
+        console.warn('editorSnapshots exceeds localStorage quota; skipping this snapshot.', error);
+        return;
+    }
     _lastSnapshotTime = now;
     _lastSnapshotJson = geoJsonString;
     renderSnapshotList();
@@ -191,7 +196,11 @@ function dataChanged() {
     });
     const data = editorLayer.toGeoJSON();
     const geoJsonString = JSON.stringify(data);
-    localStorage.setItem('editorLayerData', geoJsonString);
+    try {
+        localStorage.setItem('editorLayerData', geoJsonString);
+    } catch (error) {
+        console.warn('editorLayerData exceeds localStorage quota; layer is shown but will not persist across reloads.', error);
+    }
     saveSnapshot(geoJsonString);
 }
 
