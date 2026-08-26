@@ -311,10 +311,25 @@ const editorLayer = L.geoJSON([], {
     pane: 'editor',
     pointToLayer: function(feature, latlng) {
         const properties = feature.properties || {};
+        if (properties.icon) {
+            const height = properties.iconHeight || 20;
+            return L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'geojson-svg-icon',
+                    html: `<img src="${properties.icon}" style="height:${height}px" />`,
+                    iconSize: null,
+                    iconAnchor: [0, 0],
+                }),
+            });
+        }
         if ('radius' in properties) {
             return L.circle(latlng, properties);
-        } else if ('fill' in properties || 'color' in properties) {
-            return L.circleMarker(latlng, properties);
+        } else if ('markerRadius' in properties || 'fill' in properties || 'color' in properties) {
+            const circleOptions = Object.assign({}, properties);
+            if ('markerRadius' in properties) {
+                circleOptions.radius = properties.markerRadius;
+            }
+            return L.circleMarker(latlng, circleOptions);
         } else if ('markerText' in properties) {
             return L.marker(latlng, {
                 textMarker: true,
