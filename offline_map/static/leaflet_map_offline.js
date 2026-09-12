@@ -71,7 +71,7 @@ L.control.scale({
     'imperial': false
 }).addTo(map);
 const layerControl = L.control.layers({}, {}, {
-    collapsed: L.Browser.mobile,
+    collapsed: true,
     position: 'topright'
 }).addTo(map);
 
