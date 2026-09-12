@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import threading
 from fastapi import APIRouter, HTTPException, Request, Response
 from pathlib import Path
 
@@ -18,47 +19,65 @@ raster_sources = {
     "landcover": Path("..") / "landcover.mbtiles",
 }
 
-# Persistent read-only connections, opened once at module load time.
-# check_same_thread=False is required because FastAPI uses a thread pool.
+# Persistent read-only connections, one per file, reused across requests.
+# A single sqlite3.Connection isn't safe for concurrent queries from
+# multiple threads (FastAPI's thread pool can interleave them), which
+# caused sporadic spurious 404s for tiles that clearly exist. Fixed with
+# one lock per connection, held for the whole query.
 _db_connections: dict[Path, sqlite3.Connection] = {}
+_db_locks: dict[Path, threading.Lock] = {}
+_creation_lock = threading.Lock()
 
 
 def get_db_connection(db_file_name: Path) -> sqlite3.Connection:
     if db_file_name not in _db_connections:
-        if not db_file_name.is_file():
-            raise HTTPException(
-                status_code=404,
-                detail=f"File '{db_file_name}' not found.",
-            )
-        conn = sqlite3.connect(
-            f"file:{db_file_name}?mode=ro",
-            uri=True,
-            check_same_thread=False,
-        )
-        # 8 MB page cache per connection; no mmap to keep VSZ low
-        conn.execute("PRAGMA cache_size = -8192")
-        conn.execute("PRAGMA mmap_size = 0")
-        conn.execute("PRAGMA temp_store = MEMORY")
-        _db_connections[db_file_name] = conn
+        with _creation_lock:
+            # Re-check: another thread may have created it while we waited.
+            if db_file_name not in _db_connections:
+                if not db_file_name.is_file():
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"File '{db_file_name}' not found.",
+                    )
+                conn = sqlite3.connect(
+                    f"file:{db_file_name}?mode=ro",
+                    uri=True,
+                    check_same_thread=False,
+                )
+                # 8 MB page cache per connection; no mmap to keep VSZ low
+                conn.execute("PRAGMA cache_size = -8192")
+                conn.execute("PRAGMA mmap_size = 0")
+                conn.execute("PRAGMA temp_store = MEMORY")
+                _db_connections[db_file_name] = conn
+                _db_locks[db_file_name] = threading.Lock()
     return _db_connections[db_file_name]
 
 
-def fetch_tile_data(db_connection, zoom_level, tile_column, tile_row):
-    cursor = db_connection.execute(
-        "SELECT tile_data FROM tiles"
-        " WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
-        (zoom_level, tile_column, tile_row),
-    )
-    return cursor.fetchone()
+def get_db_lock(db_file_name: Path) -> threading.Lock:
+    # Ensure the connection (and its lock) exists first.
+    get_db_connection(db_file_name)
+    return _db_locks[db_file_name]
+
+
+def fetch_tile_data(db_file_name: Path, zoom_level, tile_column, tile_row):
+    conn = get_db_connection(db_file_name)
+    with get_db_lock(db_file_name):
+        cursor = conn.execute(
+            "SELECT tile_data FROM tiles"
+            " WHERE zoom_level = ? and tile_column = ? and tile_row = ?",
+            (zoom_level, tile_column, tile_row),
+        )
+        return cursor.fetchone()
 
 
 def get_mbtiles_maxzoom(path: Path) -> int | None:
     if not path.is_file():
         return None
     conn = get_db_connection(path)
-    row = conn.execute(
-        "SELECT value FROM metadata WHERE name = 'maxzoom'"
-    ).fetchone()
+    with get_db_lock(path):
+        row = conn.execute(
+            "SELECT value FROM metadata WHERE name = 'maxzoom'"
+        ).fetchone()
     return int(row[0]) if row else None
 
 
@@ -87,9 +106,10 @@ def list_vector_regions():
 def get_vector_metadata(region: str, request: Request):
     db_file_name = osm_path / f"{region}.mbtiles"
     db_connection = get_db_connection(db_file_name)
-    cursor = db_connection.execute("SELECT * FROM metadata")
-    result = cursor.fetchall()
-    if result is None:
+    with get_db_lock(db_file_name):
+        cursor = db_connection.execute("SELECT * FROM metadata")
+        result = cursor.fetchall()
+    if not result:
         raise HTTPException(status_code=404, detail="Metadata not found.")
     base = _base_url(request)
     metadata = {
@@ -118,7 +138,7 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
 
     if planet_max_zoom is not None and zoom_level <= planet_max_zoom:
         result = fetch_tile_data(
-            get_db_connection(planet_path),
+            planet_path,
             zoom_level,
             tile_column,
             tile_row,
@@ -126,7 +146,7 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
 
     if result is None:
         result = fetch_tile_data(
-            get_db_connection(db_file_name),
+            db_file_name,
             zoom_level,
             tile_column,
             tile_row,
@@ -134,7 +154,7 @@ def get_vector_tiles(region: str, zoom_level: int, x: int, y: int):
 
     if result is None and zoom_level <= 7:
         result = fetch_tile_data(
-            get_db_connection(natural_earth_vector_path),
+            natural_earth_vector_path,
             zoom_level,
             tile_column,
             tile_row,
@@ -195,7 +215,7 @@ def get_raster_tile(source: str, zoom_level: int, x: int, y: int):
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
     result = fetch_tile_data(
-        get_db_connection(path),
+        path,
         zoom_level,
         tile_column,
         tile_row,
@@ -220,10 +240,11 @@ def list_vector_overlays():
 @router.get("/api/vector/overlay/metadata/{overlay}.json")
 def get_overlay_metadata(overlay: str, request: Request):
     db_file_name = overlays_path / f"{overlay}.mbtiles"
-    with get_db_connection(db_file_name) as db_connection:
+    db_connection = get_db_connection(db_file_name)
+    with get_db_lock(db_file_name):
         cursor = db_connection.execute("SELECT * FROM metadata")
         result = cursor.fetchall()
-    if result is None:
+    if not result:
         raise HTTPException(status_code=404, detail="Metadata not found.")
     base = _base_url(request)
     metadata = {
@@ -250,10 +271,9 @@ def get_overlay_tiles(overlay: str, zoom_level: int, x: int, y: int):
     tile_column = x
     tile_row = 2**zoom_level - 1 - y
     db_file_name = overlays_path / f"{overlay}.mbtiles"
-    with get_db_connection(db_file_name) as db_connection:
-        result = fetch_tile_data(
-            db_connection, zoom_level, tile_column, tile_row
-        )
+    result = fetch_tile_data(
+        db_file_name, zoom_level, tile_column, tile_row
+    )
     if result is None:
         raise HTTPException(status_code=404, detail="Tile not found.")
     return Response(
