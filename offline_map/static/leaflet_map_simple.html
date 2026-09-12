@@ -322,5 +322,11 @@
     window.parseCoordinate = parseCoordinate;
     window.convertLatlon = convertLatlon;
 </script>
+<script type="module">
+    import {
+        mgrsGridLayer
+    } from '/static/mgrs_grid_layer.js';
+    layerControl.addOverlay(mgrsGridLayer(), 'MGRS/UTMREF Grid');
+</script>
 
 </html>
