@@ -15,6 +15,7 @@ const throttle = (func, limit) => {
 const myMarker = L.marker([50, 8.6], {
     draggable: true,
     zIndexOffset: 1000,
+    pmIgnore: true,
     icon: L.icon({
         iconUrl: '/static/img/level_staff_red.svg',
         shadowUrl: '/static/img/level_staff_shadow.png',
@@ -55,7 +56,34 @@ function updateMarker(position) {
     if (!map.getBounds().contains(myMarker.getLatLng())) {
         map.setView(myMarker.getLatLng());
     }
+    updateCenterHint();
 }
+
+// Subtle marker at the current map center, shown only until a real
+// location picker position exists. Lives in locationPickerLayer so it
+// can be hidden along with the picker marker.
+const centerHintMarker = L.circleMarker([0, 0], {
+    radius: 6,
+    color: '#888',
+    weight: 1,
+    fill: false,
+    interactive: false,
+    pmIgnore: true,
+});
+
+function updateCenterHint() {
+    if (map.hasLayer(myMarker)) {
+        locationPickerLayer.removeLayer(centerHintMarker);
+        return;
+    }
+    centerHintMarker.setLatLng(map.getCenter());
+    if (!locationPickerLayer.hasLayer(centerHintMarker)) {
+        centerHintMarker.addTo(locationPickerLayer);
+    }
+}
+
+map.on('move', updateCenterHint);
+map.whenReady(updateCenterHint);
 
 function handleApiResponse(response) {
     if (response.status === 200) {
