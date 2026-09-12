@@ -23,7 +23,20 @@
     <link rel="stylesheet" href="/static/leaflet_map_common.css">
     <style>
         #textInput {
-            width: 100px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #symbolInput,
+        #symbolCategoryInput {
+            max-width: 220px;
+        }
+
+        #unitDesignationInput,
+        #unitStrengthInput {
+            flex: 0 1 100px;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         #io-control {
@@ -129,6 +142,25 @@
 
             <input type="checkbox" id="fillCheckbox" name="fillCheckbox" checked onchange="updateFeatureProperties()">
             <label for="fillCheckbox">fill</label>
+
+            <button id="feature-add-button" type="button" onclick="handleCoordinateAddButton()" title="Add marker at current location">+</button>
+        </div>
+
+        <div class="legend-item">
+            <select id="symbolCategoryInput" name="symbolCategoryInput" onchange="handleSymbolCategoryChange()">
+                <option value="">Keine Kategorie</option>
+            </select>
+        </div>
+
+        <div class="legend-item">
+            <select id="symbolInput" name="symbolInput" onchange="updateFeatureProperties()" disabled>
+                <option value="">Kein Zeichen</option>
+            </select>
+        </div>
+
+        <div class="legend-item">
+            <input type="text" id="unitDesignationInput" name="unitDesignationInput" placeholder="Kennung" onchange="updateFeatureProperties()">
+            <input type="text" id="unitStrengthInput" name="unitStrengthInput" placeholder="Stärke/Name" onchange="updateFeatureProperties()">
         </div>
 
         <div class="legend-item">
@@ -201,6 +233,8 @@
         );
         historySection.classList.add("collapsed");
         historyHeader.addEventListener("click", () => historySection.classList.toggle("collapsed"));
+        coordSection.classList.add("collapsed");
+        featureSection.classList.add("collapsed");
 
         L.DomEvent.disableClickPropagation(this._div);
         L.DomEvent.disableScrollPropagation(this._div);
@@ -212,10 +246,6 @@
         featureHeader.addEventListener("click", () => {
             featureSection.classList.toggle("collapsed");
         });
-
-        if (window.innerWidth < 768) {
-            featureSection.classList.add("collapsed");
-        }
 
         return this._div;
     };
