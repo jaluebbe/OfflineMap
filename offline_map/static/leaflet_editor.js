@@ -292,6 +292,14 @@ function updateFeatureProperties() {
         properties.icon = '/static/symbols/' + symbolPath;
         properties.iconName = symbolNameByPath[symbolPath] || '';
         properties.iconHeight = properties.iconHeight || 48;
+        const anchor = symbolAnchorByPath[symbolPath];
+        if (anchor) {
+            properties.iconAnchorX = anchor.x;
+            properties.iconAnchorY = anchor.y;
+        } else {
+            delete properties.iconAnchorX;
+            delete properties.iconAnchorY;
+        }
         delete properties.color;
         delete properties.fill;
     } else if (hadIcon) {
@@ -745,6 +753,11 @@ function addCircleMarkerFeature(lat, lng) {
             iconName: symbolNameByPath[symbolPath] || '',
             iconHeight: 48,
         };
+        const anchor = symbolAnchorByPath[symbolPath];
+        if (anchor) {
+            properties.iconAnchorX = anchor.x;
+            properties.iconAnchorY = anchor.y;
+        }
     } else {
         properties = {
             color: colorInput.value,
@@ -801,10 +814,15 @@ document.getElementById('coordinate-add-button').addEventListener('click', handl
 
 let symbolManifest = {};
 let symbolNameByPath = {};
+let symbolAnchorByPath = {};
+
+function isMapVisible(symbol) {
+    return !symbol.excludeFrom || !symbol.excludeFrom.includes('map');
+}
 
 function populateSymbolSelect(category) {
     symbolInput.innerHTML = '<option value="">Kein Zeichen</option>';
-    const symbols = symbolManifest[category] || [];
+    const symbols = (symbolManifest[category] || []).filter(isMapVisible);
     for (const symbol of symbols) {
         const option = document.createElement('option');
         option.value = symbol.path;
@@ -826,12 +844,20 @@ fetch('/static/symbols/symbols_manifest.json')
     .then(manifest => {
         symbolManifest = manifest;
         for (const [category, symbols] of Object.entries(manifest)) {
-            const option = document.createElement('option');
-            option.value = category;
-            option.textContent = category.replace(/_/g, ' ');
-            symbolCategoryInput.appendChild(option);
+            if (symbols.some(isMapVisible)) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.replace(/_/g, ' ');
+                symbolCategoryInput.appendChild(option);
+            }
             for (const symbol of symbols) {
                 symbolNameByPath[symbol.path] = symbol.name;
+                if (symbol.anchorX !== undefined || symbol.anchorY !== undefined) {
+                    symbolAnchorByPath[symbol.path] = {
+                        x: symbol.anchorX ?? 0.5,
+                        y: symbol.anchorY ?? 0.5,
+                    };
+                }
             }
         }
     })
