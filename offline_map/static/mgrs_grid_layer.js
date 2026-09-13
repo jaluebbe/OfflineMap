@@ -90,6 +90,8 @@ export const MGRSGridLayer = L.Layer.extend({
     const centerUtm = new LatLon(center.lat, center.lng).toUtm();
     const zoneNumber = centerUtm.zone;
     const hemisphere = centerUtm.hemisphere;
+    this._zoneNumber = zoneNumber;
+    this._hemisphere = hemisphere;
     this._cornerDiv.textContent = this._squareId(centerUtm.toMgrs());
 
     const interval = this._currentInterval(center.lat, map.getZoom());
@@ -117,6 +119,10 @@ export const MGRSGridLayer = L.Layer.extend({
     const maxE = Math.max(...eastings);
     const minN = Math.min(...northings);
     const maxN = Math.max(...northings);
+    this._minE = minE;
+    this._maxE = maxE;
+    this._minN = minN;
+    this._maxN = maxN;
 
     const toLatLng = (easting, northing) => {
       const utm = new Utm(zoneNumber, hemisphere, easting, northing);
@@ -131,34 +137,54 @@ export const MGRSGridLayer = L.Layer.extend({
     // box per cell instead (see _addSquareLabels).
     const showSquareLabels = interval >= 100000;
 
-    for (let e = startE, prevELetter = null; e <= maxE; e += interval) {
-      const line = [toLatLng(e, minN), toLatLng(e, maxN)];
-      let label = null;
-      if (!showSquareLabels) {
-        const { digitStr, letter } = this._digitLabel(e, interval, zoneNumber, hemisphere, minN, 'E');
-        label = letter === prevELetter ? digitStr : `${letter}${digitStr}`;
-        prevELetter = letter;
+    if (!showSquareLabels) {
+      this._drawNumericLines(startE, maxE, interval, 'E', minN, toLatLng);
+      this._drawNumericLines(startN, maxN, interval, 'N', minE, toLatLng);
+    } else {
+      for (let e = startE; e <= maxE; e += interval) {
+        this._addLine([toLatLng(e, minN), toLatLng(e, maxN)], null);
       }
-      const labelAt = this._clampAxis(line[0], 'y', { x: this.options.lineGap });
-      this._addLine(line, label, labelAt, 'E');
-    }
-
-    for (let n = startN, prevNLetter = null; n <= maxN; n += interval) {
-      const line = [toLatLng(minE, n), toLatLng(maxE, n)];
-      let label = null;
-      if (!showSquareLabels) {
-        const { digitStr, letter } = this._digitLabel(minE, interval, zoneNumber, hemisphere, n, 'N');
-        label = letter === prevNLetter ? digitStr : `${letter}${digitStr}`;
-        prevNLetter = letter;
+      for (let n = startN; n <= maxN; n += interval) {
+        this._addLine([toLatLng(minE, n), toLatLng(maxE, n)], null);
       }
-      const labelAt = this._clampAxis(line[0], 'x', { y: -this.options.lineGap });
-      this._addLine(line, label, labelAt, 'N');
-    }
-
-    if (showSquareLabels) {
       const centerZoneBand = `${centerUtm.toMgrs().zone}${centerUtm.toMgrs().band}`;
       this._addSquareLabels(zoneNumber, hemisphere, startE, maxE, startN, maxN, interval, centerZoneBand);
     }
+  },
+
+  // Draws a set of parallel grid lines along one axis, computing
+  // each line's MGRS digits and 100km letter first so the letter
+  // can be shown on both the first and last line of its square -
+  // not just where a new square begins.
+  _drawNumericLines: function (start, max, interval, axis, otherAxisValue, toLatLng) {
+    const zoneNumber = this._zoneNumber;
+    const hemisphere = this._hemisphere;
+
+    const lines = [];
+    for (let v = start; v <= max; v += interval) {
+      const easting = axis === 'E' ? v : otherAxisValue;
+      const northing = axis === 'E' ? otherAxisValue : v;
+      lines.push({ v, ...this._digitLabel(easting, interval, zoneNumber, hemisphere, northing, axis) });
+    }
+
+    lines.forEach((line, i) => {
+      const prevLetter = i > 0 ? lines[i - 1].letter : null;
+      const nextLetter = i < lines.length - 1 ? lines[i + 1].letter : null;
+      const showLetter =
+        (prevLetter !== null && line.letter !== prevLetter) ||
+        (nextLetter !== null && line.letter !== nextLetter);
+      const label = showLetter ? `${line.letter}${line.digitStr}` : line.digitStr;
+
+      const points = axis === 'E'
+        ? [toLatLng(line.v, this._minN), toLatLng(line.v, this._maxN)]
+        : [toLatLng(this._minE, line.v), toLatLng(this._maxE, line.v)];
+
+      const labelAt = axis === 'E'
+        ? this._clampAxis(points[0], 'y', { x: this.options.lineGap })
+        : this._clampAxis(points[0], 'x', { y: -this.options.lineGap });
+
+      this._addLine(points, label, labelAt, axis);
+    });
   },
 
   // Centered two-letter square ID per visible 100km cell, using
