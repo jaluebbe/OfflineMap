@@ -10360,18 +10360,10 @@
       "layout": {
         "symbol-placement": "line",
         "symbol-spacing": 400,
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin} {name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 5,
         "text-size": {
           "stops": [
@@ -10410,18 +10402,10 @@
       "minzoom": 0,
       "layout": {
         "symbol-placement": "line",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 5,
         "text-size": 12,
         "visibility": "visible"
@@ -10448,18 +10432,10 @@
       "source-layer": "water_name",
       "minzoom": 15,
       "layout": {
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 5,
         "text-size": 11,
         "visibility": "visible"
@@ -10494,7 +10470,9 @@
         "symbol-avoid-edges": false,
         "text-allow-overlap": false,
         "text-field": "{housenumber}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-ignore-placement": false,
         "text-line-height": -0.15,
         "text-padding": 3,
@@ -10511,7 +10489,9 @@
           ]
         }
       },
-      "paint": {"text-color": "#666"}
+      "paint": {
+        "text-color": "#666"
+      }
     },
     {
       "id": "Shop",
@@ -10550,18 +10530,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -10704,18 +10676,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -10781,18 +10745,10 @@
           ]
         ],
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 14,
         "text-offset": [
           0,
@@ -10849,18 +10805,10 @@
           ]
         ],
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -10911,18 +10859,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -10981,18 +10921,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11052,18 +10984,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11126,18 +11050,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11200,18 +11116,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11282,18 +11190,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11364,18 +11264,10 @@
           ]
         ],
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11428,18 +11320,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11539,18 +11423,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11685,18 +11561,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11754,18 +11622,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11826,18 +11686,10 @@
         ],
         "text-allow-overlap": false,
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -11896,18 +11748,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 14,
         "text-padding": 2,
         "text-size": {
@@ -11971,18 +11815,10 @@
           ]
         ],
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 14,
         "text-padding": 2,
         "text-size": 11,
@@ -12034,18 +11870,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Italic"
         ],
-        "text-font": ["KlokanTech Noto Sans Italic"],
         "text-max-width": 6,
         "text-padding": 2,
         "text-size": {
@@ -12098,18 +11926,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Italic"
         ],
-        "text-font": ["KlokanTech Noto Sans Italic"],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -12181,18 +12001,10 @@
         ],
         "text-allow-overlap": false,
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 14,
         "text-offset": [
           0,
@@ -12425,18 +12237,10 @@
       "layout": {
         "symbol-placement": "line",
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin} {name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-offset": [
           0,
           0
@@ -12494,18 +12298,10 @@
           1100
         ],
         "text-anchor": "center",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin} {name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-offset": [
           0,
           0
@@ -12574,7 +12370,9 @@
         },
         "symbol-spacing": 560,
         "text-field": "{ref}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-rotation-alignment": "viewport",
         "text-size": {
           "stops": [
@@ -12650,7 +12448,9 @@
         },
         "symbol-spacing": 560,
         "text-field": "{ref}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-rotation-alignment": "viewport",
         "text-size": {
           "stops": [
@@ -12726,7 +12526,9 @@
         },
         "symbol-spacing": 560,
         "text-field": "{ref}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-rotation-alignment": "viewport",
         "text-size": {
           "stops": [
@@ -12802,7 +12604,9 @@
         },
         "symbol-spacing": 560,
         "text-field": "{ref}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-rotation-alignment": "viewport",
         "text-size": {
           "stops": [
@@ -12878,7 +12682,9 @@
         },
         "symbol-spacing": 760,
         "text-field": "{ref}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-keep-upright": true,
         "text-max-width": 10,
         "text-optional": false,
@@ -12955,7 +12761,9 @@
             ]
           ]
         },
-        "text-font": ["KlokanTech Noto Sans Italic"],
+        "text-font": [
+          "KlokanTech Noto Sans Italic"
+        ],
         "text-max-width": 9,
         "text-offset": [
           0,
@@ -13006,18 +12814,10 @@
             "rank"
           ]
         ],
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Italic"
         ],
-        "text-font": ["KlokanTech Noto Sans Italic"],
         "text-size": {
           "stops": [
             [
@@ -13055,7 +12855,9 @@
       "minzoom": 16.5,
       "layout": {
         "text-field": "{ref}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-size": {
           "stops": [
             [
@@ -13099,18 +12901,10 @@
           ]
         ],
         "symbol-spacing": 150,
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 10,
         "text-size": {
           "base": 1.2,
@@ -13201,18 +12995,10 @@
         ],
         "symbol-spacing": 150,
         "text-allow-overlap": false,
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Italic"
         ],
-        "text-font": ["KlokanTech Noto Sans Italic"],
         "text-max-width": {
           "stops": [
             [
@@ -13276,18 +13062,10 @@
         ],
         "symbol-spacing": 150,
         "text-allow-overlap": false,
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Italic"
         ],
-        "text-font": ["KlokanTech Noto Sans Italic"],
         "text-size": 12,
         "visibility": "visible"
       },
@@ -13345,18 +13123,10 @@
           ]
         ],
         "text-anchor": "top",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-max-width": 6,
         "text-offset": [
           0,
@@ -13430,7 +13200,9 @@
             ]
           ]
         },
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-line-height": 1.1,
         "text-max-width": 6,
         "text-offset": [
@@ -13485,7 +13257,9 @@
             ]
           ]
         },
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-line-height": 1.1,
         "text-max-width": 6,
         "text-offset": [
@@ -13528,18 +13302,10 @@
             "rank"
           ]
         ],
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 8,
         "text-size": {
           "base": 1.2,
@@ -13586,18 +13352,10 @@
           ]
         ],
         "text-anchor": "bottom",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 8,
         "text-offset": [
           0,
@@ -13648,18 +13406,10 @@
             "rank"
           ]
         ],
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
         ],
-        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-letter-spacing": 0,
         "text-padding": 2,
         "text-size": {
@@ -13731,18 +13481,10 @@
           ]
         ],
         "text-anchor": "bottom",
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "name:en"
-          ],
-          [
-            "get",
-            "name"
-          ]
+        "text-field": "{name:latin}\n{name:nonlatin}",
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
         ],
-        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-max-width": 8,
         "text-offset": [
           0,
@@ -13831,7 +13573,9 @@
         ],
         "text-anchor": "bottom",
         "text-field": "{name:en}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
+        "text-font": [
+          "KlokanTech Noto Sans Regular"
+        ],
         "text-max-width": 8,
         "text-offset": [
           0,
@@ -13900,7 +13644,9 @@
           ]
         ],
         "text-field": "{name:en}",
-        "text-font": ["KlokanTech Noto Sans Bold"],
+        "text-font": [
+          "KlokanTech Noto Sans Bold"
+        ],
         "text-max-width": 6.25,
         "text-size": [
           "interpolate",
