@@ -1,4 +1,4 @@
-const minZoom = 0;
+const minZoom = window.mapMinZoom ?? 0;
 const maxZoom = 22;
 const map = L.map('map', {
     minZoom: minZoom,
@@ -262,28 +262,34 @@ const regionsPromise = fetch('/api/vector/regions')
         return null;
     });
 
-fetch('/api/vector/overlays')
-    .then(r => r.json())
-    .then(overlays => {
-        overlays.filter(name => name.includes('railway')).forEach(name => {
-            const label = `Railway (${name})`;
-            const styleUrl = `/api/vector/overlay/style/${name}/railway_standard.json`;
-            const standaloneLayer = L.maplibreGL({
-                style: styleUrl,
-                attribution: '&copy; <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>',
-            });
-            railwayOverlays[label] = {
-                styleUrl,
-                standaloneLayer,
-                enabled: false,
-                fetchedStyle: null,
-                injectedInto: null,
-            };
-            layerControl.addOverlay(L.layerGroup(), label);
-        });
-    });
+const enableRailwayOverlays = window.enableRailwayOverlays ?? true;
 
-const rasterPromises = [
+if (enableRailwayOverlays) {
+    fetch('/api/vector/overlays')
+        .then(r => r.json())
+        .then(overlays => {
+            overlays.filter(name => name.includes('railway')).forEach(name => {
+                const label = `Railway (${name})`;
+                const styleUrl = `/api/vector/overlay/style/${name}/railway_standard.json`;
+                const standaloneLayer = L.maplibreGL({
+                    style: styleUrl,
+                    attribution: '&copy; <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>',
+                });
+                railwayOverlays[label] = {
+                    styleUrl,
+                    standaloneLayer,
+                    enabled: false,
+                    fetchedStyle: null,
+                    injectedInto: null,
+                };
+                layerControl.addOverlay(L.layerGroup(), label);
+            });
+        });
+}
+
+const enableRasterLayers = window.enableRasterLayers ?? true;
+
+const rasterPromises = enableRasterLayers ? [
     checkRasterLayerAvailable(
         '/api/raster/gebco/{z}/{x}/{y}.webp', {
             maxNativeZoom: 9,
@@ -309,12 +315,12 @@ const rasterPromises = [
         },
         'Land Cover'
     ),
-];
+] : [];
 
 Promise.all([regionsPromise, ...rasterPromises]).then(([mapRegion, ...rasterResults]) => {
     const availableRasterLayers = rasterResults.filter(Boolean);
     const hasHttps = location.protocol === 'https:';
-    if (mapRegion && (availableRasterLayers.length > 0 || hasHttps)) {
+    if (enableRasterLayers && mapRegion && (availableRasterLayers.length > 0 || hasHttps)) {
         labelsOverlay = L.maplibreGL({
             style: `/api/vector/style/${mapRegion}/map_labels.json`,
             attribution: '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
