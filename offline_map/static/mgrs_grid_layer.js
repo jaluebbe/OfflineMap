@@ -208,6 +208,7 @@ export const MGRSGridLayer = L.Layer.extend({
             iconSize: null,
           }),
           interactive: false,
+          pmIgnore: true,
         }).addTo(this._group);
       }
     }
@@ -241,6 +242,9 @@ export const MGRSGridLayer = L.Layer.extend({
       // opt out of the global showMeasurements default from
       // leaflet-measure-path (set in leaflet_editor.js)
       showMeasurements: false,
+      // exclude from Geoman entirely - otherwise dragged markers
+      // snap to grid lines
+      pmIgnore: true,
     }).addTo(this._group);
 
     if (label) {
@@ -252,6 +256,7 @@ export const MGRSGridLayer = L.Layer.extend({
           iconSize: null,
         }),
         interactive: false,
+        pmIgnore: true,
       }).addTo(this._group);
     }
   },
