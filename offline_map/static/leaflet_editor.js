@@ -229,14 +229,33 @@ function resetInputsToDefault() {
     measureCheckbox.checked = false;
     measureCheckbox.disabled = false;
     textInput.value = '';
+    unitDesignationInput.value = '';
+    unitStrengthInput.value = '';
+    symbolCategoryInput.value = '';
+    symbolCategoryInput.disabled = false;
+    populateSymbolSelect('');
 }
 
 function updateInputsFromProperties(properties) {
-    if ('color' in properties) {
-        colorInput.value = properties.color;
-        colorInput.disabled = false;
-    } else {
+    const isPoint = selectedShape?.feature?.geometry?.type === 'Point';
+    if (isPoint && 'icon' in properties) {
+        const relPath = properties.icon.replace('/static/symbols/', '');
+        const category = relPath.split('/')[0];
+        symbolCategoryInput.value = category;
+        symbolCategoryInput.disabled = false;
+        populateSymbolSelect(category);
+        symbolInput.value = relPath;
         colorInput.disabled = true;
+    } else {
+        symbolCategoryInput.value = '';
+        symbolCategoryInput.disabled = !isPoint;
+        populateSymbolSelect('');
+        if ('color' in properties) {
+            colorInput.value = properties.color;
+            colorInput.disabled = false;
+        } else {
+            colorInput.disabled = true;
+        }
     }
     if ('fill' in properties) {
         fillCheckbox.checked = properties.fill;
@@ -255,6 +274,8 @@ function updateInputsFromProperties(properties) {
     } else {
         textInput.value = '';
     }
+    unitDesignationInput.value = properties.unitDesignation || '';
+    unitStrengthInput.value = properties.unitStrength || '';
 }
 
 function updateFeatureProperties() {
@@ -262,6 +283,32 @@ function updateFeatureProperties() {
         return;
     }
     const properties = selectedShape.feature.properties || {};
+    const symbolPath = symbolInput.value;
+    const hadIcon = 'icon' in properties;
+    const wantsIcon = !!symbolPath;
+    colorInput.disabled = wantsIcon;
+
+    if (wantsIcon) {
+        properties.icon = '/static/symbols/' + symbolPath;
+        properties.iconName = symbolNameByPath[symbolPath] || '';
+        properties.iconHeight = properties.iconHeight || 48;
+        const anchor = symbolAnchorByPath[symbolPath];
+        if (anchor) {
+            properties.iconAnchorX = anchor.x;
+            properties.iconAnchorY = anchor.y;
+        } else {
+            delete properties.iconAnchorX;
+            delete properties.iconAnchorY;
+        }
+        delete properties.color;
+        delete properties.fill;
+    } else if (hadIcon) {
+        delete properties.icon;
+        delete properties.iconName;
+        delete properties.iconHeight;
+        delete properties.iconAnchorX;
+        delete properties.iconAnchorY;
+    }
     if (!colorInput.disabled) {
         properties.color = colorInput.value;
     }
@@ -272,6 +319,18 @@ function updateFeatureProperties() {
         properties.showMeasurements = measureCheckbox.checked;
     }
     properties.text = textInput.value;
+    properties.unitDesignation = unitDesignationInput.value;
+    properties.unitStrength = unitStrengthInput.value;
+
+    if (hadIcon !== wantsIcon) {
+        // Icon marker and circle/plain marker are different Leaflet layer
+        // classes; switching between them needs a fresh layer, not setStyle.
+        recreateSelectedShape(properties);
+        return;
+    }
+    if (wantsIcon && typeof selectedShape.setIcon === 'function') {
+        selectedShape.setIcon(buildSvgDivIcon(properties));
+    }
     if (typeof selectedShape.setStyle === 'function') {
         const style = {
             color: properties.color,
@@ -279,8 +338,23 @@ function updateFeatureProperties() {
         };
         selectedShape.setStyle(style);
     }
-    updateEditorTooltip(selectedShape, properties.text);
+    updateEditorTooltip(selectedShape, buildTooltipContent(properties));
+    updateShapeLabel(selectedShape);
     applyMeasurements(selectedShape);
+    dataChanged();
+}
+
+function recreateSelectedShape(properties) {
+    const latlng = selectedShape.getLatLng();
+    editorLayer.removeLayer(selectedShape);
+    editorLayer.addData({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [latlng.lng, latlng.lat] },
+        properties: properties,
+    });
+    // The new layer isn't tracked as the current selection; click it again
+    // on the map to keep editing it.
+    selectedShape = undefined;
     dataChanged();
 }
 
@@ -307,20 +381,84 @@ function applyMeasurements(layer) {
     }
 }
 
+function buildSvgDivIcon(properties) {
+    const height = properties.iconHeight || 27;
+    const anchorX = properties.iconAnchorX ?? 0.5;
+    const anchorY = properties.iconAnchorY ?? 0.5;
+    const labelLines = [];
+    const designation = properties.unitDesignation ? properties.unitDesignation.trim() : '';
+    const strength = properties.unitStrength ? properties.unitStrength.trim() : '';
+    if (designation) labelLines.push(designation);
+    if (strength) labelLines.push(strength);
+    // Position below the image's actual bottom edge, which depends on
+    // where the anchor sits within it (e.g. near the top for arrow tips).
+    const labelTop = height * (1 - anchorY);
+    const labelHtml = labelLines.length
+        ? `<div class="unit-label" style="position:absolute; top:${labelTop}px; left:0; transform: translate(-50%, 0); white-space:nowrap; text-align:center;">${labelLines.join('<br>')}</div>`
+        : '';
+    return L.divIcon({
+        className: 'geojson-svg-icon',
+        html: `<img src="${properties.icon}" style="height:${height}px; transform: translate(-${anchorX * 100}%, -${anchorY * 100}%)" />${labelHtml}`,
+        iconSize: null,
+        iconAnchor: [0, 0],
+    });
+}
+
+function buildTooltipContent(properties) {
+    const text = properties.text ? properties.text.trim() : '';
+    if (properties.iconName) {
+        return text ? `${properties.iconName}<br>${text}` : properties.iconName;
+    }
+    return properties.text;
+}
+
+// Designation/strength for shapes/lines (which have no single icon to
+// attach a label to) render as a small permanent marker at the geometry's
+// lowest point instead. Point markers carry their own label in buildSvgDivIcon.
+const shapeLabelLayer = L.layerGroup().addTo(map);
+
+function getLabelLatLng(layer) {
+    try {
+        const point = turf.pointOnFeature(layer.toGeoJSON());
+        const [lng, lat] = point.geometry.coordinates;
+        return L.latLng(lat, lng);
+    } catch (error) {
+        console.warn('Could not compute a label point for this feature:', error);
+        return null;
+    }
+}
+
+function updateShapeLabel(layer) {
+    if (layer._unitLabelMarker) {
+        shapeLabelLayer.removeLayer(layer._unitLabelMarker);
+        layer._unitLabelMarker = null;
+    }
+    if (layer.feature?.geometry?.type === 'Point') return;
+    const properties = layer.feature?.properties || {};
+    const designation = properties.unitDesignation ? properties.unitDesignation.trim() : '';
+    const strength = properties.unitStrength ? properties.unitStrength.trim() : '';
+    if (!designation && !strength) return;
+    const latlng = getLabelLatLng(layer);
+    if (!latlng) return;
+    const lines = [designation, strength].filter(Boolean);
+    layer._unitLabelMarker = L.marker(latlng, {
+        interactive: false,
+        pmIgnore: true,
+        icon: L.divIcon({
+            className: 'geojson-svg-icon',
+            html: `<div class="unit-label" style="position:absolute; top:0; left:0; transform: translate(-50%, -50%); white-space:nowrap; text-align:center;">${lines.join('<br>')}</div>`,
+            iconSize: null,
+            iconAnchor: [0, 0],
+        }),
+    }).addTo(shapeLabelLayer);
+}
+
 const editorLayer = L.geoJSON([], {
     pane: 'editor',
     pointToLayer: function(feature, latlng) {
         const properties = feature.properties || {};
         if (properties.icon) {
-            const height = properties.iconHeight || 20;
-            return L.marker(latlng, {
-                icon: L.divIcon({
-                    className: 'geojson-svg-icon',
-                    html: `<img src="${properties.icon}" style="height:${height}px" />`,
-                    iconSize: null,
-                    iconAnchor: [0, 0],
-                }),
-            });
+            return L.marker(latlng, { icon: buildSvgDivIcon(properties) });
         }
         if ('radius' in properties) {
             return L.circle(latlng, properties);
@@ -345,7 +483,8 @@ const editorLayer = L.geoJSON([], {
             layer.options.showMeasurements = properties.showMeasurements;
             applyMeasurements(layer);
         }
-        updateEditorTooltip(layer, properties.text);
+        updateEditorTooltip(layer, buildTooltipContent(properties));
+        updateShapeLabel(layer);
         layer.on('click', clickedShape);
     },
     style: function(feature) {
@@ -388,6 +527,7 @@ function clearEditor() {
     const confirmation = confirm("Do you really want to clear the editor layer?");
     if (confirmation) {
         editorLayer.clearLayers();
+        shapeLabelLayer.clearLayers();
         dataChanged();
         const stateSelect = document.getElementById('state-select');
         if (stateSelect) {
@@ -458,16 +598,16 @@ function exportEditor() {
     if (fileName === null || fileName.length == 0) {
         return;
     }
-    var pom = document.createElement('a');
-    let exportData = JSON.stringify(editorLayer.toGeoJSON());
-    pom.setAttribute('href', 'data:application/geo+json;charset=utf-8,' + encodeURIComponent(exportData));
-    pom.setAttribute('download', fileName);
-    const clickEvent = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        view: window
-    });
-    pom.dispatchEvent(clickEvent);
+    const exportData = JSON.stringify(editorLayer.toGeoJSON());
+    const blob = new Blob([exportData], { type: 'application/geo+json' });
+    const url = URL.createObjectURL(blob);
+    const pom = document.createElement('a');
+    pom.href = url;
+    pom.download = fileName;
+    document.body.appendChild(pom);
+    pom.click();
+    document.body.removeChild(pom);
+    URL.revokeObjectURL(url);
 }
 
 function toggleMapClick(e) {
@@ -562,6 +702,7 @@ map.on('pm:cut', function(eo) {
         initializeFeature(newLayer, originalLayer);
         applyMeasurements(newLayer);
         copyTooltip(originalLayer, newLayer);
+        updateShapeLabel(newLayer);
         if (newLayer.feature.geometry?.type === 'MultiPolygon') {
             flattenAndAddMultiPolygon(newLayer);
         }
@@ -570,15 +711,26 @@ map.on('pm:cut', function(eo) {
                 initializeFeature(layer, originalLayer);
                 applyMeasurements(layer);
                 copyTooltip(originalLayer, layer);
+                updateShapeLabel(layer);
             });
         }
     }
     dataChanged();
 });
 
-map.on('pm:remove', dataChanged);
+map.on('pm:remove', function(eo) {
+    if (eo.layer && eo.layer._unitLabelMarker) {
+        shapeLabelLayer.removeLayer(eo.layer._unitLabelMarker);
+    }
+    dataChanged();
+});
 
-editorLayer.on('pm:update', dataChanged);
+editorLayer.on('pm:update', function(eo) {
+    if (eo.layer) {
+        updateShapeLabel(eo.layer);
+    }
+    dataChanged();
+});
 
 L.Polygon.prototype.options.measurementOptions = {
     ha: true,
@@ -593,13 +745,34 @@ function addCircleMarkerFeature(lat, lng) {
         _lastAddedCircleMarkerLatLng.lng === lng) {
         return;
     }
-    const properties = {
-        color: colorInput.value,
-        fill: fillCheckbox.checked,
-    };
+    const symbolPath = symbolInput.value;
+    let properties;
+    if (symbolPath) {
+        properties = {
+            icon: '/static/symbols/' + symbolPath,
+            iconName: symbolNameByPath[symbolPath] || '',
+            iconHeight: 48,
+        };
+        const anchor = symbolAnchorByPath[symbolPath];
+        if (anchor) {
+            properties.iconAnchorX = anchor.x;
+            properties.iconAnchorY = anchor.y;
+        }
+    } else {
+        properties = {
+            color: colorInput.value,
+            fill: fillCheckbox.checked,
+        };
+    }
     const text = textInput.value;
     if (text) {
         properties.text = text;
+    }
+    if (unitDesignationInput.value) {
+        properties.unitDesignation = unitDesignationInput.value;
+    }
+    if (unitStrengthInput.value) {
+        properties.unitStrength = unitStrengthInput.value;
     }
     editorLayer.addData({
         type: 'Feature',
@@ -613,8 +786,7 @@ function addCircleMarkerFeature(lat, lng) {
 function handleCoordinateAddButton() {
     const coordinateInput = document.getElementById('coordinate-input').value.trim();
     if (coordinateInput === '') {
-        if (!map.hasLayer(myMarker)) return;
-        const latlng = myMarker.getLatLng();
+        const latlng = map.hasLayer(myMarker) ? myMarker.getLatLng() : map.getCenter();
         addCircleMarkerFeature(latlng.lat, latlng.lng);
         return;
     }
@@ -640,5 +812,80 @@ function handleCoordinateAddButton() {
 
 document.getElementById('coordinate-add-button').addEventListener('click', handleCoordinateAddButton);
 
+let symbolManifest = {};
+let symbolNameByPath = {};
+let symbolAnchorByPath = {};
+
+function isMapVisible(symbol) {
+    return !symbol.excludeFrom || !symbol.excludeFrom.includes('map');
+}
+
+function populateSymbolSelect(category) {
+    const symbols = (symbolManifest[category] || []).filter(isMapVisible);
+    const fresh = symbolInput.cloneNode(false);
+    fresh.innerHTML = '<option value="">Kein Zeichen</option>';
+    for (const symbol of symbols) {
+        const option = document.createElement('option');
+        option.value = symbol.path;
+        option.textContent = symbol.name;
+        fresh.appendChild(option);
+    }
+    fresh.disabled = symbols.length === 0;
+    symbolInput.replaceWith(fresh);
+}
+
+function handleSymbolCategoryChange() {
+    populateSymbolSelect(symbolCategoryInput.value);
+    if (!symbolCategoryInput.value) {
+        updateFeatureProperties();
+    }
+}
+
+fetch('/static/symbols/symbols_manifest.json')
+    .then(handleApiResponse)
+    .then(manifest => {
+        symbolManifest = manifest;
+        for (const [category, symbols] of Object.entries(manifest)) {
+            if (symbols.some(isMapVisible)) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.replace(/_/g, ' ');
+                symbolCategoryInput.appendChild(option);
+            }
+            for (const symbol of symbols) {
+                symbolNameByPath[symbol.path] = symbol.name;
+                if (symbol.anchorX !== undefined || symbol.anchorY !== undefined) {
+                    symbolAnchorByPath[symbol.path] = {
+                        x: symbol.anchorX ?? 0.5,
+                        y: symbol.anchorY ?? 0.5,
+                    };
+                }
+            }
+        }
+    })
+    .catch(error => console.warn('Could not load symbol manifest:', error));
+
 loadEditorLayerFromLocalStorage();
 renderSnapshotList();
+
+const UnitLabelToggleControl = L.Control.extend({
+    options: { position: 'topleft' },
+    onAdd: function() {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        const button = L.DomUtil.create('a', '', container);
+        button.href = '#';
+        button.title = 'Beschriftung ein-/ausblenden';
+        button.style.display = 'flex';
+        button.style.alignItems = 'center';
+        button.style.justifyContent = 'center';
+        button.style.fontSize = '16px';
+        button.innerHTML = '🏷️';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(button, 'click', function(e) {
+            L.DomEvent.preventDefault(e);
+            map.getContainer().classList.toggle('unit-labels-hidden');
+        });
+        return container;
+    },
+});
+map.addControl(new UnitLabelToggleControl());

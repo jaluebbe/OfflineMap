@@ -84,22 +84,23 @@ body {
 .section-content {
     padding: 6px 8px;
     background: white;
-    transition: max-height 0.25s ease-out, opacity 0.25s ease-out, padding 0.25s ease-out;
+    transition: max-height 0.25s ease-out, opacity 0.25s ease-out, padding 0.25s ease-out, width 0.25s ease-out;
     max-height: 1000px;
     opacity: 1;
 }
 
 .section.collapsed .section-content {
     max-height: 0;
+    width: 0;
     opacity: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0;
 }
 
 /* ── Form elements ──────────────────────────────────────────────────────── */
 .legend-item {
     display: flex;
     align-items: center;
+    gap: 6px;
     margin-bottom: 5px;
 }
 
@@ -122,10 +123,15 @@ body {
     gap: 5px;
 }
 
-#coordinate-add-button {
+#coordinate-add-button,
+#feature-add-button {
     padding-left: 10px;
     padding-right: 10px;
     font-weight: bold;
+}
+
+#feature-add-button {
+    margin-left: auto;
 }
 
 #region-control {
@@ -161,6 +167,17 @@ body {
 }
 .geojson-svg-icon img {
     position: absolute;
-    transform: translate(-50%, -50%);
     pointer-events: auto;
+}
+
+.unit-label {
+    font-size: 10px;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0 3px;
+    border-radius: 2px;
+}
+
+.unit-labels-hidden .unit-label {
+    display: none;
 }
