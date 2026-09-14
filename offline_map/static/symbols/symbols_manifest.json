@@ -1877,6 +1877,62 @@
       ]
     },
     {
+      "name": "gelb / Schadenskonto 2",
+      "path": "Schadenskonten/gelb/Schadenskonto_2.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 3",
+      "path": "Schadenskonten/gelb/Schadenskonto_3.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 4",
+      "path": "Schadenskonten/gelb/Schadenskonto_4.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 5",
+      "path": "Schadenskonten/gelb/Schadenskonto_5.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 6",
+      "path": "Schadenskonten/gelb/Schadenskonto_6.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 7",
+      "path": "Schadenskonten/gelb/Schadenskonto_7.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 8",
+      "path": "Schadenskonten/gelb/Schadenskonto_8.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "gelb / Schadenskonto 9",
+      "path": "Schadenskonten/gelb/Schadenskonto_9.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
       "name": "gelb / Schadenskonto 10",
       "path": "Schadenskonten/gelb/Schadenskonto_10.svg",
       "excludeFrom": [
@@ -1947,64 +2003,8 @@
       ]
     },
     {
-      "name": "gelb / Schadenskonto 2",
-      "path": "Schadenskonten/gelb/Schadenskonto_2.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
       "name": "gelb / Schadenskonto 20",
       "path": "Schadenskonten/gelb/Schadenskonto_20.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 3",
-      "path": "Schadenskonten/gelb/Schadenskonto_3.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 4",
-      "path": "Schadenskonten/gelb/Schadenskonto_4.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 5",
-      "path": "Schadenskonten/gelb/Schadenskonto_5.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 6",
-      "path": "Schadenskonten/gelb/Schadenskonto_6.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 7",
-      "path": "Schadenskonten/gelb/Schadenskonto_7.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 8",
-      "path": "Schadenskonten/gelb/Schadenskonto_8.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "gelb / Schadenskonto 9",
-      "path": "Schadenskonten/gelb/Schadenskonto_9.svg",
       "excludeFrom": [
         "map"
       ]
@@ -2018,6 +2018,54 @@
     {
       "name": "gelb / Schadensstelle 1",
       "path": "Schadenskonten/gelb/Schadensstelle_1.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 2",
+      "path": "Schadenskonten/gelb/Schadensstelle_2.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 3",
+      "path": "Schadenskonten/gelb/Schadensstelle_3.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 4",
+      "path": "Schadenskonten/gelb/Schadensstelle_4.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 5",
+      "path": "Schadenskonten/gelb/Schadensstelle_5.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 6",
+      "path": "Schadenskonten/gelb/Schadensstelle_6.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 7",
+      "path": "Schadenskonten/gelb/Schadensstelle_7.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 8",
+      "path": "Schadenskonten/gelb/Schadensstelle_8.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "gelb / Schadensstelle 9",
+      "path": "Schadenskonten/gelb/Schadensstelle_9.svg",
       "anchorX": 0.5,
       "anchorY": 0.02
     },
@@ -2082,56 +2130,8 @@
       "anchorY": 0.02
     },
     {
-      "name": "gelb / Schadensstelle 2",
-      "path": "Schadenskonten/gelb/Schadensstelle_2.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
       "name": "gelb / Schadensstelle 20",
       "path": "Schadenskonten/gelb/Schadensstelle_20.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 3",
-      "path": "Schadenskonten/gelb/Schadensstelle_3.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 4",
-      "path": "Schadenskonten/gelb/Schadensstelle_4.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 5",
-      "path": "Schadenskonten/gelb/Schadensstelle_5.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 6",
-      "path": "Schadenskonten/gelb/Schadensstelle_6.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 7",
-      "path": "Schadenskonten/gelb/Schadensstelle_7.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 8",
-      "path": "Schadenskonten/gelb/Schadensstelle_8.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "gelb / Schadensstelle 9",
-      "path": "Schadenskonten/gelb/Schadensstelle_9.svg",
       "anchorX": 0.5,
       "anchorY": 0.02
     },
@@ -2145,6 +2145,62 @@
     {
       "name": "rot / Schadenskonto 1",
       "path": "Schadenskonten/rot/Schadenskonto_1.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 2",
+      "path": "Schadenskonten/rot/Schadenskonto_2.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 3",
+      "path": "Schadenskonten/rot/Schadenskonto_3.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 4",
+      "path": "Schadenskonten/rot/Schadenskonto_4.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 5",
+      "path": "Schadenskonten/rot/Schadenskonto_5.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 6",
+      "path": "Schadenskonten/rot/Schadenskonto_6.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 7",
+      "path": "Schadenskonten/rot/Schadenskonto_7.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 8",
+      "path": "Schadenskonten/rot/Schadenskonto_8.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "rot / Schadenskonto 9",
+      "path": "Schadenskonten/rot/Schadenskonto_9.svg",
       "excludeFrom": [
         "map"
       ]
@@ -2220,64 +2276,8 @@
       ]
     },
     {
-      "name": "rot / Schadenskonto 2",
-      "path": "Schadenskonten/rot/Schadenskonto_2.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
       "name": "rot / Schadenskonto 20",
       "path": "Schadenskonten/rot/Schadenskonto_20.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 3",
-      "path": "Schadenskonten/rot/Schadenskonto_3.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 4",
-      "path": "Schadenskonten/rot/Schadenskonto_4.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 5",
-      "path": "Schadenskonten/rot/Schadenskonto_5.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 6",
-      "path": "Schadenskonten/rot/Schadenskonto_6.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 7",
-      "path": "Schadenskonten/rot/Schadenskonto_7.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 8",
-      "path": "Schadenskonten/rot/Schadenskonto_8.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "rot / Schadenskonto 9",
-      "path": "Schadenskonten/rot/Schadenskonto_9.svg",
       "excludeFrom": [
         "map"
       ]
@@ -2291,6 +2291,54 @@
     {
       "name": "rot / Schadensstelle 1",
       "path": "Schadenskonten/rot/Schadensstelle_1.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 2",
+      "path": "Schadenskonten/rot/Schadensstelle_2.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 3",
+      "path": "Schadenskonten/rot/Schadensstelle_3.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 4",
+      "path": "Schadenskonten/rot/Schadensstelle_4.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 5",
+      "path": "Schadenskonten/rot/Schadensstelle_5.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 6",
+      "path": "Schadenskonten/rot/Schadensstelle_6.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 7",
+      "path": "Schadenskonten/rot/Schadensstelle_7.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 8",
+      "path": "Schadenskonten/rot/Schadensstelle_8.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "rot / Schadensstelle 9",
+      "path": "Schadenskonten/rot/Schadensstelle_9.svg",
       "anchorX": 0.5,
       "anchorY": 0.02
     },
@@ -2355,56 +2403,8 @@
       "anchorY": 0.02
     },
     {
-      "name": "rot / Schadensstelle 2",
-      "path": "Schadenskonten/rot/Schadensstelle_2.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
       "name": "rot / Schadensstelle 20",
       "path": "Schadenskonten/rot/Schadensstelle_20.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 3",
-      "path": "Schadenskonten/rot/Schadensstelle_3.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 4",
-      "path": "Schadenskonten/rot/Schadensstelle_4.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 5",
-      "path": "Schadenskonten/rot/Schadensstelle_5.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 6",
-      "path": "Schadenskonten/rot/Schadensstelle_6.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 7",
-      "path": "Schadenskonten/rot/Schadensstelle_7.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 8",
-      "path": "Schadenskonten/rot/Schadensstelle_8.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "rot / Schadensstelle 9",
-      "path": "Schadenskonten/rot/Schadensstelle_9.svg",
       "anchorX": 0.5,
       "anchorY": 0.02
     },
@@ -2418,6 +2418,62 @@
     {
       "name": "weiss / Schadenskonto 1",
       "path": "Schadenskonten/weiss/Schadenskonto_1.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 2",
+      "path": "Schadenskonten/weiss/Schadenskonto_2.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 3",
+      "path": "Schadenskonten/weiss/Schadenskonto_3.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 4",
+      "path": "Schadenskonten/weiss/Schadenskonto_4.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 5",
+      "path": "Schadenskonten/weiss/Schadenskonto_5.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 6",
+      "path": "Schadenskonten/weiss/Schadenskonto_6.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 7",
+      "path": "Schadenskonten/weiss/Schadenskonto_7.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 8",
+      "path": "Schadenskonten/weiss/Schadenskonto_8.svg",
+      "excludeFrom": [
+        "map"
+      ]
+    },
+    {
+      "name": "weiss / Schadenskonto 9",
+      "path": "Schadenskonten/weiss/Schadenskonto_9.svg",
       "excludeFrom": [
         "map"
       ]
@@ -2493,64 +2549,8 @@
       ]
     },
     {
-      "name": "weiss / Schadenskonto 2",
-      "path": "Schadenskonten/weiss/Schadenskonto_2.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
       "name": "weiss / Schadenskonto 20",
       "path": "Schadenskonten/weiss/Schadenskonto_20.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 3",
-      "path": "Schadenskonten/weiss/Schadenskonto_3.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 4",
-      "path": "Schadenskonten/weiss/Schadenskonto_4.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 5",
-      "path": "Schadenskonten/weiss/Schadenskonto_5.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 6",
-      "path": "Schadenskonten/weiss/Schadenskonto_6.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 7",
-      "path": "Schadenskonten/weiss/Schadenskonto_7.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 8",
-      "path": "Schadenskonten/weiss/Schadenskonto_8.svg",
-      "excludeFrom": [
-        "map"
-      ]
-    },
-    {
-      "name": "weiss / Schadenskonto 9",
-      "path": "Schadenskonten/weiss/Schadenskonto_9.svg",
       "excludeFrom": [
         "map"
       ]
@@ -2564,6 +2564,54 @@
     {
       "name": "weiss / Schadensstelle 1",
       "path": "Schadenskonten/weiss/Schadensstelle_1.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 2",
+      "path": "Schadenskonten/weiss/Schadensstelle_2.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 3",
+      "path": "Schadenskonten/weiss/Schadensstelle_3.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 4",
+      "path": "Schadenskonten/weiss/Schadensstelle_4.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 5",
+      "path": "Schadenskonten/weiss/Schadensstelle_5.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 6",
+      "path": "Schadenskonten/weiss/Schadensstelle_6.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 7",
+      "path": "Schadenskonten/weiss/Schadensstelle_7.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 8",
+      "path": "Schadenskonten/weiss/Schadensstelle_8.svg",
+      "anchorX": 0.5,
+      "anchorY": 0.02
+    },
+    {
+      "name": "weiss / Schadensstelle 9",
+      "path": "Schadenskonten/weiss/Schadensstelle_9.svg",
       "anchorX": 0.5,
       "anchorY": 0.02
     },
@@ -2628,56 +2676,8 @@
       "anchorY": 0.02
     },
     {
-      "name": "weiss / Schadensstelle 2",
-      "path": "Schadenskonten/weiss/Schadensstelle_2.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
       "name": "weiss / Schadensstelle 20",
       "path": "Schadenskonten/weiss/Schadensstelle_20.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 3",
-      "path": "Schadenskonten/weiss/Schadensstelle_3.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 4",
-      "path": "Schadenskonten/weiss/Schadensstelle_4.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 5",
-      "path": "Schadenskonten/weiss/Schadensstelle_5.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 6",
-      "path": "Schadenskonten/weiss/Schadensstelle_6.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 7",
-      "path": "Schadenskonten/weiss/Schadensstelle_7.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 8",
-      "path": "Schadenskonten/weiss/Schadensstelle_8.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.02
-    },
-    {
-      "name": "weiss / Schadensstelle 9",
-      "path": "Schadenskonten/weiss/Schadensstelle_9.svg",
       "anchorX": 0.5,
       "anchorY": 0.02
     }

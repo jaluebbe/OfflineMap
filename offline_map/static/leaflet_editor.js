@@ -821,15 +821,17 @@ function isMapVisible(symbol) {
 }
 
 function populateSymbolSelect(category) {
-    symbolInput.innerHTML = '<option value="">Kein Zeichen</option>';
     const symbols = (symbolManifest[category] || []).filter(isMapVisible);
+    const fresh = symbolInput.cloneNode(false);
+    fresh.innerHTML = '<option value="">Kein Zeichen</option>';
     for (const symbol of symbols) {
         const option = document.createElement('option');
         option.value = symbol.path;
         option.textContent = symbol.name;
-        symbolInput.appendChild(option);
+        fresh.appendChild(option);
     }
-    symbolInput.disabled = symbols.length === 0;
+    fresh.disabled = symbols.length === 0;
+    symbolInput.replaceWith(fresh);
 }
 
 function handleSymbolCategoryChange() {
