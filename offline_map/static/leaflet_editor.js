@@ -1,3 +1,25 @@
+// SVG filter for the symbol halo (see .symbol-halo in the common CSS).
+// The halo is limited to the area outside the symbol so its pixels stay
+// unchanged.
+document.body.insertAdjacentHTML('beforeend', `
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="symbol-halo-filter" x="-30%" y="-30%" width="160%" height="160%"
+      color-interpolation-filters="sRGB">
+    <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="grown"/>
+    <feGaussianBlur in="grown" stdDeviation="0.8" result="soft"/>
+    <feFlood flood-color="#fff" flood-opacity="0.9"/>
+    <feComposite in2="soft" operator="in" result="halo"/>
+    <feComponentTransfer in="SourceAlpha" result="shape">
+      <feFuncA type="linear" slope="20"/>
+    </feComponentTransfer>
+    <feComposite in="halo" in2="shape" operator="out" result="ring"/>
+    <feMerge>
+      <feMergeNode in="ring"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</svg>`);
+
 map.createPane('editor');
 map.getPane('editor').style.zIndex = 392;
 
@@ -246,6 +268,8 @@ function updateInputsFromProperties(properties) {
         populateSymbolSelect(category);
         symbolInput.value = relPath;
         colorInput.disabled = true;
+        fillCheckbox.checked = !!properties.fill;
+        fillCheckbox.disabled = false;
     } else {
         symbolCategoryInput.value = '';
         symbolCategoryInput.disabled = !isPoint;
@@ -257,7 +281,9 @@ function updateInputsFromProperties(properties) {
             colorInput.disabled = true;
         }
     }
-    if ('fill' in properties) {
+    if (isPoint && 'icon' in properties) {
+        // Checkbox state already set above.
+    } else if ('fill' in properties) {
         fillCheckbox.checked = properties.fill;
         fillCheckbox.disabled = false;
     } else {
@@ -301,7 +327,7 @@ function updateFeatureProperties() {
             delete properties.iconAnchorY;
         }
         delete properties.color;
-        delete properties.fill;
+        fillCheckbox.disabled = false;
     } else if (hadIcon) {
         delete properties.icon;
         delete properties.iconName;
@@ -398,7 +424,7 @@ function buildSvgDivIcon(properties) {
         : '';
     return L.divIcon({
         className: 'geojson-svg-icon',
-        html: `<img src="${properties.icon}" style="height:${height}px; transform: translate(-${anchorX * 100}%, -${anchorY * 100}%)" />${labelHtml}`,
+        html: `<img class="${properties.fill ? 'symbol-halo' : ''}" src="${properties.icon}" style="height:${height}px; transform: translate(-${anchorX * 100}%, -${anchorY * 100}%)" />${labelHtml}`,
         iconSize: null,
         iconAnchor: [0, 0],
     });
@@ -752,6 +778,7 @@ function addCircleMarkerFeature(lat, lng) {
             icon: '/static/symbols/' + symbolPath,
             iconName: symbolNameByPath[symbolPath] || '',
             iconHeight: 48,
+            fill: fillCheckbox.checked,
         };
         const anchor = symbolAnchorByPath[symbolPath];
         if (anchor) {

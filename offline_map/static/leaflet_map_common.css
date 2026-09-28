@@ -170,6 +170,11 @@ body {
     pointer-events: auto;
 }
 
+/* White contour outside the symbol shape for contrast on aerial imagery. */
+.geojson-svg-icon img.symbol-halo {
+    filter: url(#symbol-halo-filter);
+}
+
 .unit-label {
     font-size: 10px;
     pointer-events: none;
