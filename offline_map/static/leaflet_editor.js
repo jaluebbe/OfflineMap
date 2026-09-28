@@ -328,6 +328,10 @@ function updateFeatureProperties() {
         }
         delete properties.color;
         fillCheckbox.disabled = false;
+        if (!hadIcon) {
+            // Halo is on by default for newly assigned symbols.
+            fillCheckbox.checked = true;
+        }
     } else if (hadIcon) {
         delete properties.icon;
         delete properties.iconName;
@@ -778,7 +782,7 @@ function addCircleMarkerFeature(lat, lng) {
             icon: '/static/symbols/' + symbolPath,
             iconName: symbolNameByPath[symbolPath] || '',
             iconHeight: 48,
-            fill: fillCheckbox.checked,
+            fill: true,
         };
         const anchor = symbolAnchorByPath[symbolPath];
         if (anchor) {
