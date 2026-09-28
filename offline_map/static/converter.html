@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Coordinate Converter</title>
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#1e64a0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Coordinates">
+    <link rel="manifest" href="converter_manifest.json">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: max(16px, env(safe-area-inset-top))
+                max(16px, env(safe-area-inset-right))
+                max(16px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+            background: #f0f0f0;
+            color: #333;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        main {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            padding: 12px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+
+        #search-control {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        #coordinate-input,
+        #coordinate-go-button {
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+        }
+
+        #coordinate-go-button {
+            background: #1e64a0;
+            border-color: #1e64a0;
+            color: white;
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        #coordinate-go-button:active {
+            background: #17507f;
+        }
+
+        #coordinate-result {
+            margin-top: 12px;
+            padding: 5px;
+            font-size: 15px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 6px 12px;
+            word-break: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Coordinate Converter</h1>
+        <div id="search-control">
+            <input type="text" id="coordinate-input" placeholder="Enter coordinate"
+                autocomplete="off" autocapitalize="characters"
+                autocorrect="off" spellcheck="false" enterkeyhint="go">
+            <button id="coordinate-go-button" type="button">Go</button>
+        </div>
+        <div id="coordinate-result"></div>
+    </main>
+
+    <script type="module">
+        import {
+            parseCoordinate,
+            convertLatlon
+        } from './coordinate_parser.js';
+
+        const input = document.getElementById('coordinate-input');
+        const resultDiv = document.getElementById('coordinate-result');
+
+        function showResult(position) {
+            resultDiv.innerHTML = [
+                ['Lat., Lon.', `${position.latitude}, ${position.longitude}`],
+                ['UTM', position.utm],
+                ['MGRS', position.mgrs],
+            ].map(([label, value]) =>
+                `<div><b>${label}</b></div><div>${value}</div>`
+            ).join('');
+            resultDiv.style.color = 'black';
+            input.value = '';
+        }
+
+        function showError(message) {
+            resultDiv.textContent = message;
+            resultDiv.style.color = 'red';
+        }
+
+        // Empty input: convert the device position.
+        function locate() {
+            if (!navigator.geolocation) {
+                showError('Geolocation not supported');
+                return;
+            }
+            showError('Locating...');
+            resultDiv.style.color = '#666';
+            navigator.geolocation.getCurrentPosition(
+                pos => showResult(convertLatlon(
+                    pos.coords.latitude, pos.coords.longitude)),
+                err => showError(err.message || 'Location unavailable'),
+                {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function handleCoordinateInput() {
+            const value = input.value;
+            if (value.trim() === '') {
+                locate();
+                return;
+            }
+            const data = parseCoordinate(value);
+            if (data) {
+                showResult(data);
+            } else {
+                showError('Invalid coordinate');
+            }
+        }
+
+        document.getElementById('coordinate-go-button')
+            .addEventListener('click', handleCoordinateInput);
+        input.addEventListener('keydown', event => {
+            if (event.key === 'Enter') handleCoordinateInput();
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('converter_sw.js', { scope: './converter.html' })
+                .catch(console.error);
+        }
+    </script>
+</body>
+
+</html>

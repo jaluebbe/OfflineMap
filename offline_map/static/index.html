@@ -13,6 +13,7 @@
             --accent-full: #2a7fc4;
             --accent-mobile: #4db87a;
             --accent-gps: #e07b2a;
+            --accent-converter: #b06fd8;
             --card-bg: rgba(255,255,255,0.04);
             --card-border: rgba(255,255,255,0.08);
         }
@@ -102,6 +103,7 @@
         .card-full   { --accent: var(--accent-full); }
         .card-mobile { --accent: var(--accent-mobile); }
         .card-gps    { --accent: var(--accent-gps); }
+        .card-converter { --accent: var(--accent-converter); }
 
         footer {
             font-size: 0.7rem;
@@ -158,6 +160,17 @@
                 <div class="card-desc">
                     Live GPS position, accuracy circle, compass, heading, speed &amp; altitude.
                     No editor or search tools.
+                </div>
+            </div>
+        </a>
+
+        <a href="/static/converter.html" class="card card-converter">
+            <div class="card-icon">🧭</div>
+            <div class="card-body">
+                <div class="card-title">Coordinate Converter</div>
+                <div class="card-desc">
+                    Convert between Lat/Lon, UTM &amp; MGRS, or use the device position.
+                    No map, installable as an offline PWA.
                 </div>
             </div>
         </a>
