@@ -268,8 +268,10 @@ if (enableRailwayOverlays) {
     fetch('/api/vector/overlays')
         .then(r => r.json())
         .then(overlays => {
-            overlays.filter(name => name.includes('railway')).forEach(name => {
-                const label = `Railway (${name})`;
+            const names = overlays.filter(name => name.includes('railway'));
+            names.forEach(name => {
+                const label = names.length === 1 ? 'OpenRailwayMap' :
+                    `OpenRailwayMap (${name})`;
                 const styleUrl = `/api/vector/overlay/style/${name}/railway_standard.json`;
                 const standaloneLayer = L.maplibreGL({
                     style: styleUrl,
@@ -289,24 +291,27 @@ if (enableRailwayOverlays) {
 
 const enableRasterLayers = window.enableRasterLayers ?? true;
 
-const rasterPromises = enableRasterLayers ? [
-    checkRasterLayerAvailable(
+// Labels of raster layers to omit, e.g. ['GEBCO'].
+const hiddenRasterLayers = window.hiddenRasterLayers ?? [];
+
+const rasterLayerSpecs = [
+    [
         '/api/raster/gebco/{z}/{x}/{y}.webp', {
             maxNativeZoom: 9,
             maxZoom: 22,
             attribution: '&copy; <a href="https://www.gebco.net/data-products-gridded-bathymetry-data/gebco2026-grid">GEBCO_2026 Grid</a>'
         },
         'GEBCO'
-    ),
-    checkRasterLayerAvailable(
+    ],
+    [
         '/api/raster/bluemarble/{z}/{x}/{y}.webp', {
             maxNativeZoom: 8,
             maxZoom: 22,
             attribution: '&copy; <a href="https://github.com/freetiler/nasa-bluemarble">FreeTiler.com | NASA Earth Observatory</a>'
         },
         'Blue Marble'
-    ),
-    checkRasterLayerAvailable(
+    ],
+    [
         '/api/raster/landcover/{z}/{x}/{y}.webp', {
             maxNativeZoom: 9,
             maxZoom: 22,
@@ -314,8 +319,13 @@ const rasterPromises = enableRasterLayers ? [
             className: 'pixelated-layer'
         },
         'Land Cover'
-    ),
-] : [];
+    ],
+];
+
+const rasterPromises = enableRasterLayers ?
+    rasterLayerSpecs
+    .filter(([, , label]) => !hiddenRasterLayers.includes(label))
+    .map(spec => checkRasterLayerAvailable(...spec)) : [];
 
 Promise.all([regionsPromise, ...rasterPromises]).then(([mapRegion, ...rasterResults]) => {
     const availableRasterLayers = rasterResults.filter(Boolean);
@@ -325,7 +335,12 @@ Promise.all([regionsPromise, ...rasterPromises]).then(([mapRegion, ...rasterResu
             style: `/api/vector/style/${mapRegion}/map_labels.json`,
             attribution: '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         });
-        layerControl.addOverlay(labelsOverlay, "Labels");
+        if (window.labelsSelectable ?? true) {
+            layerControl.addOverlay(labelsOverlay, "Labels");
+        } else {
+            // Not user-selectable: always shown on raster base layers.
+            labelsEnabled = true;
+        }
     }
 });
 
